@@ -1,6 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <Compile Remove="Repositorios\DadosSecretaria.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\BaseApi.Domain\BaseApi.Domain.csproj" />
     <ProjectReference Include="..\BaseApi.Application\BaseApi.Application.csproj" />
   </ItemGroup>
