@@ -6,7 +6,7 @@
 /// </summary>
 public class DadosSecretaria
 {
-    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid SecretariaId { get; set; } = Guid.NewGuid();
 
     public string Nome { get; set; } = string.Empty;
 

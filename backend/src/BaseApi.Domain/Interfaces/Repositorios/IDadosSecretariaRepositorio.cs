@@ -4,7 +4,7 @@ public interface IDadosSecretariaRepositorio
 {
     Task<DadosSecretaria?> ObterAsync( CancellationToken ct = default);
 
-    Task<DadosSecretaria?> ObterPorIdAsync( Guid id, CancellationToken ct = default);
+    Task<DadosSecretaria?> ObterPorIdAsync( Guid secretariaid, CancellationToken ct = default);
 
     Task<bool> EmailExisteAsync(string email, Guid? ignorarId = null, CancellationToken ct = default);
 

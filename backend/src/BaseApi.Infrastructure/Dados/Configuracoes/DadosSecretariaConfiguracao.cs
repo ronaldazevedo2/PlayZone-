@@ -8,7 +8,7 @@ public class DadosSecretariaMap : IEntityTypeConfiguration<DadosSecretaria>
     {
         builder.ToTable("DadosSecretaria");
 
-        builder.HasKey(x => x.Id);
+        builder.HasKey(x => x.SecretariaId);
 
         builder.Property(x => x.Nome)
                .IsRequired()
@@ -31,7 +31,7 @@ public class DadosSecretariaMap : IEntityTypeConfiguration<DadosSecretaria>
                .HasMaxLength(10);
 
         builder.Property(x => x.Bairro)
-               .HasMaxLength(100);
+               .HasMaxLength(50);
 
         builder.Property(x => x.Cidade)
                .HasMaxLength(100);

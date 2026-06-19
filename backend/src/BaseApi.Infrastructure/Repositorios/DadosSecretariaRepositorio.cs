@@ -11,14 +11,14 @@ public class DadosSecretariaRepositorio(AppDbContext contexto) : IDadosSecretari
         return await contexto.DadosSecretaria.FirstOrDefaultAsync(ct);
     }
 
-    public async Task<DadosSecretaria?> ObterPorIdAsync( Guid id, CancellationToken ct = default)
+    public async Task<DadosSecretaria?> ObterPorIdAsync( Guid secretariaid, CancellationToken ct = default)
     {
-        return await contexto.DadosSecretaria.FirstOrDefaultAsync(x => x.Id == id, ct);
+        return await contexto.DadosSecretaria.FirstOrDefaultAsync(x => x.SecretariaId == secretariaid, ct);
     }
 
     public async Task<bool> EmailExisteAsync( string email, Guid? ignorarId = null, CancellationToken ct = default)
     {
-        return await contexto.DadosSecretaria.AnyAsync(x => x.Email == email && (ignorarId == null || x.Id != ignorarId), ct);
+        return await contexto.DadosSecretaria.AnyAsync(x => x.Email == email && (ignorarId == null || x.SecretariaId != ignorarId), ct);
     }
 
     public async Task AdicionarAsync( DadosSecretaria dadosSecretaria, CancellationToken ct = default)
