@@ -6,13 +6,20 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace BaseApi.Application.Vigilantes.Commands.CriarVigilante;
+using MediatR;
 
+namespace BaseApi.Application.vigilantes.Commands.CriarVigilantes;
+
+/// <summary>
+/// Command para criar um novo telefone no catálogo.
+/// "record" é imutável — ideal para Commands (não muda depois de criado).
+/// </summary>
 public record CriarVigilanteCommand(
-    string NomeCompleto,
-    string Cpf,
-    string Email,
-    string Telefone,
-    DateTime DataNascimento,
-    string? FotoPerfil
-) : IRequest<CriarVigilanteResposta>;
+    string Marca,
+    string Modelo,
+    decimal Preco,
+    int Estoque
+) : IRequest<CriarTelefoneResposta>;
+
+/// <summary>Dados retornados após criação bem-sucedida</summary>
+public record CriarTelefoneResposta(Guid Id, string Marca, string Modelo, decimal Preco);
