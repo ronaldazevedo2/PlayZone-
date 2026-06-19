@@ -26,6 +26,7 @@ namespace BaseApi.Domain.Entidades
 
 
 
+
     }
 
 }
