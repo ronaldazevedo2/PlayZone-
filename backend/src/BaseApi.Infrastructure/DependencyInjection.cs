@@ -4,7 +4,6 @@ using BaseApi.Infrastructure.Dados;
 using BaseApi.Infrastructure.Repositorios;
 using BaseApi.Infrastructure.Servicos;
 using Microsoft.EntityFrameworkCore;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 

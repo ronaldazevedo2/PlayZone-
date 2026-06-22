@@ -7,6 +7,10 @@ public class CriarSecretariaValidator : AbstractValidator<CriarSecretariaCommand
 {
     public CriarSecretariaValidator(IDadosSecretariaRepositorio repositorio)
     {
+        RuleFor(x => x.SecretariaId)
+            .NotEmpty()
+            .WithMessage("Id da Secretaria é obrigatório.");
+
         RuleFor(x => x.Nome)
             .NotEmpty().WithMessage("Nome completo é obrigatório.")
             .MaximumLength(150).WithMessage("Nome deve ter no máximo 100 caracteres.");
@@ -43,8 +47,6 @@ public class CriarSecretariaValidator : AbstractValidator<CriarSecretariaCommand
             .NotEmpty().WithMessage("Cidade é obrigatório.")
             .MaximumLength(150).WithMessage("Cidade deve ter no máximo 100 caracteres.");
 
-        RuleFor(x => x.SecretariaId)
-            .NotEmpty()
-            .WithMessage("Id da Secretaria é obrigatório.");
+        
     }
 }

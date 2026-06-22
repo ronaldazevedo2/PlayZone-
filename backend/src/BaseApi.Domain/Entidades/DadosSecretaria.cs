@@ -1,7 +1,7 @@
 ﻿namespace BaseApi.Domain.Entidades;
 
 /// <summary>
-/// Entidade principal do sistema. Representa um usuário cadastrado.
+/// Entidade principal do sistema. Representa uma secretaria cadastrado.
 /// Contém dados de autenticação e referência ao perfil de acesso.
 /// </summary>
 public class DadosSecretaria

@@ -1,15 +1,19 @@
-﻿using BaseApi.Application.Usuarios.Commands.CriarUsuario;
+﻿using BaseApi.Domain.Interfaces.Repositorios;
 using FluentValidation;
 
-namespace BaseApi.Application.Secretaria.Commands.CriarSecretaria;
+namespace BaseApi.Application.Secretaria.Commands.AtualizarSecretaria;
 
-public class CriarSecretariaValidator : AbstractValidator<CriarSecretariaCommand>
+public class AtualizarSecretariaValidator : AbstractValidator<AtualizarSecretariaCommand>
 {
-    public CriarSecretariaValidator(IDadosSecretariaRepositorio repositorio)
+    public AtualizarSecretariaValidator(IDadosSecretariaRepositorio repositorio)
     {
+        RuleFor(x => x.SecretariaId)
+           .NotEmpty()
+           .WithMessage("Id da Secretaria é obrigatório.");
+
         RuleFor(x => x.Nome)
-            .NotEmpty().WithMessage("Nome completo é obrigatório.")
-            .MaximumLength(150).WithMessage("Nome deve ter no máximo 100 caracteres.");
+           .NotEmpty().WithMessage("Nome completo é obrigatório.")
+           .MaximumLength(150).WithMessage("Nome deve ter no máximo 100 caracteres.");
 
         RuleFor(x => x.Email)
             .NotEmpty().WithMessage("E-mail é obrigatório.")
@@ -43,8 +47,6 @@ public class CriarSecretariaValidator : AbstractValidator<CriarSecretariaCommand
             .NotEmpty().WithMessage("Cidade é obrigatório.")
             .MaximumLength(150).WithMessage("Cidade deve ter no máximo 100 caracteres.");
 
-        RuleFor(x => x.SecretariaId)
-            .NotEmpty()
-            .WithMessage("Id da Secretaria é obrigatório.");
+       
     }
 }

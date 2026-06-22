@@ -8,9 +8,11 @@ public interface IDadosSecretariaRepositorio
 
     Task<bool> EmailExisteAsync(string email, Guid? ignorarId = null, CancellationToken ct = default);
 
-    Task AdicionarAsync( DadosSecretaria dadosSecretaria, CancellationToken ct = default);
+    Task AdicionarAsync( DadosSecretaria secretaria, CancellationToken ct = default);
 
-    void Atualizar(DadosSecretaria dadosSecretaria);
+    void Atualizar(DadosSecretaria secretaria);
+    void Remover(DadosSecretaria secretaria);
 
     Task SalvarAsync( CancellationToken ct = default);
+    Task<(object itens, int total)> ListarAsync(int pagina, int tamanhoPagina, string busca, CancellationToken ct);
 }

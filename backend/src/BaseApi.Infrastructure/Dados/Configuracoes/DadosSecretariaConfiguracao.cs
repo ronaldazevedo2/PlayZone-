@@ -6,7 +6,7 @@ public class DadosSecretariaMap : IEntityTypeConfiguration<DadosSecretaria>
 {
     public void Configure(EntityTypeBuilder<DadosSecretaria> builder)
     {
-        builder.ToTable("DadosSecretaria");
+        builder.ToTable("dados_secretaria");
 
         builder.HasKey(x => x.SecretariaId);
 
