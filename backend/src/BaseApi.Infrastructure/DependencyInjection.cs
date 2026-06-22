@@ -4,7 +4,6 @@ using BaseApi.Infrastructure.Dados;
 using BaseApi.Infrastructure.Repositorios;
 using BaseApi.Infrastructure.Servicos;
 using Microsoft.EntityFrameworkCore;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -31,6 +30,7 @@ public static class DependencyInjection
         // Repositórios
         services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
         services.AddScoped<IPerfilRepositorio, PerfilRepositorio>();
+        services.AddScoped<IDadosSecretariaRepositorio, DadosSecretariaRepositorio>();
         services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
         services.AddScoped<IPerfilRepositorio, PerfilRepositorio>();
         services.AddScoped<IVigilanteRepositorio, VigilanteRepositorio>();
