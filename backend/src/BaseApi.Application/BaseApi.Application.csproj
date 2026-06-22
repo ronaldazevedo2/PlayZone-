@@ -12,6 +12,12 @@
     <PackageReference Include="MediatR" Version="12.4.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Autenticacao\Commands\Excluir\" />
+    <Folder Include="Autenticacao\Commands\Atualizar\" />
+    <Folder Include="Autenticacao\Commands\Criar\" />
+  </ItemGroup>
+
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
