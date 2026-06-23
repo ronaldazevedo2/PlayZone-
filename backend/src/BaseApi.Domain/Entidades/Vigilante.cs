@@ -29,5 +29,7 @@ namespace BaseApi.Domain.Entidades
         public DateTime CriadoEm { get; set; } = DateTime.UtcNow;
 
         public DateTime AtualizadoEm { get; set; } = DateTime.UtcNow;
+        public string Matricula { get; set; }
+        public string Arena { get; set; }
     }
 }
