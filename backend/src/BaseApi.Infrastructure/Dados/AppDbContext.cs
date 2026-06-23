@@ -15,6 +15,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 {
     public DbSet<Usuario> Usuarios => Set<Usuario>();
     public DbSet<Perfil> Perfis => Set<Perfil>();
+    public DbSet<DadosSecretaria> DadosSecretaria => Set<DadosSecretaria>();
     public DbSet<Vigilante> Vigilantes => Set<Vigilante>();
 
 
