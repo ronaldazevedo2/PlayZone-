@@ -9,7 +9,7 @@ public class ReservaConfiguracao : IEntityTypeConfiguration<Reserva>
     public void Configure(EntityTypeBuilder<Reserva> builder)
     {
         // Nome da tabela no banco
-        builder.ToTable("Reservas");
+        builder.ToTable("reservas");
 
         // Chave primária
         builder.HasKey(r => r.Id);

@@ -14,7 +14,7 @@ namespace BaseApi.Infrastructure.Dados.Configuracoes
         public void Configure(EntityTypeBuilder<Quadra> builder)
         {
             // Nome da tabela no banco
-            builder.ToTable("Quadras");
+            builder.ToTable("quadras");
 
             // Chave primária
             builder.HasKey(q => q.Id);
