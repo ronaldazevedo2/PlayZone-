@@ -1,5 +1,18 @@
-﻿################################################################################
-# Este arquivo .gitignore foi criado automaticamente pelo Microsoft(R) Visual Studio.
-################################################################################
+﻿## .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+*.swp
 
-/.vs
+## Configurações locais (não versionar — contém senhas!)
+appsettings.Local.json
+
+## Docker volumes
+mysql_data/
+
+## IDE
+.idea/
+.vscode/
+*.DS_Store
