@@ -2,4 +2,4 @@
 
 namespace BaseApi.Application.Vigilantes.Commands.ExcluirVigilante;
 
-public record ExcluirVigilanteCommand(int Id) : IRequest<Unit>;
+public record ExcluirVigilanteCommand(Guid Id) : IRequest<Unit>;

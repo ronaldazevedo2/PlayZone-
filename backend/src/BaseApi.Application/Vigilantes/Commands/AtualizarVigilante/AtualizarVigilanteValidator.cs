@@ -7,7 +7,7 @@ public class AtualizarVigilanteValidator : AbstractValidator<AtualizarVigilanteC
     public AtualizarVigilanteValidator()
     {
         RuleFor(x => x.Id)
-            .GreaterThan(0).WithMessage("Id do vigilante é obrigatório.");
+     .NotEmpty().WithMessage("Id do vigilante é obrigatório.");
 
         RuleFor(x => x.NomeCompleto)
             .NotEmpty().WithMessage("Nome é obrigatório.")

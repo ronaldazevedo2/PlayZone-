@@ -135,3 +135,11 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+builder.Services.AdicionarInfrastructure(builder.Configuration);
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await db.Database.MigrateAsync();
+}

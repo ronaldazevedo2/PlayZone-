@@ -4,9 +4,15 @@ using MediatR;
 
 namespace BaseApi.Application.Vigilantes.Commands.CriarVigilante;
 
-public class CriarVigilanteHandler(IVigilanteRepositorio repositorio)
-    : IRequestHandler<CriarVigilanteCommand, CriarVigilanteResposta>
+public class CriarVigilanteHandler : IRequestHandler<CriarVigilanteCommand, CriarVigilanteResposta>
 {
+    private readonly IVigilanteRepositorio _repositorio;
+
+    public CriarVigilanteHandler(IVigilanteRepositorio repositorio)
+    {
+        _repositorio = repositorio;
+    }
+
     public async Task<CriarVigilanteResposta> Handle(CriarVigilanteCommand command, CancellationToken ct)
     {
         var vigilante = new Vigilante
@@ -20,8 +26,8 @@ public class CriarVigilanteHandler(IVigilanteRepositorio repositorio)
             AtualizadoEm = DateTime.UtcNow
         };
 
-        await repositorio.AdicionarAsync(vigilante, ct);
-        await repositorio.SalvarAsync(ct);
+        await _repositorio.AdicionarAsync(vigilante, ct);
+        await _repositorio.SalvarAsync(ct);
 
         return new CriarVigilanteResposta(
             vigilante.Id,

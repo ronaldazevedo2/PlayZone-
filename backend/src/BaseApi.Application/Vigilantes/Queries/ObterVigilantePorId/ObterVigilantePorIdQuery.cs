@@ -6,8 +6,7 @@ namespace BaseApi.Application.Vigilantes.Queries.ObterVigilantePorId;
 /// Query para buscar um único vigilante pelo Id.
 /// Queries nunca alteram dados.
 /// </summary>
-public record ObterVigilantePorIdQuery(int Id) : IRequest<VigilanteDetalheDto>;
-
+public record ObterVigilantePorIdQuery(Guid Id) : IRequest<VigilanteDetalheDto>;
 /// <summary>
 /// DTO com todos os dados do vigilante para exibição.
 /// </summary>

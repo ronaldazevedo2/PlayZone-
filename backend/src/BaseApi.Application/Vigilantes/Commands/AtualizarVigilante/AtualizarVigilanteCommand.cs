@@ -3,7 +3,7 @@
 namespace BaseApi.Application.Vigilantes.Commands.AtualizarVigilante;
 
 public record AtualizarVigilanteCommand(
-    int Id,
+    Guid Id,
     string NomeCompleto,
     string Cpf,
     string Matricula,
