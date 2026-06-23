@@ -15,10 +15,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 {
     public DbSet<Usuario> Usuarios => Set<Usuario>();
     public DbSet<Perfil> Perfis => Set<Perfil>();
-    public DbSet<Reserva> Reserva => Set<Reserva>(); // ← ADICIONE ESTA LINHA
-    public DbSet<Quadra> Quadra => Set<Quadra>(); // ← ADICIONE ESTA LINHA
-
-
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
