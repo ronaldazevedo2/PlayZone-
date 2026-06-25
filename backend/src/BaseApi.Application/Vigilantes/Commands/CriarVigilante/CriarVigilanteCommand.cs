@@ -1,9 +1,4 @@
 ﻿using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 
 namespace BaseApi.Application.Vigilantes.Commands.CriarVigilante;
@@ -15,4 +10,8 @@ public record CriarVigilanteCommand(
     string Telefone,
     DateTime DataNascimento,
     string? FotoPerfil
-) : IRequest<CriarVigilanteResposta>;
+) : IRequest<CriarVigilanteResposta>
+{
+    public string Matricula { get; internal set; }
+    public string Arena { get; internal set; }
+}

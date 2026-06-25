@@ -3,7 +3,7 @@ namespace BaseApi.Domain.Entidades
     
     public class Vigilante
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         /// <summary>Nome completo do vigilante</summary>
         public string NomeCompleto { get; set; } = string.Empty;
@@ -29,5 +29,7 @@ namespace BaseApi.Domain.Entidades
         public DateTime CriadoEm { get; set; } = DateTime.UtcNow;
 
         public DateTime AtualizadoEm { get; set; } = DateTime.UtcNow;
+        public required string Matricula { get; set; }
+        public required string Arena { get; set; }
     }
 }
