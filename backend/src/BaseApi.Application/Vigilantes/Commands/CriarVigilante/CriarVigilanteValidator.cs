@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 
-
 namespace BaseApi.Application.Vigilantes.Commands.CriarVigilante;
 
 public class CriarVigilanteValidator : AbstractValidator<CriarVigilanteCommand>

@@ -10,4 +10,8 @@ public record CriarVigilanteCommand(
     string Telefone,
     DateTime DataNascimento,
     string? FotoPerfil
-) : IRequest<CriarVigilanteResposta>;
+) : IRequest<CriarVigilanteResposta>
+{
+    public string Matricula { get; internal set; }
+    public string Arena { get; internal set; }
+}

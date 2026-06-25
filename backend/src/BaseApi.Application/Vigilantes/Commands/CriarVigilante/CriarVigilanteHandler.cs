@@ -19,7 +19,7 @@ public class CriarVigilanteHandler : IRequestHandler<CriarVigilanteCommand, Cria
         {
             NomeCompleto = command.NomeCompleto.Trim(),
             Cpf = command.Cpf.Trim(),
-            Matricula = command.Matricula.Trim(),
+            Matricula = command.Matricula,
             Arena = command.Arena.Trim(),
             Ativo = true,
             CriadoEm = DateTime.UtcNow,
