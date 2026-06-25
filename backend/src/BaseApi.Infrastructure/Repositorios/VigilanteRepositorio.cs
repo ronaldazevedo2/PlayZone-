@@ -12,7 +12,7 @@ namespace BaseApi.Infrastructure.Repositorios;
 
 public class VigilanteRepositorio(AppDbContext contexto) : IVigilanteRepositorio
 {
-    public async Task<Vigilante?> ObterPorIdAsync(int id, CancellationToken ct = default)
+    public async Task<Vigilante?> ObterPorIdAsync(Guid id, CancellationToken ct = default)
         => await contexto.Vigilantes
             .FirstOrDefaultAsync(v => v.Id == id, ct);
 
