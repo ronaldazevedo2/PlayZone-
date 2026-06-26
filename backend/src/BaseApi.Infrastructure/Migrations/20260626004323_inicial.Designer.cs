@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BaseApi.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260622225842_inicial")]
+    [Migration("20260626004323_inicial")]
     partial class inicial
     {
         /// <inheritdoc />
@@ -122,6 +122,68 @@ namespace BaseApi.Infrastructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("BaseApi.Domain.Entidades.Quadra", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<int>("Capacidade")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Descricao")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<string>("ImagemUrl")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<string>("Localizacao")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("Modalidade")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("quadras", (string)null);
+                });
+
+            modelBuilder.Entity("BaseApi.Domain.Entidades.Reserva", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("DataAgendada")
+                        .HasColumnType("date");
+
+                    b.Property<TimeSpan>("HorarioAgendado")
+                        .HasColumnType("time");
+
+                    b.Property<Guid>("QuadraId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuadraId", "DataAgendada", "HorarioAgendado")
+                        .IsUnique();
+
+                    b.ToTable("reservas", (string)null);
+                });
+
             modelBuilder.Entity("BaseApi.Domain.Entidades.Usuario", b =>
                 {
                     b.Property<Guid>("Id")
@@ -180,8 +242,79 @@ namespace BaseApi.Infrastructure.Migrations
                             Email = "admin@baseapi.com",
                             NomeCompleto = "Administrador do Sistema",
                             PerfilId = 1,
-                            SenhaHash = "$2a$11$EumypWOza5ztixSA9RajKOQjd0GHwdB3FbMBIIYkAHBuZHUK2ONcS"
+                            SenhaHash = "$2a$11$V7s4Rpui4z59OcuLtgUec.2vKUbfPdLLYRVCjXz/7NR6cLkKVNMOG"
                         });
+                });
+
+            modelBuilder.Entity("BaseApi.Domain.Entidades.Vigilante", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Arena")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<DateTime>("AtualizadoEm")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Cpf")
+                        .IsRequired()
+                        .HasMaxLength(14)
+                        .HasColumnType("varchar(14)");
+
+                    b.Property<DateTime>("CriadoEm")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("DataNascimento")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("varchar(150)");
+
+                    b.Property<string>("FotoPerfil")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<string>("Matricula")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("NomeCompleto")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("Telefone")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Cpf")
+                        .IsUnique();
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.ToTable("vigilantes", (string)null);
+                });
+
+            modelBuilder.Entity("BaseApi.Domain.Entidades.Reserva", b =>
+                {
+                    b.HasOne("BaseApi.Domain.Entidades.Quadra", null)
+                        .WithMany()
+                        .HasForeignKey("QuadraId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("BaseApi.Domain.Entidades.Usuario", b =>

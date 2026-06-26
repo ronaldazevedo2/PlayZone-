@@ -30,6 +30,10 @@ public static class DependencyInjection
         // Repositórios
         services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
         services.AddScoped<IPerfilRepositorio, PerfilRepositorio>();
+        services.AddScoped<IDadosSecretariaRepositorio, DadosSecretariaRepositorio>();
+        services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
+        services.AddScoped<IPerfilRepositorio, PerfilRepositorio>();
+        services.AddScoped<IVigilanteRepositorio, VigilanteRepositorio>();
 
         // Serviços de infraestrutura
         services.AddScoped<ITokenServico, TokenServico>();

@@ -13,7 +13,7 @@ namespace BaseApi.Infrastructure.Repositorios;
 public class VigilanteRepositorio(AppDbContext contexto) : IVigilanteRepositorio
 {
     public async Task<Vigilante?> ObterPorIdAsync(Guid id, CancellationToken ct = default)
-        => await contexto.Vigilantes
+        => await contexto.Vigilante
             .FirstOrDefaultAsync(v => v.Id == id, ct);
 
     public async Task<(IEnumerable<Vigilante> Itens, int Total)> ListarAsync(
@@ -22,7 +22,7 @@ public class VigilanteRepositorio(AppDbContext contexto) : IVigilanteRepositorio
         string? busca,
         CancellationToken ct = default)
     {
-        var query = contexto.Vigilantes
+        var query = contexto.Vigilante
             .AsNoTracking();
 
         // Filtro de busca por nome, CPF ou e-mail
@@ -48,13 +48,13 @@ public class VigilanteRepositorio(AppDbContext contexto) : IVigilanteRepositorio
     }
 
     public async Task AdicionarAsync(Vigilante vigilante, CancellationToken ct = default)
-        => await contexto.Vigilantes.AddAsync(vigilante, ct);
+        => await contexto.Vigilante.AddAsync(vigilante, ct);
 
     public void Atualizar(Vigilante vigilante)
-        => contexto.Vigilantes.Update(vigilante);
+        => contexto.Vigilante.Update(vigilante);
 
     public void Remover(Vigilante vigilante)
-        => contexto.Vigilantes.Remove(vigilante);
+        => contexto.Vigilante.Remove(vigilante);
 
     public async Task SalvarAsync(CancellationToken ct = default)
         => await contexto.SaveChangesAsync(ct);
