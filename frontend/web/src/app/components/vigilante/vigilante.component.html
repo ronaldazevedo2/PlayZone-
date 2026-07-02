@@ -1,0 +1,108 @@
+<div class="tab-panel animate-fade">
+  <div class="vigilante-header-bar">
+    <div class="vigilante-title">
+      <h3>Gestão e Escala de Vigilantes</h3>
+      <p>Controle as rondas, turnos e check-ins de segurança na arena.</p>
+    </div>
+    <div class="vigilante-actions">
+      <button class="btn btn-danger btn-sm" (click)="registerGuardIncident()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 5px; vertical-align: middle;">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+        Registrar Ocorrência
+      </button>
+      <button class="btn btn-success btn-sm" (click)="addNewGuard()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 5px; vertical-align: middle;">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        Adicionar Vigilante
+      </button>
+    </div>
+  </div>
+
+  <!-- Guards Specific Stats -->
+  <section class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon res-icon" style="background-color: rgba(40, 167, 69, 0.1); color: #28a745;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+        </svg>
+      </div>
+      <div class="stat-details">
+        <p class="stat-label">Vigilantes em Turno</p>
+        <h3>3 Ativos</h3>
+        <p class="stat-sub text-green">1 em folga regulamentar</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon msg-icon" style="background-color: rgba(26, 115, 232, 0.1); color: var(--secondary-color);">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+        </svg>
+      </div>
+      <div class="stat-details">
+        <p class="stat-label">Ronda da Semana</p>
+        <h3>100% Concluída</h3>
+        <div class="progress-container">
+          <div class="progress-bar" style="width: 100%; background-color: #28a745;"></div>
+        </div>
+        <p class="stat-sub">Sem atrasos reportados</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon star-icon" style="background-color: rgba(255, 193, 7, 0.1); color: #ffc107;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+      </div>
+      <div class="stat-details">
+        <p class="stat-label">Última Ronda Geral</p>
+        <h3>Há 5 min</h3>
+        <p class="stat-sub">Portaria e Vestiários revisados</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Guards List Table -->
+  <div class="font-card" style="margin-top: 30px; padding: 25px; background: var(--white); border-radius: 12px; box-shadow: var(--shadow-sm);">
+    <div class="card-title-bar">
+      <h4>Equipe de Vigilância Operacional</h4>
+    </div>
+    <div class="table-container">
+      <table class="bookings-table">
+        <thead>
+          <tr>
+            <th>Vigilante</th>
+            <th>Turno Escala</th>
+            <th>Status de Operação</th>
+            <th>Último Ponto de Ronda</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let guard of guards">
+            <td>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <div class="guard-avatar">{{ guard.name.substring(0, 2).toUpperCase() }}</div>
+                <strong>{{ guard.name }}</strong>
+              </div>
+            </td>
+            <td>{{ guard.shift }}</td>
+            <td>
+              <span class="status-indicator" [class.active-status]="guard.status === 'Ativo'" [class.inactive-status]="guard.status === 'De Folga'">
+                {{ guard.status }}
+              </span>
+            </td>
+            <td>{{ guard.lastCheckin }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

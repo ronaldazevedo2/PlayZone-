@@ -1,9 +1,4 @@
 ﻿using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 
 namespace BaseApi.Application.Vigilantes.Commands.CriarVigilante;
@@ -16,3 +11,7 @@ public record CriarVigilanteCommand(
     DateTime DataNascimento,
     string? FotoPerfil
 ) : IRequest<CriarVigilanteResposta>;
+
+public class CriarVigilanteResposta
+{
+}

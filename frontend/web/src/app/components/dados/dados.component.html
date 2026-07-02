@@ -1,0 +1,101 @@
+<div class="tab-panel animate-fade">
+  <!-- Page Title Bar -->
+  <div class="dados-header">
+    <div class="dados-title-block">
+      <h2 class="dados-page-title">Dados</h2>
+      <p class="dados-page-subtitle">Gerencie as informações do seu perfil e endereço.</p>
+    </div>
+    <button class="btn-salvar-dados" (click)="salvarDados()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+        <polyline points="17 21 17 13 7 13 7 21"></polyline>
+        <polyline points="7 3 7 8 15 8"></polyline>
+      </svg>
+      Salvar alterações
+    </button>
+  </div>
+
+  <!-- Form Card: Informações Pessoais -->
+  <div class="dados-card">
+    <div class="dados-card-header">
+      <div class="dados-card-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+      </div>
+      <div>
+        <h3 class="dados-card-title">Informações Pessoais</h3>
+        <p class="dados-card-sub">Seus dados de identificação e contato.</p>
+      </div>
+    </div>
+
+    <div class="dados-fields-grid">
+      <!-- Nome -->
+      <div class="dados-field-group full-width">
+        <label class="dados-label" for="campo-nome">Nome</label>
+        <input id="campo-nome" class="dados-input" type="text" placeholder="Digite seu nome completo" [(ngModel)]="dadosNome">
+      </div>
+
+      <!-- Email -->
+      <div class="dados-field-group">
+        <label class="dados-label" for="campo-email">E-mail</label>
+        <input id="campo-email" class="dados-input" type="email" placeholder="seu@email.com" [(ngModel)]="dadosEmail">
+      </div>
+
+      <!-- Contato -->
+      <div class="dados-field-group">
+        <label class="dados-label" for="campo-contato">Contato</label>
+        <input id="campo-contato" class="dados-input" type="text" placeholder="(00) 00000-0000" [(ngModel)]="dadosContato">
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Card: Endereço -->
+  <div class="dados-card">
+    <div class="dados-card-header">
+      <div class="dados-card-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+          <circle cx="12" cy="10" r="3"></circle>
+        </svg>
+      </div>
+      <div>
+        <h3 class="dados-card-title">Endereço</h3>
+        <p class="dados-card-sub">Informações de localização para atendimento.</p>
+      </div>
+    </div>
+
+    <div class="dados-fields-grid">
+      <!-- CEP -->
+      <div class="dados-field-group">
+        <label class="dados-label" for="campo-cep">CEP</label>
+        <input id="campo-cep" class="dados-input" type="text" placeholder="00000-000" [(ngModel)]="dadosCep">
+      </div>
+
+      <!-- Endereço -->
+      <div class="dados-field-group flex-3">
+        <label class="dados-label" for="campo-endereco">Endereço</label>
+        <input id="campo-endereco" class="dados-input" type="text" placeholder="Rua, Avenida, etc." [(ngModel)]="dadosEndereco">
+      </div>
+
+      <!-- Número -->
+      <div class="dados-field-group">
+        <label class="dados-label" for="campo-numero">Número</label>
+        <input id="campo-numero" class="dados-input" type="text" placeholder="Ex: 123" [(ngModel)]="dadosNumero">
+      </div>
+
+      <!-- Bairro -->
+      <div class="dados-field-group">
+        <label class="dados-label" for="campo-bairro">Bairro</label>
+        <input id="campo-bairro" class="dados-input" type="text" placeholder="Nome do bairro" [(ngModel)]="dadosBairro">
+      </div>
+
+      <!-- Cidade -->
+      <div class="dados-field-group">
+        <label class="dados-label" for="campo-cidade">Cidade</label>
+        <input id="campo-cidade" class="dados-input" type="text" placeholder="Nome da cidade" [(ngModel)]="dadosCidade">
+      </div>
+    </div>
+  </div>
+</div>
