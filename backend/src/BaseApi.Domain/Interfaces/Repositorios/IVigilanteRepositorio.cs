@@ -1,4 +1,4 @@
-﻿using BaseApi.Domain.Entidades;
+using BaseApi.Domain.Entidades;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +18,10 @@ public interface IVigilanteRepositorio
         CancellationToken ct = default);
 
     Task AdicionarAsync(Vigilante vigilante , CancellationToken ct = default);
+
+    Task<bool> CpfExisteAsync(string cpf, CancellationToken ct = default);
+
+    Task<bool> EmailExisteAsync(string email, CancellationToken ct = default);
 
     void Atualizar(Vigilante vigilante );
 

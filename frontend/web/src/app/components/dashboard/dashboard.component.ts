@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { SecretariaService, SecretariaListaDto } from '../../services/secretaria.service';
 
 interface Booking {
   time: string;
@@ -47,10 +48,33 @@ export class DashboardComponent implements OnInit {
     { sender: 'Carlos Oliveira', avatar: 'CO', content: 'Como funciona o cancelamento?', time: 'Há 10 min' }
   ];
 
+  secretarias: SecretariaListaDto[] = [];
+  carregando = false;
+  erro = '';
+
+  constructor(
+    private secretariaService: SecretariaService
+  ) { }
+
   ngOnInit(): void {
-    // Component initialization
+    this.carregarSecretarias();
   }
 
+  carregarSecretarias(): void {
+    this.carregando = true;
+
+    this.secretariaService.listar(1, 50).subscribe({
+      next: (res) => {
+        this.secretarias = res.dados.itens ?? [];
+        this.carregando = false;
+      },
+      error: (err) => {
+        console.error(err);
+        this.erro = 'Erro ao carregar secretarias.';
+        this.carregando = false;
+      }
+    });
+  }
   triggerAction(actionName: string): void {
     alert(`Ação executada: ${actionName} (MOCK)`);
   }
