@@ -1,4 +1,4 @@
-﻿using BaseApi.Application.Notifiacoes.Queries.ObterNotificacaoPorId;
+﻿using BaseApi.Application.Notificacoes.Queries.ObterNotificacaoPorId;
 using BaseApi.Domain.Entidades;
 using BaseApi.Domain.Excecoes;
 using BaseApi.Domain.Interfaces.Repositorios;

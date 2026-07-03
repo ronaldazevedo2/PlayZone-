@@ -1,38 +1,45 @@
-﻿using BaseApi.Application.Comum.Modelos;
-using BaseApi.Application.Notificacoes.Queries.ListarNotificacoes;
+﻿using MediatR;
 using BaseApi.Domain.Interfaces.Repositorios;
-using Mapster;
-using MediatR;
+using BaseApi.Application.Notificacoes.Queries.ObterNotificacaoPorId;
+using BaseApi.Domain.Entidades;
 
-namespace BaseApi.Application.Notificacoes.Queries.ListarNotificacoes;
+namespace BaseApi.Application.Notificacoes.Queries.ListarNotificacao;
 
-// Ensure ListarNotificacoesQuery implements IRequest<ResultadoPaginado<NotificacaoListaDto>>
-public class ListarNotificacoesQuery : IRequest<ResultadoPaginado<NotificacaoListaDto>>
+public class ListarNotificacaoHandler : IRequestHandler<ListarNotificacaoQuery, List<NotificacaoDetalheDto>>
 {
-    public int Pagina { get; set; }
-    public int TamanhoPagina { get; set; }
-    public string? Busca { get; set; }
+    private readonly INotificacaoRepositorio _notificacaoRepositorio;
+
+    public ListarNotificacaoHandler(INotificacaoRepositorio notificacaoRepositorio)
+    {
+        _notificacaoRepositorio = notificacaoRepositorio;
+    }
+
+    public async Task<List<NotificacaoDetalheDto>> Handle(ListarNotificacaoQuery request, CancellationToken cancellationToken)
+    {
+        var notificacoes = await _notificacaoRepositorio.ObterTodosAsync();
+
+        // Corrige o problema de tipagem e fornece o valor necessário para o parâmetro 'id'
+        return notificacoes.OfType<Notificacao>().Select(n => new NotificacaoDetalheDto(
+            Guid.NewGuid(), // Gera um novo Guid para o Id
+            n.CriadoEm      // Usa o valor de CriadoEm da entidade Notificacao
+        )).ToList();
+    }
 }
 
-public class ListarNotificacoesHandler : IRequestHandler<ListarNotificacoesQuery, ResultadoPaginado<NotificacaoListaDto>>
+public record NotificacaoDetalheDto : IEquatable<NotificacaoDetalheDto>
 {
-    private readonly INotificacaoRepositorio _repositorio;
+    public Guid Id { get; init; }
+    public DateTime CriadoEm { get; init; }
 
-    public ListarNotificacoesHandler(INotificacaoRepositorio repositorio)
+    // Adiciona um construtor para inicializar as propriedades
+    public NotificacaoDetalheDto(Guid id, DateTime criadoEm)
     {
-        _repositorio = repositorio;
+        Id = id;
+        CriadoEm = criadoEm;
     }
+}
 
-    public async Task<ResultadoPaginado<NotificacaoListaDto>> Handle(ListarNotificacoesQuery query, CancellationToken ct)
-    {
-        var (itens, total) = await _repositorio.ListarAsync(query.Pagina, query.TamanhoPagina, query.Busca, ct);
-
-        return new ResultadoPaginado<NotificacaoListaDto>
-        {
-            Itens = itens.Adapt<IEnumerable<NotificacaoListaDto>>(),
-            Total = total,
-            Pagina = query.Pagina,
-            TamanhoPagina = query.TamanhoPagina
-        };
-    }
+// Renomeia a classe para evitar conflito com outra definição de ListarNotificacaoQuery
+public record ListarTodasNotificacoesQuery : IRequest<List<NotificacaoDetalheDto>>, IBaseRequest, IEquatable<ListarTodasNotificacoesQuery>
+{
 }

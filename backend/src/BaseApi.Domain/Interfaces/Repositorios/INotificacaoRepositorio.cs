@@ -23,4 +23,5 @@ public interface INotificacaoRepositorio
     void Remover(Notificacao Notificacao);
 
     Task SalvarAsync(CancellationToken ct = default);
+    Task<IEnumerable<object>> ObterTodosAsync();
 }

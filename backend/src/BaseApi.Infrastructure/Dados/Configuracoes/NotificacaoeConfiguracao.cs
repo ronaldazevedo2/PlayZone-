@@ -17,6 +17,5 @@ public class NotificacaoConfiguracao : IEntityTypeConfiguration<Notificacao>
 
         // Chave primária
         builder.HasKey(t => t.Id);
-
-       
+    }
 }

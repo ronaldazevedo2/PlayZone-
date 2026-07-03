@@ -1,19 +1,6 @@
-﻿using BaseApi.Application.Comum.Modelos;
+﻿using BaseApi.Application.Notificacoes.Queries.ObterNotificacaoPorId;
 using MediatR;
 
-namespace BaseApi.Application.Notificacoes.Queries.ListarNotificacoes;
+namespace BaseApi.Application.Notificacoes.Queries.ListarNotificacao;
 
-/// <summary>
-/// Query para listar Notificacoes com paginação e busca por marca/modelo.
-/// </summary>
-public record ListarNotificacaoQuery(
-    int Pagina = 1,
-    int TamanhoPagina = 10,
-    string? Busca = null
-) : IRequest<ResultadoPaginado<NotificacaoListaDto>>;
-
-/// <summary>DTO resumido para listagem</summary>
-public record NotificacaoListaDto(
-    Guid Id,
-   
-);
+public record ListarNotificacaoQuery() : IRequest<List<NotificacaoDetalheDto>>;
