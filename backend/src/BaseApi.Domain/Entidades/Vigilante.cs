@@ -3,7 +3,7 @@ namespace BaseApi.Domain.Entidades
     
     public class Vigilante
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
 
         /// <summary>Nome completo do vigilante</summary>
         public string NomeCompleto { get; set; } = string.Empty;
