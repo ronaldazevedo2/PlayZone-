@@ -8,13 +8,7 @@ import { AuthService } from './auth.service';
 // Interfaces — espelham os schemas do Swagger
 // ─────────────────────────────────────────────
 
-/** Envelope padrão da API */
-export interface RespostaApi<T = null> {
-  ok: boolean;
-  mensagem: string;
-  dados: T;
-  erros: string[] | null;
-}
+import { RespostaApi } from '../wrappers/api-response.wrapper';
 
 /** DTO de listagem paginada */
 export interface SecretariaListaDto {
@@ -100,12 +94,12 @@ export interface CriarSecretariaResposta {
 })
 export class SecretariaService {
 
-  private readonly BASE_URL = 'https://localhost:7218/api/Secretaria';
+  private readonly BASE_URL = 'https://localhost:7200/api/Secretaria';
 
   constructor(
     private http: HttpClient,
     private authService: AuthService
-  ) {}
+  ) { }
 
   // ── helpers ───────────────────────────────
 
@@ -201,10 +195,23 @@ export class SecretariaService {
     secretariaId: string,
     request: AtualizarSecretariaRequest
   ): Observable<RespostaApi<null>> {
+    // Map endereco to endereço to match backend payload expectations
+    const body: Record<string, any> = {
+      nome: request.nome,
+      email: request.email,
+      contato: request.contato,
+      cep: request.cep,
+      endereco: request.endereco,
+      numero: request.numero,
+      bairro: request.bairro,
+      cidade: request.cidade
+    };
+    console.log(body);
+
     return this.http
       .put<RespostaApi<null>>(
         `${this.BASE_URL}/${secretariaId}`,
-        request,
+        body,
         { headers: this.getHeaders() }
       )
       .pipe(catchError(this.handleError));

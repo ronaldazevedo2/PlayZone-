@@ -18,7 +18,23 @@ public class AtualizarSecretariaValidator : AbstractValidator<AtualizarSecretari
         RuleFor(x => x.Email)
             .NotEmpty().WithMessage("E-mail é obrigatório.")
             .EmailAddress().WithMessage("E-mail inválido.")
-            .MustAsync(async (email, ct) => !await repositorio.EmailExisteAsync(email, ct: ct))
+            .MustAsync(async (command, email, ct) =>
+            {
+                var secretaria = await repositorio.ObterPorIdAsync(command.SecretariaId, ct);
+
+                // Se o e-mail não foi alterado, permite salvar
+                if (secretaria != null &&
+                    secretaria.Email.Equals(email.Trim(), StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+
+                // Se foi alterado, verifica se já existe em outra secretaria
+                return !await repositorio.EmailExisteAsync(
+                    email.Trim().ToLowerInvariant(),
+                    command.SecretariaId,
+                    ct);
+            })
             .WithMessage("Este e-mail já está cadastrado.");
 
         RuleFor(x => x.Contato)
