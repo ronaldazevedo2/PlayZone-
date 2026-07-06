@@ -1,12 +1,9 @@
-﻿using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using MediatR;
 
 
 namespace BaseApi.Application.Vigilantes.Commands.CriarVigilante;
+
+using MediatR;
 
 public record CriarVigilanteCommand(
     string NomeCompleto,
@@ -14,5 +11,41 @@ public record CriarVigilanteCommand(
     string Email,
     string Telefone,
     DateTime DataNascimento,
-    string? FotoPerfil
+    string? FotoPerfil,
+    string Matricula,
+    string Arena
 ) : IRequest<CriarVigilanteResposta>;
+
+public record CriarVigilanteResposta(
+    int Id,
+    string NomeCompleto,
+    string Cpf,
+    string Email,
+    string Telefone,
+    DateTime DataNascimento,
+    string FotoPerfil,
+    bool Ativo
+);
+    string? FotoPerfil,
+    bool Ativo,
+    DateTime CriadoEm,
+    DateTime AtualizadoEm,
+    string Matricula,
+    string Arena
+)
+{
+    public record CriarVigilanteCommand(
+     string NomeCompleto,
+     string Cpf,
+     string Email,
+     string Telefone,
+     DateTime DataNascimento,
+     string? FotoPerfil,
+     string Matricula,
+     string Arena
+ ) : IRequest<CriarVigilanteResposta>;
+
+
+}
+
+   

@@ -1,6 +1,7 @@
 using BaseApi.Application.Autenticacao.Commands.EsqueceuSenha;
 using BaseApi.Application.Autenticacao.Commands.Login;
 using BaseApi.Application.Autenticacao.Commands.RedefinirSenha;
+using BaseApi.Application.Autenticacao.Commands.RegistrarUsuario;
 using BaseApi.Application.Comum.Modelos;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +15,7 @@ namespace BaseApi.API.Controllers;
 ///
 /// Endpoints públicos (sem autenticação):
 ///   POST /api/autenticacao/login            → Faz login e retorna o JWT
+///   POST /api/autenticacao/registrar        → Cadastra um novo usuário
 ///   POST /api/autenticacao/esqueceu-senha   → Envia e-mail de recuperação
 ///   POST /api/autenticacao/redefinir-senha  → Redefine a senha com o token
 ///
@@ -44,6 +46,19 @@ public class AutenticacaoController(IMediator mediator) : ControllerBase
         var resultado = await mediator.Send(command, ct);
         return Ok(RespostaApi<LoginResposta>.Sucesso(resultado, "Login realizado com sucesso."));
     }
+
+    /// <summary>
+    /// Cadastra um novo usuário e retorna os dados cadastrados.
+    /// </summary>
+    [HttpPost("registrar")]
+    [ProducesResponseType(typeof(RespostaApi<RespostaRegistrarUsuario>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(RespostaApi), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> Registrar([FromBody] ComandoRegistrarUsuario comando, CancellationToken tokenCancelamento)
+    {
+        var resultado = await mediator.Send(comando, tokenCancelamento);
+        return Ok(RespostaApi<RespostaRegistrarUsuario>.Sucesso(resultado, "Usuário cadastrado com sucesso!"));
+    }
+
 
     /// <summary>
     /// Inicia o fluxo de recuperação de senha.

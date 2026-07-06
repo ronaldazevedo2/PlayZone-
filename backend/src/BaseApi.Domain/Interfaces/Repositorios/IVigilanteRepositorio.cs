@@ -1,4 +1,4 @@
-﻿using BaseApi.Domain.Entidades;
+using BaseApi.Domain.Entidades;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,8 +9,7 @@ namespace BaseApi.Domain.Interfaces.Repositorios;
 
 public interface IVigilanteRepositorio
 {
-    Task<Vigilante?> ObterPorIdAsync(int id, CancellationToken ct = default);
-
+    Task<Vigilante?> ObterPorIdAsync(Guid id, CancellationToken ct);
     Task<(IEnumerable<Vigilante> Itens, int Total)> ListarAsync(
         int pagina,
         int tamanhoPagina,
@@ -18,6 +17,10 @@ public interface IVigilanteRepositorio
         CancellationToken ct = default);
 
     Task AdicionarAsync(Vigilante vigilante , CancellationToken ct = default);
+
+    Task<bool> CpfExisteAsync(string cpf, CancellationToken ct = default);
+
+    Task<bool> EmailExisteAsync(string email, CancellationToken ct = default);
 
     void Atualizar(Vigilante vigilante );
 
