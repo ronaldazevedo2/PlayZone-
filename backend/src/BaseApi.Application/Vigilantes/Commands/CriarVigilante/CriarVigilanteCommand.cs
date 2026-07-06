@@ -1,4 +1,5 @@
-﻿using MediatR;
+using MediatR;
+
 
 namespace BaseApi.Application.Vigilantes.Commands.CriarVigilante;
 
@@ -16,12 +17,15 @@ public record CriarVigilanteCommand(
 ) : IRequest<CriarVigilanteResposta>;
 
 public record CriarVigilanteResposta(
-    Guid Id,
+    int Id,
     string NomeCompleto,
     string Cpf,
     string Email,
     string Telefone,
     DateTime DataNascimento,
+    string FotoPerfil,
+    bool Ativo
+);
     string? FotoPerfil,
     bool Ativo,
     DateTime CriadoEm,
