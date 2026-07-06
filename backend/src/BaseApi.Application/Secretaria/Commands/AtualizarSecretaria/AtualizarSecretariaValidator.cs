@@ -1,5 +1,4 @@
-﻿using BaseApi.Domain.Interfaces.Repositorios;
-using FluentValidation;
+﻿using FluentValidation;
 
 namespace BaseApi.Application.Secretaria.Commands.AtualizarSecretaria;
 
