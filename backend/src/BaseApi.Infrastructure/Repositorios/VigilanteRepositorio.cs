@@ -50,12 +50,6 @@ public class VigilanteRepositorio(AppDbContext contexto) : IVigilanteRepositorio
     public async Task AdicionarAsync(Vigilante vigilante, CancellationToken ct = default)
         => await contexto.Vigilantes.AddAsync(vigilante, ct);
 
-    public async Task<bool> CpfExisteAsync(string cpf, CancellationToken ct = default)
-        => await contexto.Vigilantes.AnyAsync(v => v.Cpf == cpf, ct);
-
-    public async Task<bool> EmailExisteAsync(string email, CancellationToken ct = default)
-        => await contexto.Vigilantes.AnyAsync(v => v.Email.ToLower() == email.ToLower(), ct);
-
     public void Atualizar(Vigilante vigilante)
         => contexto.Vigilantes.Update(vigilante);
 
@@ -64,4 +58,14 @@ public class VigilanteRepositorio(AppDbContext contexto) : IVigilanteRepositorio
 
     public async Task SalvarAsync(CancellationToken ct = default)
         => await contexto.SaveChangesAsync(ct);
+
+    public Task<bool> CpfExisteAsync(string cpf, CancellationToken ct = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<bool> EmailExisteAsync(string email, CancellationToken ct = default)
+    {
+        throw new NotImplementedException();
+    }
 }
