@@ -1,4 +1,4 @@
-﻿using BaseApi.Domain.Entidades;
+using BaseApi.Domain.Entidades;
 using BaseApi.Domain.Interfaces.Repositorios;
 using BaseApi.Infrastructure.Dados;
 using Microsoft.EntityFrameworkCore;
@@ -58,4 +58,14 @@ public class VigilanteRepositorio(AppDbContext contexto) : IVigilanteRepositorio
 
     public async Task SalvarAsync(CancellationToken ct = default)
         => await contexto.SaveChangesAsync(ct);
+
+    public Task<bool> CpfExisteAsync(string cpf, CancellationToken ct = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<bool> EmailExisteAsync(string email, CancellationToken ct = default)
+    {
+        throw new NotImplementedException();
+    }
 }

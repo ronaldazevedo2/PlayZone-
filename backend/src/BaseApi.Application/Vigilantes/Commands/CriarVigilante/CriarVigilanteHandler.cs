@@ -1,8 +1,7 @@
-﻿using BaseApi.Domain.Entidades;
+﻿using BaseApi.Application.Vigilantes.Commands.CriarVigilante;
+using BaseApi.Domain.Entidades;
 using BaseApi.Domain.Interfaces.Repositorios;
 using MediatR;
-
-namespace BaseApi.Application.Vigilantes.Commands.CriarVigilante;
 
 public class CriarVigilanteHandler : IRequestHandler<CriarVigilanteCommand, CriarVigilanteResposta>
 {
@@ -17,24 +16,34 @@ public class CriarVigilanteHandler : IRequestHandler<CriarVigilanteCommand, Cria
     {
         var vigilante = new Vigilante
         {
+            Matricula = command.Matricula,
+            Arena = command.Arena,
             NomeCompleto = command.NomeCompleto.Trim(),
             Cpf = command.Cpf.Trim(),
-            Matricula = command.Matricula,
-            Arena = command.Arena.Trim(),
-            Ativo = true,
+            Email = command.Email.Trim(),
+            Telefone = command.Telefone.Trim(),
+            DataNascimento = command.DataNascimento,
+            FotoPerfil = command.FotoPerfil,
             CriadoEm = DateTime.UtcNow,
-            AtualizadoEm = DateTime.UtcNow
+            AtualizadoEm = DateTime.UtcNow,
         };
 
         await _repositorio.AdicionarAsync(vigilante, ct);
         await _repositorio.SalvarAsync(ct);
 
         return new CriarVigilanteResposta(
-            vigilante.Id,
-            vigilante.NomeCompleto,
-            vigilante.Cpf,
-            vigilante.Matricula,
-            vigilante.Arena
-        );
+     vigilante.Id,
+     vigilante.NomeCompleto,
+     vigilante.Cpf,
+     vigilante.Email,
+     vigilante.Telefone,
+     vigilante.DataNascimento,
+     vigilante.FotoPerfil,
+     vigilante.Ativo,
+     vigilante.CriadoEm,
+     vigilante.AtualizadoEm,
+     vigilante.Matricula,
+     vigilante.Arena
+ );
     }
 }

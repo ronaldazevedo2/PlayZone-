@@ -1,5 +1,4 @@
 using BaseApi.Application.Comum.Comportamentos;
-using BaseApi.Application.Comum.Mapeamentos;
 using FluentValidation;
 using Mapster;
 using MapsterMapper;

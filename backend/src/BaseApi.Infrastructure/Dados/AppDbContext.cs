@@ -18,6 +18,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
     public DbSet<Notificacao> Notificacoes => Set<Notificacao>(); // ← ADICIONE ESTA LINHA
 
+    public DbSet<Quadra> Quadra => Set<Quadra>();
+    public DbSet<Reserva> Reserva => Set<Reserva>();
     public DbSet<DadosSecretaria> DadosSecretaria => Set<DadosSecretaria>();
     public DbSet<Vigilante> Vigilantes => Set<Vigilante>();
 
