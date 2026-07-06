@@ -13,7 +13,7 @@ namespace BaseApi.Infrastructure.Repositorios;
 public class VigilanteRepositorio(AppDbContext contexto) : IVigilanteRepositorio
 {
     public async Task<Vigilante?> ObterPorIdAsync(Guid id, CancellationToken ct = default)
-        => await contexto.Vigilante
+        => await contexto.Vigilantes
             .FirstOrDefaultAsync(v => v.Id == id, ct);
 
     public async Task<(IEnumerable<Vigilante> Itens, int Total)> ListarAsync(
@@ -22,7 +22,7 @@ public class VigilanteRepositorio(AppDbContext contexto) : IVigilanteRepositorio
         string? busca,
         CancellationToken ct = default)
     {
-        var query = contexto.Vigilante
+        var query = contexto.Vigilantes
             .AsNoTracking();
 
         // Filtro de busca por nome, CPF ou e-mail
@@ -48,20 +48,24 @@ public class VigilanteRepositorio(AppDbContext contexto) : IVigilanteRepositorio
     }
 
     public async Task AdicionarAsync(Vigilante vigilante, CancellationToken ct = default)
-        => await contexto.Vigilante.AddAsync(vigilante, ct);
-
-    public async Task<bool> CpfExisteAsync(string cpf, CancellationToken ct = default)
-        => await contexto.Vigilantes.AnyAsync(v => v.Cpf == cpf, ct);
-
-    public async Task<bool> EmailExisteAsync(string email, CancellationToken ct = default)
-        => await contexto.Vigilantes.AnyAsync(v => v.Email.ToLower() == email.ToLower(), ct);
+        => await contexto.Vigilantes.AddAsync(vigilante, ct);
 
     public void Atualizar(Vigilante vigilante)
-        => contexto.Vigilante.Update(vigilante);
+        => contexto.Vigilantes.Update(vigilante);
 
     public void Remover(Vigilante vigilante)
-        => contexto.Vigilante.Remove(vigilante);
+        => contexto.Vigilantes.Remove(vigilante);
 
     public async Task SalvarAsync(CancellationToken ct = default)
         => await contexto.SaveChangesAsync(ct);
+
+    public Task<bool> CpfExisteAsync(string cpf, CancellationToken ct = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<bool> EmailExisteAsync(string email, CancellationToken ct = default)
+    {
+        throw new NotImplementedException();
+    }
 }
