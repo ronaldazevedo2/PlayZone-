@@ -1,9 +1,6 @@
-﻿using BaseApi.Application.Comum.Modelos;
-using BaseApi.Application.Vigilantes.Commands.AtualizarVigilante;
+using BaseApi.Application.Comum.Modelos;
 using BaseApi.Application.Vigilantes.Commands.CriarVigilante;
-using BaseApi.Application.Vigilantes.Commands.ExcluirVigilante;
 using BaseApi.Application.Vigilantes.Queries.ListarVigilantes;
-using BaseApi.Application.Vigilantes.Queries.ObterVigilantePorId;
 using BaseApi.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

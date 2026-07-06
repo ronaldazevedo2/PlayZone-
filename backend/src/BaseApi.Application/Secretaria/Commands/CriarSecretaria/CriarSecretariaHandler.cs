@@ -20,6 +20,7 @@ public class CriarSecretariaHandler(
             Endereço = command.Endereço,
             Numero = command.Numero,
             Bairro = command.Bairro,
+            Cidade = command.Cidade,
         };
 
         await repositorio.AdicionarAsync(secretaria, ct);

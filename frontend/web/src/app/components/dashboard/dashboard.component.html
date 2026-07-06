@@ -1,0 +1,238 @@
+<div class="tab-panel animate-fade">
+  <!-- Stats Cards Grid -->
+  <section class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon res-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+      </div>
+      <div class="stat-details">
+        <p class="stat-label">Reservas Hoje</p>
+        <h3>{{ reservasHojeCount }}</h3>
+        <p class="stat-sub text-green">
+          <span class="arrow-up">▲</span> + 3 em relação a ontem
+        </p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon quadras-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+          <circle cx="12" cy="12" r="4"></circle>
+        </svg>
+      </div>
+      <div class="stat-details">
+        <p class="stat-label">Quadras Ocupadas</p>
+        <h3>{{ quadrasOcupadasCount }} / {{ quadrasTotalCount }}</h3>
+        <div class="progress-container">
+          <div class="progress-bar" style="width: 62.5%"></div>
+        </div>
+        <p class="stat-sub">62% de ocupação</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon msg-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+      </div>
+      <div class="stat-details">
+        <p class="stat-label">Mensagens Pendentes</p>
+        <h3>{{ mensagensPendentesCount }}</h3>
+        <p class="stat-sub text-orange">Aguardando resposta</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon star-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+        </svg>
+      </div>
+      <div class="stat-details">
+        <p class="stat-label">Avaliação Média</p>
+        <h3>{{ avaliacaoMedia }} <span class="star-rating">★</span></h3>
+        <p class="stat-sub">Baseado em 124 avaliações</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Chart Section -->
+  <section class="chart-card">
+    <div class="chart-header">
+      <h3>Reservas da Semana</h3>
+      <select class="chart-filter">
+        <option>Esta semana</option>
+        <option>Semana passada</option>
+      </select>
+    </div>
+    <div class="chart-container">
+      <!-- Premium SVG Chart -->
+      <svg class="svg-chart" viewBox="0 0 520 180">
+        <defs>
+          <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#28a745" stop-opacity="0.3"/>
+            <stop offset="100%" stop-color="#28a745" stop-opacity="0.0"/>
+          </linearGradient>
+        </defs>
+        <!-- Grid Lines -->
+        <line x1="50" y1="20" x2="490" y2="20" stroke="#f1f3f5" stroke-width="1" />
+        <line x1="50" y1="50" x2="490" y2="50" stroke="#f1f3f5" stroke-width="1" />
+        <line x1="50" y1="80" x2="490" y2="80" stroke="#f1f3f5" stroke-width="1" />
+        <line x1="50" y1="110" x2="490" y2="110" stroke="#f1f3f5" stroke-width="1" />
+        <line x1="50" y1="140" x2="490" y2="140" stroke="#f1f3f5" stroke-width="1" />
+        
+        <!-- Area under the line -->
+        <path d="M 50 140 L 50 120 L 120 105 L 190 95 L 260 112 L 330 72 L 400 50 L 470 62 L 470 140 Z" fill="url(#chartGrad)"/>
+        
+        <!-- Sparkline path -->
+        <path d="M 50 120 Q 85 112, 120 105 T 190 95 T 260 112 T 330 72 T 400 50 T 470 62" fill="none" stroke="#28a745" stroke-width="3" stroke-linecap="round"/>
+        
+        <!-- Dot values -->
+        <circle cx="50" cy="120" r="4" fill="#ffffff" stroke="#28a745" stroke-width="2"/>
+        <text x="50" y="110" class="chart-dot-val">12</text>
+        
+        <circle cx="120" cy="105" r="4" fill="#ffffff" stroke="#28a745" stroke-width="2"/>
+        <text x="120" y="95" class="chart-dot-val">18</text>
+        
+        <circle cx="190" cy="95" r="4" fill="#ffffff" stroke="#28a745" stroke-width="2"/>
+        <text x="190" y="85" class="chart-dot-val">22</text>
+        
+        <circle cx="260" cy="112" r="4" fill="#ffffff" stroke="#28a745" stroke-width="2"/>
+        <text x="260" y="102" class="chart-dot-val">15</text>
+        
+        <circle cx="330" cy="72" r="4" fill="#ffffff" stroke="#28a745" stroke-width="2"/>
+        <text x="330" y="62" class="chart-dot-val">31</text>
+        
+        <circle cx="400" cy="50" r="4" fill="#ffffff" stroke="#28a745" stroke-width="2"/>
+        <text x="400" y="40" class="chart-dot-val">40</text>
+        
+        <circle cx="470" cy="62" r="4" fill="#ffffff" stroke="#28a745" stroke-width="2"/>
+        <text x="470" y="52" class="chart-dot-val">35</text>
+
+        <!-- Day Labels -->
+        <text x="50" y="165" class="chart-lbl">Seg</text>
+        <text x="120" y="165" class="chart-lbl">Ter</text>
+        <text x="190" y="165" class="chart-lbl">Qua</text>
+        <text x="260" y="165" class="chart-lbl">Qui</text>
+        <text x="330" y="165" class="chart-lbl">Sex</text>
+        <text x="400" y="165" class="chart-lbl">Sáb</text>
+        <text x="470" y="165" class="chart-lbl">Dom</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- Two Column Main Layout -->
+  <div class="row-layout">
+    <!-- Left Column: Upcoming Bookings Table -->
+    <div class="col-main font-card flex-2">
+      <div class="card-title-bar">
+        <h3>Próximas Reservas</h3>
+        <button class="text-link-btn" (click)="triggerAction('Ver todas as reservas')">Ver todas</button>
+      </div>
+      <div class="table-container">
+        <table class="bookings-table">
+          <thead>
+            <tr>
+              <th>Horário</th>
+              <th>Quadra</th>
+              <th>Cliente</th>
+              <th>Tipo</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let booking of bookings">
+              <td><strong>{{ booking.time }}</strong></td>
+              <td>{{ booking.court }}</td>
+              <td>{{ booking.client }}</td>
+              <td>
+                <span class="type-badge" [class]="booking.typeClass">{{ booking.type }}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Right Column: Messages and Quick Actions -->
+    <div class="col-main side-cards flex-1">
+      <!-- Messages Card -->
+      <div class="card font-card msg-card">
+        <div class="card-title-bar">
+          <h3>Mensagens Recentes</h3>
+          <button class="text-link-btn" (click)="triggerAction('Ver todas as mensagens')">Ver todas</button>
+        </div>
+        <div class="messages-list">
+          <div *ngFor="let msg of messages" class="msg-item">
+            <div class="msg-avatar">{{ msg.avatar }}</div>
+            <div class="msg-info">
+              <div class="msg-sender">
+                <h5>{{ msg.sender }}</h5>
+                <span class="msg-time">{{ msg.time }}</span>
+              </div>
+              <p class="msg-body">{{ msg.content }}</p>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-outline" (click)="triggerAction('Mensagens')">Abrir Central de Mensagens</button>
+      </div>
+
+      <!-- Quick Actions Card -->
+      <div class="card font-card actions-card">
+        <h3>Ações Rápidas</h3>
+        <div class="actions-grid">
+          <button class="action-btn" (click)="triggerAction('Nova Quadra')">
+            <div class="act-icon bg-green">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+            </div>
+            <span>Nova Quadra</span>
+          </button>
+          <button class="action-btn" (click)="triggerAction('Nova Reserva')">
+            <div class="act-icon bg-green-light">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+            </div>
+            <span>Nova Reserva</span>
+          </button>
+          <button class="action-btn" (click)="triggerAction('Enviar Aviso')">
+            <div class="act-icon bg-orange">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
+                <path d="M18 13l-1.5-1.5"></path>
+                <path d="M19 14l-1.5-1.5"></path>
+                <path d="M20 15l-1.5-1.5"></path>
+                <path d="M14 20l-1.5-1.5"></path>
+                <path d="M2.5 12a9.5 9.5 0 0 1 18.28-3.41"></path>
+                <path d="M2 12h10"></path>
+                <path d="M2 12a10 10 0 0 0 9.8 10"></path>
+              </svg>
+            </div>
+            <span>Enviar Aviso</span>
+          </button>
+          <button class="action-btn" (click)="triggerAction('Bloquear Horário')">
+            <div class="act-icon bg-red">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+            </div>
+            <span>Bloquear Horário</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

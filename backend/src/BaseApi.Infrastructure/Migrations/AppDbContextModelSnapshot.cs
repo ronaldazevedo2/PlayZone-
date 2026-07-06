@@ -119,68 +119,6 @@ namespace BaseApi.Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("BaseApi.Domain.Entidades.Quadra", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<int>("Capacidade")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Descricao")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)");
-
-                    b.Property<string>("ImagemUrl")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)");
-
-                    b.Property<string>("Localizacao")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
-
-                    b.Property<string>("Modalidade")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<string>("Nome")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("quadras", (string)null);
-                });
-
-            modelBuilder.Entity("BaseApi.Domain.Entidades.Reserva", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<DateTime>("DataAgendada")
-                        .HasColumnType("date");
-
-                    b.Property<TimeSpan>("HorarioAgendado")
-                        .HasColumnType("time");
-
-                    b.Property<Guid>("QuadraId")
-                        .HasColumnType("char(36)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("QuadraId", "DataAgendada", "HorarioAgendado")
-                        .IsUnique();
-
-                    b.ToTable("reservas", (string)null);
-                });
-
             modelBuilder.Entity("BaseApi.Domain.Entidades.Usuario", b =>
                 {
                     b.Property<Guid>("Id")
@@ -239,7 +177,7 @@ namespace BaseApi.Infrastructure.Migrations
                             Email = "admin@baseapi.com",
                             NomeCompleto = "Administrador do Sistema",
                             PerfilId = 1,
-                            SenhaHash = "$2a$11$V7s4Rpui4z59OcuLtgUec.2vKUbfPdLLYRVCjXz/7NR6cLkKVNMOG"
+                            SenhaHash = "$2a$11$I5VNh2RKRSfHq7ujbE9xDekdEPbEXhuaRbVjf02.Hwy5g.difsTBi"
                         });
                 });
 
@@ -303,15 +241,6 @@ namespace BaseApi.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("vigilantes", (string)null);
-                });
-
-            modelBuilder.Entity("BaseApi.Domain.Entidades.Reserva", b =>
-                {
-                    b.HasOne("BaseApi.Domain.Entidades.Quadra", null)
-                        .WithMany()
-                        .HasForeignKey("QuadraId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("BaseApi.Domain.Entidades.Usuario", b =>

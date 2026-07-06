@@ -19,6 +19,12 @@ public record VigilanteListaDto(
     int Id,
     string NomeCompleto,
     string Cpf,
+    string Email,
+    string Telefone,
+    DateTime DataNascimento,
+    string FotoPerfil,
+    bool Ativo
+);
     string Matricula,
     string Arena,
     bool Ativo
