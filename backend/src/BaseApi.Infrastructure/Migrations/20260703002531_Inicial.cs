@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BaseApi.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class inicial : Migration
+    public partial class Inicial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -63,6 +63,36 @@ namespace BaseApi.Infrastructure.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "vigilantes",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    NomeCompleto = table.Column<string>(type: "varchar(200)", maxLength: 200, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Cpf = table.Column<string>(type: "varchar(14)", maxLength: 14, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Email = table.Column<string>(type: "varchar(150)", maxLength: 150, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Telefone = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    DataNascimento = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    FotoPerfil = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Ativo = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    CriadoEm = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    AtualizadoEm = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    Matricula = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Arena = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_vigilantes", x => x.Id);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "usuarios",
                 columns: table => new
                 {
@@ -106,7 +136,7 @@ namespace BaseApi.Infrastructure.Migrations
             migrationBuilder.InsertData(
                 table: "usuarios",
                 columns: new[] { "Id", "Ativo", "AtualizadoEm", "CriadoEm", "Email", "NomeCompleto", "PerfilId", "SenhaHash", "TokenExpiracao", "TokenRedefinicaoSenha" },
-                values: new object[] { new Guid("00000000-0000-0000-0000-000000000001"), true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "admin@baseapi.com", "Administrador do Sistema", 1, "$2a$11$EumypWOza5ztixSA9RajKOQjd0GHwdB3FbMBIIYkAHBuZHUK2ONcS", null, null });
+                values: new object[] { new Guid("00000000-0000-0000-0000-000000000001"), true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "admin@baseapi.com", "Administrador do Sistema", 1, "$2a$11$I5VNh2RKRSfHq7ujbE9xDekdEPbEXhuaRbVjf02.Hwy5g.difsTBi", null, null });
 
             migrationBuilder.CreateIndex(
                 name: "IX_perfis_Nome",
@@ -124,6 +154,18 @@ namespace BaseApi.Infrastructure.Migrations
                 name: "IX_usuarios_PerfilId",
                 table: "usuarios",
                 column: "PerfilId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_vigilantes_Cpf",
+                table: "vigilantes",
+                column: "Cpf",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_vigilantes_Email",
+                table: "vigilantes",
+                column: "Email",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -134,6 +176,9 @@ namespace BaseApi.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "usuarios");
+
+            migrationBuilder.DropTable(
+                name: "vigilantes");
 
             migrationBuilder.DropTable(
                 name: "perfis");
