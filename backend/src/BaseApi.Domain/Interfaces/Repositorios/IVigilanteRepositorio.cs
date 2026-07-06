@@ -9,8 +9,7 @@ namespace BaseApi.Domain.Interfaces.Repositorios;
 
 public interface IVigilanteRepositorio
 {
-    Task<Vigilante?> ObterPorIdAsync(int id, CancellationToken ct = default);
-
+    Task<Vigilante?> ObterPorIdAsync(Guid id, CancellationToken ct);
     Task<(IEnumerable<Vigilante> Itens, int Total)> ListarAsync(
         int pagina,
         int tamanhoPagina,

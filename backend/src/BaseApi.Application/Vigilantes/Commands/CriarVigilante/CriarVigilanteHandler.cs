@@ -1,46 +1,49 @@
+﻿using BaseApi.Application.Vigilantes.Commands.CriarVigilante;
 using BaseApi.Domain.Entidades;
-using BaseApi.Domain.Excecoes;
 using BaseApi.Domain.Interfaces.Repositorios;
 using MediatR;
 
-namespace BaseApi.Application.Vigilantes.Commands.CriarVigilante;
-
-public class CriarVigilanteHandler(
-    IVigilanteRepositorio repositorio) : IRequestHandler<CriarVigilanteCommand, CriarVigilanteResposta>
+public class CriarVigilanteHandler : IRequestHandler<CriarVigilanteCommand, CriarVigilanteResposta>
 {
+    private readonly IVigilanteRepositorio _repositorio;
+
+    public CriarVigilanteHandler(IVigilanteRepositorio repositorio)
+    {
+        _repositorio = repositorio;
+    }
+
     public async Task<CriarVigilanteResposta> Handle(CriarVigilanteCommand command, CancellationToken ct)
     {
-        if (await repositorio.CpfExisteAsync(command.Cpf, ct))
-            throw new ExcecaoDominio("CPF já cadastrado para outro vigilante.");
-
-        if (await repositorio.EmailExisteAsync(command.Email, ct))
-            throw new ExcecaoDominio("E-mail já cadastrado para outro vigilante.");
-
         var vigilante = new Vigilante
         {
-            NomeCompleto = command.NomeCompleto,
-            Cpf = command.Cpf,
-            Email = command.Email.ToLowerInvariant().Trim(),
-            Telefone = command.Telefone,
+            Matricula = command.Matricula,
+            Arena = command.Arena,
+            NomeCompleto = command.NomeCompleto.Trim(),
+            Cpf = command.Cpf.Trim(),
+            Email = command.Email.Trim(),
+            Telefone = command.Telefone.Trim(),
             DataNascimento = command.DataNascimento,
-            FotoPerfil = command.FotoPerfil ?? string.Empty,
-            Ativo = true,
+            FotoPerfil = command.FotoPerfil,
             CriadoEm = DateTime.UtcNow,
-            AtualizadoEm = DateTime.UtcNow
+            AtualizadoEm = DateTime.UtcNow,
         };
 
-        await repositorio.AdicionarAsync(vigilante, ct);
-        await repositorio.SalvarAsync(ct);
+        await _repositorio.AdicionarAsync(vigilante, ct);
+        await _repositorio.SalvarAsync(ct);
 
         return new CriarVigilanteResposta(
-            vigilante.Id,
-            vigilante.NomeCompleto,
-            vigilante.Cpf,
-            vigilante.Email,
-            vigilante.Telefone,
-            vigilante.DataNascimento,
-            vigilante.FotoPerfil,
-            vigilante.Ativo
-        );
+     vigilante.Id,
+     vigilante.NomeCompleto,
+     vigilante.Cpf,
+     vigilante.Email,
+     vigilante.Telefone,
+     vigilante.DataNascimento,
+     vigilante.FotoPerfil,
+     vigilante.Ativo,
+     vigilante.CriadoEm,
+     vigilante.AtualizadoEm,
+     vigilante.Matricula,
+     vigilante.Arena
+ );
     }
 }
