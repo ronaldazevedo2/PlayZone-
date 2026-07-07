@@ -22,7 +22,7 @@ class MeuAplicativo extends StatelessWidget {
         ),
         scaffoldBackgroundColor: Colors.white,
       ),
-      home: const TelaLogin(),
+      home: const TelaLoginUsuario(),
     );
   }
 }

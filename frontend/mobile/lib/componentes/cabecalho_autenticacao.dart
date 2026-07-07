@@ -13,7 +13,7 @@ class CabecalhoAutenticacao extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final larguraTela = MediaQuery.of(context).size.width;
-    
+
     // Calcula o tamanho da logo de forma responsiva
     final tamanhoLogo = larguraTela * 0.35;
 
@@ -51,9 +51,9 @@ class CabecalhoAutenticacao extends StatelessWidget {
         Text(
           titulo,
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFF1E293B), // Cinza muito escuro/quase preto
-              ),
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFF1E293B), // Cinza muito escuro/quase preto
+          ),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 8),
@@ -63,9 +63,9 @@ class CabecalhoAutenticacao extends StatelessWidget {
           child: Text(
             subtitulo,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: const Color(0xFF64748B), // Cinza médio
-                  height: 1.4,
-                ),
+              color: const Color(0xFF64748B), // Cinza médio
+              height: 1.4,
+            ),
             textAlign: TextAlign.center,
           ),
         ),
