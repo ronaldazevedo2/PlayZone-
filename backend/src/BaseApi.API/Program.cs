@@ -96,6 +96,7 @@ builder.Services.AddSwaggerGen(opt =>
 
 var app = builder.Build();
 
+
 // ================================================================
 // 5. MIGRATION AUTOMÁTICA — aplica ao iniciar a aplicação
 // ================================================================
