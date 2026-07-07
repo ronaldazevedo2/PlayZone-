@@ -1,5 +1,3 @@
-using MediatR;
-
 namespace BaseApi.Application.Vigilantes.Commands.CriarVigilante;
 
 using MediatR;
@@ -43,4 +41,3 @@ public record CriarVigilanteResposta(
 
 
 }
-
