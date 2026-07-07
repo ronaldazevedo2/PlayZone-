@@ -41,12 +41,12 @@ public class NotificacoesController(IMediator mediator) : ControllerBase
     /// Busca um telefone específico pelo Id.
     /// </summary>
     [HttpGet("{id:guid}")]
-    [ProducesResponseType(typeof(RespostaApi<NotificacaoDetalheDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(RespostaApi<Application.Notificacoes.Queries.ObterNotificacaoPorId.NotificacaoDetalheDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(RespostaApi), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ObterPorId(Guid id, CancellationToken ct)
     {
         var resultado = await mediator.Send(new ObterNotificacaoPorIdQuery(id), ct);
-        return Ok(RespostaApi<NotificacaoDetalheDto>.Sucesso(resultado));
+        return Ok(RespostaApi<Application.Notificacoes.Queries.ListarNotificacao.NotificacaoDetalheDto>.Sucesso(resultado));
     }
 
     /// <summary>
@@ -87,7 +87,9 @@ public class NotificacoesController(IMediator mediator) : ControllerBase
     [ProducesResponseType(typeof(RespostaApi), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Atualizar(Guid id, [FromBody] AtualizarNotificacaoRequest request, CancellationToken ct)
     {
-   
+        // Adjusted to use the constructor of AtualizarNotificacaoCommand with required parameters
+        var command = new AtualizarNotificacaoCommand(id, request.Marca, request.Modelo, request.Preco, request.Estoque);
+
         await mediator.Send(command, ct);
         return Ok(RespostaApi.Sucesso("Notificacao atualizado com sucesso!"));
     }
@@ -106,7 +108,29 @@ public class NotificacoesController(IMediator mediator) : ControllerBase
         return Ok(RespostaApi.Sucesso("Notificacao removida com sucesso!"));
     }
 }
+public record AtualizarNotificacaoCommand : IRequest<Unit>
+{
+    public Guid Id { get; init; }
+    public string Marca { get; init; }
+    public string Modelo { get; init; }
+    public decimal Preco { get; init; }
+    public int Estoque { get; init; }
+
+    // Constructor added to resolve CS1729
+    public AtualizarNotificacaoCommand(Guid id, string marca, string modelo, decimal preco, int estoque)
+    {
+        Id = id;
+        Marca = marca;
+        Modelo = modelo;
+        Preco = preco;
+        Estoque = estoque;
+    }
+}
 
 // DTO local para o body do PUT (separa o Id da URL dos dados do body)
 public record AtualizarNotificacaoRequest(
-    );
+    string Marca,
+    string Modelo,
+    decimal Preco,
+    int Estoque
+);

@@ -36,6 +36,7 @@ public static class DependencyInjection
         services.AddScoped<IVigilanteRepositorio, VigilanteRepositorio>();
       
         services.AddScoped<INotificacaoRepositorio, NotificacaoRepositorio>(); // ← ADICIONE ESTA LINHA
+       
         // Serviços de infraestrutura
         services.AddScoped<ITokenServico, TokenServico>();
         services.AddScoped<IEmailServico, EmailServico>();

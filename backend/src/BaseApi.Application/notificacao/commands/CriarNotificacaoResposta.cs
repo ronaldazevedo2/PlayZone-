@@ -2,5 +2,6 @@
 {
     public class CriarNotificacaoResposta
     {
+        public object Id { get; set; }
     }
 }

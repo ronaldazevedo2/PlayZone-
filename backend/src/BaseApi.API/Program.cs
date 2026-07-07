@@ -94,7 +94,11 @@ builder.Services.AddSwaggerGen(opt =>
         opt.IncludeXmlComments(xmlPath);
 });
 
+// Adiciona o MediatR e escaneia o Assembly atual (ou o assembly da sua camada Application)
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+
 var app = builder.Build();
+
 
 
 // ================================================================
