@@ -9,22 +9,22 @@ namespace BaseApi.Domain.Interfaces.Repositorios;
 
 public interface IVigilanteRepositorio
 {
-    Task<Vigilante?> ObterPorIdAsync(Guid id, CancellationToken ct);
-    Task<(IEnumerable<Vigilante> Itens, int Total)> ListarAsync(
+    Task<Vigilantes?> ObterPorIdAsync(Guid id, CancellationToken ct);
+    Task<(IEnumerable<Vigilantes> Itens, int Total)> ListarAsync(
         int pagina,
         int tamanhoPagina,
         string? busca,
         CancellationToken ct = default);
 
-    Task AdicionarAsync(Vigilante vigilante , CancellationToken ct = default);
+    Task AdicionarAsync(Vigilantes vigilante , CancellationToken ct = default);
 
     Task<bool> CpfExisteAsync(string cpf, CancellationToken ct = default);
 
     Task<bool> EmailExisteAsync(string email, CancellationToken ct = default);
 
-    void Atualizar(Vigilante vigilante );
+    void Atualizar(Vigilantes vigilante );
 
-    void Remover(Vigilante vigilante );
+    void Remover(Vigilantes vigilante );
 
     Task SalvarAsync(CancellationToken ct = default);
 }

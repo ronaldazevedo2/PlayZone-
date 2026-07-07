@@ -1,7 +1,7 @@
 namespace BaseApi.Domain.Entidades
 {
     
-    public class Vigilante
+    public class Vigilantes
     {
         public Guid Id { get; set; } = Guid.NewGuid();
 

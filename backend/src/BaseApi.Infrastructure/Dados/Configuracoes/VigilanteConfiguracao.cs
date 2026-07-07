@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace BaseApi.Infrastructure.Dados.Configuracoes
 {
-    public class VigilanteConfiguracao : IEntityTypeConfiguration<Vigilante>
+    public class VigilanteConfiguracao : IEntityTypeConfiguration<Vigilantes>
     {
-        public void Configure(EntityTypeBuilder<Vigilante> builder)
+        public void Configure(EntityTypeBuilder<Vigilantes> builder)
         {
             // Nome da tabela
             builder.ToTable("vigilantes");

@@ -14,7 +14,7 @@ public class CriarVigilanteHandler : IRequestHandler<CriarVigilanteCommand, Cria
 
     public async Task<CriarVigilanteResposta> Handle(CriarVigilanteCommand command, CancellationToken ct)
     {
-        var vigilante = new Vigilante
+        var vigilante = new Vigilantes
         {
             Matricula = command.Matricula,
             Arena = command.Arena,

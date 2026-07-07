@@ -2,26 +2,21 @@ using BaseApi.Domain.Entidades;
 using BaseApi.Domain.Interfaces.Repositorios;
 using BaseApi.Infrastructure.Dados;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BaseApi.Infrastructure.Repositorios;
 
 public class VigilanteRepositorio(AppDbContext contexto) : IVigilanteRepositorio
 {
-    public async Task<Vigilante?> ObterPorIdAsync(Guid id, CancellationToken ct = default)
+    public async Task<Vigilantes?> ObterPorIdAsync(Guid id, CancellationToken ct = default)
         => await contexto.Vigilantes
             .FirstOrDefaultAsync(v => v.Id == id, ct);
 
-    public async Task<(IEnumerable<Vigilante> Itens, int Total)> ListarAsync(
+    public async Task<(IEnumerable<Vigilantes> Itens, int Total)> ListarAsync(
         int pagina,
         int tamanhoPagina,
         string? busca,
         CancellationToken ct = default)
-    {
+    { 
         var query = contexto.Vigilantes
             .AsNoTracking();
 
@@ -47,13 +42,13 @@ public class VigilanteRepositorio(AppDbContext contexto) : IVigilanteRepositorio
         return (itens, total);
     }
 
-    public async Task AdicionarAsync(Vigilante vigilante, CancellationToken ct = default)
+    public async Task AdicionarAsync(Vigilantes vigilante, CancellationToken ct = default)
         => await contexto.Vigilantes.AddAsync(vigilante, ct);
 
-    public void Atualizar(Vigilante vigilante)
+    public void Atualizar(Vigilantes vigilante)
         => contexto.Vigilantes.Update(vigilante);
 
-    public void Remover(Vigilante vigilante)
+    public void Remover(Vigilantes vigilante)
         => contexto.Vigilantes.Remove(vigilante);
 
     public async Task SalvarAsync(CancellationToken ct = default)
