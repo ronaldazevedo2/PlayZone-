@@ -351,7 +351,7 @@ namespace BaseApi.Infrastructure.Migrations
                             Email = "admin@baseapi.com",
                             NomeCompleto = "Administrador do Sistema",
                             PerfilId = 1,
-                            SenhaHash = "$2a$11$DXCb3zhD3.OmaCGub5vVXuUvSg8i8feE6E8dE53uaqUdxd0/yyU1W"
+                            SenhaHash = "$2a$11$qe/ZZp2H3NFdaEusTUhDdeXw1t4tSC3AxPI1H/m1iFPuX2mnfcPDG"
                         },
                         new
                         {
@@ -362,7 +362,7 @@ namespace BaseApi.Infrastructure.Migrations
                             Email = "admin@playzone.com",
                             NomeCompleto = "Administrador",
                             PerfilId = 1,
-                            SenhaHash = "$2a$11$/4p3oken01QR4QW3ramG6ushYQ7HbnWLkFeQ3PpsQLuVEefSk6bC6"
+                            SenhaHash = "$2a$11$9iWb7Sn8SMPETKWJ.wM7VOTj6UeE/e6Z9jPqDag6jVBjEulEwMNi6"
                         },
                         new
                         {
@@ -373,7 +373,7 @@ namespace BaseApi.Infrastructure.Migrations
                             Email = "joao@playzone.com",
                             NomeCompleto = "João Silva",
                             PerfilId = 2,
-                            SenhaHash = "$2a$11$DTXGDlovUncXseXMNIu2lOH0AbBha18n.M5Xk.czbUYtmnKZvoizq"
+                            SenhaHash = "$2a$11$xCNsX9rvvOYaQDTORHQ0fewUUMHFQzPReEMTzCD3zUsnpqFs1YA2W"
                         },
                         new
                         {
@@ -384,7 +384,7 @@ namespace BaseApi.Infrastructure.Migrations
                             Email = "maria@playzone.com",
                             NomeCompleto = "Maria Souza",
                             PerfilId = 3,
-                            SenhaHash = "$2a$11$HAI/2sWBLM7bf1gd3yXvMeaUKvpMXtN/EwUHVo0vaFBs8O08unza6"
+                            SenhaHash = "$2a$11$DnANEnZKCyVyXegrf.okm.bK06iqC0Hvp6GhJknmcCfHfdHFFmTna"
                         });
                 });
 

@@ -225,10 +225,10 @@ namespace BaseApi.Infrastructure.Migrations
                 columns: new[] { "Id", "Ativo", "AtualizadoEm", "CriadoEm", "Email", "NomeCompleto", "PerfilId", "SenhaHash", "TokenExpiracao", "TokenRedefinicaoSenha" },
                 values: new object[,]
                 {
-                    { new Guid("00000000-0000-0000-0000-000000000001"), true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "admin@baseapi.com", "Administrador do Sistema", 1, "$2a$11$DXCb3zhD3.OmaCGub5vVXuUvSg8i8feE6E8dE53uaqUdxd0/yyU1W", null, null },
-                    { new Guid("77777777-7777-7777-7777-777777777777"), true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin@playzone.com", "Administrador", 1, "$2a$11$/4p3oken01QR4QW3ramG6ushYQ7HbnWLkFeQ3PpsQLuVEefSk6bC6", null, null },
-                    { new Guid("88888888-8888-8888-8888-888888888888"), true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "joao@playzone.com", "João Silva", 2, "$2a$11$DTXGDlovUncXseXMNIu2lOH0AbBha18n.M5Xk.czbUYtmnKZvoizq", null, null },
-                    { new Guid("99999999-9999-9999-9999-999999999999"), true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "maria@playzone.com", "Maria Souza", 3, "$2a$11$HAI/2sWBLM7bf1gd3yXvMeaUKvpMXtN/EwUHVo0vaFBs8O08unza6", null, null }
+                    { new Guid("00000000-0000-0000-0000-000000000001"), true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "admin@baseapi.com", "Administrador do Sistema", 1, "$2a$11$qe/ZZp2H3NFdaEusTUhDdeXw1t4tSC3AxPI1H/m1iFPuX2mnfcPDG", null, null },
+                    { new Guid("77777777-7777-7777-7777-777777777777"), true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin@playzone.com", "Administrador", 1, "$2a$11$9iWb7Sn8SMPETKWJ.wM7VOTj6UeE/e6Z9jPqDag6jVBjEulEwMNi6", null, null },
+                    { new Guid("88888888-8888-8888-8888-888888888888"), true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "joao@playzone.com", "João Silva", 2, "$2a$11$xCNsX9rvvOYaQDTORHQ0fewUUMHFQzPReEMTzCD3zUsnpqFs1YA2W", null, null },
+                    { new Guid("99999999-9999-9999-9999-999999999999"), true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "maria@playzone.com", "Maria Souza", 3, "$2a$11$DnANEnZKCyVyXegrf.okm.bK06iqC0Hvp6GhJknmcCfHfdHFFmTna", null, null }
                 });
 
             migrationBuilder.CreateIndex(
