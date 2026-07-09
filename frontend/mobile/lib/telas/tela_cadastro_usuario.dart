@@ -236,6 +236,37 @@ class _TelaCadastroUsuarioEstado extends State<TelaCadastroUsuario> {
     if (valor == null || valor.trim().isEmpty) {
       return 'A data de nascimento é obrigatória';
     }
+
+    final partes = valor.split('/');
+    if (partes.length != 3) {
+      return 'Formato inválido. Use DD/MM/AAAA';
+    }
+
+    final dia = int.tryParse(partes[0]);
+    final mes = int.tryParse(partes[1]);
+    final ano = int.tryParse(partes[2]);
+
+    if (dia == null || mes == null || ano == null) {
+      return 'Data de nascimento inválida';
+    }
+
+    try {
+      final dataNascimento = DateTime(ano, mes, dia);
+      final hoje = DateTime.now();
+
+      int idade = hoje.year - dataNascimento.year;
+      if (hoje.month < dataNascimento.month ||
+          (hoje.month == dataNascimento.month && hoje.day < dataNascimento.day)) {
+        idade--;
+      }
+
+      if (idade < 14) {
+        return 'Cadastro permitido apenas para maiores de 14 anos';
+      }
+    } catch (_) {
+      return 'Data de nascimento inválida';
+    }
+
     return null;
   }
 
@@ -247,8 +278,8 @@ class _TelaCadastroUsuarioEstado extends State<TelaCadastroUsuario> {
     final dataSelecionada = await showDatePicker(
       context: context,
       initialDate: DateTime.now().subtract(
-        const Duration(days: 365 * 18),
-      ), // 18 anos atrás como padrão
+        const Duration(days: 365 * 14),
+      ), // 14 anos atrás como padrão
       firstDate: DateTime(1920),
       lastDate: DateTime.now(),
       locale: const Locale('pt', 'BR'),

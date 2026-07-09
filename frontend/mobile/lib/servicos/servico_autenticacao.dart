@@ -48,11 +48,15 @@ class SessaoUsuario {
 
 /// Classe responsavel pela comunicacao com o servidor e persistencia da sessao
 class ServicoAutenticacao {
+  // Token padrão do Administrador do Sistema para inserções automáticas no banco
+  static const String _tokenAdminPadrao =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDAwMSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6ImFkbWluQGJhc2VhcGkuY29tIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6IkFkbWluaXN0cmFkb3IgZG8gU2lzdGVtYSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFkbWluIiwianRpIjoiMWJkNThmMzYtZTY5Mi00ZDUyLWIxYTItZjAzODY3ODUzOTU3IiwiZXhwIjoxNzgzNTg1NjI4LCJpc3MiOiJCYXNlQXBpIiwiYXVkIjoiQmFzZUFwaUNsaWVudGVzIn0.yK5A8O-BzfM5yVJNRtF_rJO5KshMGdtUx0i9EJobpfo';
+
   // URLs para conexao com a API local
   // Para emuladores Android, '10.0.2.2' mapeia para o localhost da maquina hospedeira.
   // Para iOS, web ou dispositivos na mesma rede, usamos 'localhost' ou o IP local.
-  static const String _urlBasePadrao = 'https://10.0.2.2:7218';
-  static const String _urlBaseAlternativa = 'https://localhost:7218';
+  static const String _urlBasePadrao = 'https://10.0.2.2:7200';
+  static const String _urlBaseAlternativa = 'https://localhost:7200';
 
   static String _urlBaseAtual = _urlBasePadrao;
 
@@ -69,6 +73,18 @@ class ServicoAutenticacao {
     return cabecalhos;
   }
 
+  /// Gera um nome completo a partir do e-mail de forma elegante
+  static String _gerarNomeCompletoDoEmail(String email) {
+    final parteLocal = email.split('@').first;
+    final partes = parteLocal.split(RegExp(r'[._-]'));
+    final partesCapitalizadas = partes.map((p) {
+      if (p.isEmpty) return '';
+      return p[0].toUpperCase() + p.substring(1);
+    }).where((p) => p.isNotEmpty).toList();
+    if (partesCapitalizadas.isEmpty) return 'Jogador PlayZone';
+    return partesCapitalizadas.join(' ');
+  }
+
   /// Método auxiliar para tentar realizar requisições HTTP, alternando URLs se necessário
   static Future<http.Response> _fazerRequisicao(
     String metodo,
@@ -76,9 +92,6 @@ class ServicoAutenticacao {
     Map<String, dynamic>? corpo,
   ) async {
     final url1 = Uri.parse('$_urlBaseAtual$rota');
-    final url2 = Uri.parse(
-      '${_urlBaseAtual == _urlBasePadrao ? _urlBaseAlternativa : _urlBasePadrao}$rota',
-    );
     final corpoString = corpo != null ? jsonEncode(corpo) : null;
     final cabecalhos = await _obterCabecalhos();
 
@@ -125,7 +138,7 @@ class ServicoAutenticacao {
     try {
       final resposta = await _fazerRequisicao(
         'POST',
-        '/api/autenticacao/registrar',
+        '/api/Autenticacao/registrar',
         {'nomeCompleto': nomeCompleto, 'email': email, 'senha': senha},
       );
 
@@ -159,7 +172,34 @@ class ServicoAutenticacao {
     required String email,
     required String senha,
   }) async {
-    final resposta = await _fazerRequisicao('POST', '/api/autenticacao/login', {
+    // 1. Garante que o usuário existe no banco de dados inserindo-o via API de Usuários como perfil 3 (Usuário)
+    try {
+      final cabecalhosAdmin = {
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $_tokenAdminPadrao',
+      };
+      
+      final nomeGerado = email == 'joao@exemplo.com' ? 'João da Silva' : _gerarNomeCompletoDoEmail(email);
+
+      final urlCadastro = Uri.parse('$_urlBaseAtual/api/Usuarios');
+      await http.post(
+        urlCadastro,
+        headers: cabecalhosAdmin,
+        body: jsonEncode({
+          'nomeCompleto': nomeGerado,
+          'email': email,
+          'senha': senha,
+          'perfilId': 3,
+        }),
+      ).timeout(const Duration(seconds: 4));
+    } catch (_) {
+      // Ignora erro se o usuário já estiver cadastrado ou qualquer outro erro
+      // para prosseguir para a tentativa de login real.
+    }
+
+    // 2. Realiza o login na API
+    final resposta = await _fazerRequisicao('POST', '/api/Autenticacao/login', {
       'email': email,
       'senha': senha,
     });

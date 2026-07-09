@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../modelos/modelo_quadra.dart';
 import '../servicos/servico_autenticacao.dart';
+import '../servicos/servico_quadras.dart';
 import 'tela_detalhes_quadra.dart';
 import 'tela_login.dart';
 
@@ -22,8 +23,12 @@ class _TelaInicialEstado extends State<TelaInicial> {
   List<QuadraEsportiva> _quadrasFiltradas = [];
   int _abaSelecionada = 0;
 
-  // Dados mockados das quadras esportivas
-  final List<QuadraEsportiva> _todasAsQuadras = const [
+  // Lista dinâmica de quadras carregadas da API
+  List<QuadraEsportiva> _todasAsQuadras = [];
+  bool _estaCarregando = false;
+
+  // Dados mockados locais para fallback offline
+  static const List<QuadraEsportiva> _quadrasMockadas = [
     QuadraEsportiva(
       id: '1',
       nome: 'Arena Central Park',
@@ -108,9 +113,45 @@ class _TelaInicialEstado extends State<TelaInicial> {
   void initState() {
     super.initState();
     _sessaoAtual = widget.sessao;
-    _quadrasFiltradas = List.from(_todasAsQuadras);
-    _ordenarPorDistancia();
     _controladorBusca.addListener(_filtrarQuadras);
+    
+    // Busca assíncrona das quadras na API da Quadra
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _buscarQuadrasDaApi();
+    });
+  }
+
+  Future<void> _buscarQuadrasDaApi() async {
+    if (!mounted) return;
+    setState(() {
+      _estaCarregando = true;
+    });
+
+    try {
+      final quadras = await ServicoQuadras.obterQuadras();
+      if (!mounted) return;
+      setState(() {
+        _todasAsQuadras = quadras;
+        _filtrarQuadras(); // Aplica filtros e ordena
+        _estaCarregando = false;
+      });
+    } catch (_) {
+      // Fallback offline se a API estiver inacessível
+      if (!mounted) return;
+      setState(() {
+        _todasAsQuadras = List.from(_quadrasMockadas);
+        _filtrarQuadras();
+        _estaCarregando = false;
+      });
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Conectado offline. Exibindo dados locais de demonstração.'),
+          backgroundColor: Colors.orange,
+          duration: Duration(seconds: 4),
+        ),
+      );
+    }
   }
 
   @override
@@ -178,57 +219,69 @@ class _TelaInicialEstado extends State<TelaInicial> {
     return Scaffold(
       backgroundColor: const Color(0xFFFAFAFA),
       body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // 1. Cabeçalho Customizado
-              _construirCabecalho(),
-              const SizedBox(height: 16),
-
-              // 2. Barra de Busca
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: _construirBarraBusca(),
-              ),
-              const SizedBox(height: 8),
-
-              // Indicador de filtro ativo (Bairro)
-              if (_bairroFiltrado != null)
+        child: RefreshIndicator(
+          onRefresh: _buscarQuadrasDaApi,
+          color: const Color(0xFF22C55E),
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // 1. Cabeçalho Customizado
+                _construirCabecalho(),
+                
+                // Indicador de progresso se estiver carregando
+                if (_estaCarregando)
+                  const LinearProgressIndicator(
+                    color: Color(0xFF22C55E),
+                    backgroundColor: Color(0xFFEFF6FF),
+                  ),
+                
+                const SizedBox(height: 16),
+  
+                // 2. Barra de Busca
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: Row(
-                    children: [
-                      InputChip(
-                        label: Text(
-                          'Bairro: $_bairroFiltrado',
-                          style: const TextStyle(color: Color(0xFF254EDB), fontWeight: FontWeight.bold),
-                        ),
-                        backgroundColor: const Color(0xFFEFF6FF),
-                        deleteIconColor: const Color(0xFF254EDB),
-                        onDeleted: _limparFiltroBairro,
-                      ),
-                    ],
-                  ),
+                  child: _construirBarraBusca(),
                 ),
-              const SizedBox(height: 24),
-
-              // 3. Seção Quadras Próximas
-              _construirSecaoQuadrasProximas(),
-              const SizedBox(height: 32),
-
-              // 4. Seção Explorar por Bairro
-              _construirSecaoBairros(),
-              const SizedBox(height: 32),
-
-              // 5. Banner Premium
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: _construirBannerPremium(),
-              ),
-              const SizedBox(height: 32),
-            ],
+                const SizedBox(height: 8),
+  
+                // Indicador de filtro ativo (Bairro)
+                if (_bairroFiltrado != null)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: Row(
+                      children: [
+                        InputChip(
+                          label: Text(
+                            'Bairro: $_bairroFiltrado',
+                            style: const TextStyle(color: Color(0xFF254EDB), fontWeight: FontWeight.bold),
+                          ),
+                          backgroundColor: const Color(0xFFEFF6FF),
+                          deleteIconColor: const Color(0xFF254EDB),
+                          onDeleted: _limparFiltroBairro,
+                        ),
+                      ],
+                    ),
+                  ),
+                const SizedBox(height: 24),
+  
+                // 3. Seção Quadras Próximas
+                _construirSecaoQuadrasProximas(),
+                const SizedBox(height: 32),
+  
+                // 4. Seção Explorar por Bairro
+                _construirSecaoBairros(),
+                const SizedBox(height: 32),
+  
+                // 5. Banner Premium
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: _construirBannerPremium(),
+                ),
+                const SizedBox(height: 32),
+              ],
+            ),
           ),
         ),
       ),

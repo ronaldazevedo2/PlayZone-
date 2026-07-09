@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BaseApi.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260708225755_Inicial")]
+    [Migration("20260709002256_Inicial")]
     partial class Inicial
     {
         /// <inheritdoc />
@@ -354,7 +354,7 @@ namespace BaseApi.Infrastructure.Migrations
                             Email = "admin@baseapi.com",
                             NomeCompleto = "Administrador do Sistema",
                             PerfilId = 1,
-                            SenhaHash = "$2a$11$qe/ZZp2H3NFdaEusTUhDdeXw1t4tSC3AxPI1H/m1iFPuX2mnfcPDG"
+                            SenhaHash = "$2a$11$yfmBIKkUChsjPwknL47JduYQ4aPPA8viSgHF3TdQHaZ116zYesSHe"
                         },
                         new
                         {
@@ -365,7 +365,7 @@ namespace BaseApi.Infrastructure.Migrations
                             Email = "admin@playzone.com",
                             NomeCompleto = "Administrador",
                             PerfilId = 1,
-                            SenhaHash = "$2a$11$9iWb7Sn8SMPETKWJ.wM7VOTj6UeE/e6Z9jPqDag6jVBjEulEwMNi6"
+                            SenhaHash = "$2a$11$lcLGRcapQKBxc3J8OHvZN.495l/bacBCuWXXINMW417DsuZQgYNAO"
                         },
                         new
                         {
@@ -376,7 +376,7 @@ namespace BaseApi.Infrastructure.Migrations
                             Email = "joao@playzone.com",
                             NomeCompleto = "João Silva",
                             PerfilId = 2,
-                            SenhaHash = "$2a$11$xCNsX9rvvOYaQDTORHQ0fewUUMHFQzPReEMTzCD3zUsnpqFs1YA2W"
+                            SenhaHash = "$2a$11$eTEmNg23MDla.OT8sPAlc.s7s6Cv3R4vVtxMFbpUgE8y/0cMI5pYa"
                         },
                         new
                         {
@@ -387,7 +387,7 @@ namespace BaseApi.Infrastructure.Migrations
                             Email = "maria@playzone.com",
                             NomeCompleto = "Maria Souza",
                             PerfilId = 3,
-                            SenhaHash = "$2a$11$DnANEnZKCyVyXegrf.okm.bK06iqC0Hvp6GhJknmcCfHfdHFFmTna"
+                            SenhaHash = "$2a$11$vP2OQjyizrexH1IaY65OveQ2mgFAn2TjbOr6gka9hQ52srUDwmzZy"
                         });
                 });
 
