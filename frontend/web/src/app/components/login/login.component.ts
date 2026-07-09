@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -11,7 +11,7 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   email = '';
   password = '';
   showPassword = false;
@@ -19,7 +19,24 @@ export class LoginComponent {
   isLoading = false;
   rememberMe = false;
 
+  private readonly REMEMBERED_EMAIL_KEY = 'rememberedEmail';
+
   constructor(private router: Router, private authService: AuthService) {}
+
+  ngOnInit(): void {
+    // Redireciona automaticamente se já estiver logado
+    if (this.authService.isLoggedIn()) {
+      this.router.navigate(['/dashboard']);
+      return;
+    }
+
+    // Carrega o e-mail salvo se existir
+    const savedEmail = localStorage.getItem(this.REMEMBERED_EMAIL_KEY);
+    if (savedEmail) {
+      this.email = savedEmail;
+      this.rememberMe = true;
+    }
+  }
 
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
@@ -36,6 +53,12 @@ export class LoginComponent {
 
     this.authService.login(this.email, this.password).subscribe({
       next: () => {
+        // Trata o "Lembrar de mim"
+        if (this.rememberMe) {
+          localStorage.setItem(this.REMEMBERED_EMAIL_KEY, this.email);
+        } else {
+          localStorage.removeItem(this.REMEMBERED_EMAIL_KEY);
+        }
         this.router.navigate(['/dashboard']);
       },
       error: (err) => {

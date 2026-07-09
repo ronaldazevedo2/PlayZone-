@@ -1,11 +1,12 @@
-﻿using BaseApi.Application.Comum.Modelos;
+
+using BaseApi.Application.Comum.Modelos;
 using BaseApi.Domain.Interfaces.Repositorios;
 using Mapster;
 using MediatR;
 
 namespace BaseApi.Application.Vigilantes.Queries.ListarVigilantes;
 
-public class ListarVigilantesHandler(IVigilanteRepositorio repositorio)
+public class ListarVigilanteHandler(IVigilanteRepositorio repositorio)
     : IRequestHandler<ListarVigilantesQuery, ResultadoPaginado<VigilanteListaDto>>
 {
     public async Task<ResultadoPaginado<VigilanteListaDto>> Handle(ListarVigilantesQuery query, CancellationToken ct)

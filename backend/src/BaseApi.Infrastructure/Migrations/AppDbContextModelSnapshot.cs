@@ -71,6 +71,32 @@ namespace BaseApi.Infrastructure.Migrations
                     b.HasKey("SecretariaId");
 
                     b.ToTable("dados_secretaria", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            SecretariaId = new Guid("11111111-1111-1111-1111-111111111111"),
+                            Bairro = "Centro",
+                            Cep = "01001000",
+                            Cidade = "São Paulo",
+                            Contato = "(11) 99999-9999",
+                            Email = "esportes@prefeitura.com",
+                            Endereço = "Rua das Flores",
+                            Nome = "Secretaria Municipal de Esportes",
+                            Numero = "100"
+                        },
+                        new
+                        {
+                            SecretariaId = new Guid("22222222-2222-2222-2222-222222222222"),
+                            Bairro = "Jardim América",
+                            Cep = "02002000",
+                            Cidade = "São Paulo",
+                            Contato = "(11) 98888-8888",
+                            Email = "educacao@prefeitura.com",
+                            Endereço = "Av. Brasil",
+                            Nome = "Secretaria Municipal de Educação",
+                            Numero = "250"
+                        });
                 });
 
             modelBuilder.Entity("BaseApi.Domain.Entidades.Perfil", b =>
@@ -116,6 +142,154 @@ namespace BaseApi.Infrastructure.Migrations
                             Id = 3,
                             Descricao = "Acesso básico ao sistema",
                             Nome = "Usuário"
+                        });
+                });
+
+            modelBuilder.Entity("BaseApi.Domain.Entidades.Quadra", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<int>("Capacidade")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Descricao")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<string>("ImagemUrl")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<string>("Localizacao")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("Modalidade")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("quadras", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("33333333-3333-3333-3333-333333333333"),
+                            Capacidade = 20,
+                            Descricao = "Ginásio Poliesportivo localizado no bairro São José.",
+                            ImagemUrl = "https://www.aecweb.com.br/revista/materias/projetando-areas-esportivas-conheca-os-materiais-mais-indicados/6698",
+                            Localizacao = "São José",
+                            Modalidade = "Futebol",
+                            Nome = "GINÁSIO POLIESPORTIVO \"EURICO GUILHERME SCHULZ\""
+                        },
+                        new
+                        {
+                            Id = new Guid("44444444-4444-4444-4444-444444444444"),
+                            Capacidade = 20,
+                            Descricao = "Ginásio Poliesportivo localizado no bairro Aviso.",
+                            ImagemUrl = "https://www.newquadras.com.br/images/Projetos/Fotos/ESCOLA%20IPSG%20(2).jpg",
+                            Localizacao = "Aviso",
+                            Modalidade = "Futebol",
+                            Nome = "GINÁSIO POLIESPORTIVO BAIRRO AVISO"
+                        },
+                        new
+                        {
+                            Id = new Guid("55555555-5555-5555-5555-555555555555"),
+                            Capacidade = 20,
+                            Descricao = "Ginásio Poliesportivo localizado no bairro Interlagos.",
+                            ImagemUrl = "https://exemplo.com/imagens/interlagos.jpg",
+                            Localizacao = "Interlagos",
+                            Modalidade = "Futebol",
+                            Nome = "GINÁSIO POLIESPORTIVO \"LEANDRO SILVA DOS REIS\""
+                        },
+                        new
+                        {
+                            Id = new Guid("66666666-6666-6666-6666-666666666666"),
+                            Capacidade = 20,
+                            Descricao = "Ginásio Poliesportivo localizado no bairro Araçá.",
+                            ImagemUrl = "https://exemplo.com/imagens/araca.jpg",
+                            Localizacao = "Araçá",
+                            Modalidade = "Futebol",
+                            Nome = "GINÁSIO POLIESPORTIVO BAIRRO ARAÇÁ"
+                        });
+                });
+
+            modelBuilder.Entity("BaseApi.Domain.Entidades.Reserva", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("DataAgendada")
+                        .HasColumnType("date");
+
+                    b.Property<TimeSpan>("HorarioAgendado")
+                        .HasColumnType("time");
+
+                    b.Property<Guid>("QuadraId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuadraId", "DataAgendada", "HorarioAgendado")
+                        .IsUnique();
+
+                    b.ToTable("reservas", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("70000000-0000-0000-0000-000000000001"),
+                            DataAgendada = new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            HorarioAgendado = new TimeSpan(0, 8, 0, 0, 0),
+                            QuadraId = new Guid("33333333-3333-3333-3333-333333333333")
+                        },
+                        new
+                        {
+                            Id = new Guid("70000000-0000-0000-0000-000000000002"),
+                            DataAgendada = new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            HorarioAgendado = new TimeSpan(0, 9, 0, 0, 0),
+                            QuadraId = new Guid("33333333-3333-3333-3333-333333333333")
+                        },
+                        new
+                        {
+                            Id = new Guid("70000000-0000-0000-0000-000000000003"),
+                            DataAgendada = new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            HorarioAgendado = new TimeSpan(0, 10, 0, 0, 0),
+                            QuadraId = new Guid("44444444-4444-4444-4444-444444444444")
+                        },
+                        new
+                        {
+                            Id = new Guid("70000000-0000-0000-0000-000000000004"),
+                            DataAgendada = new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            HorarioAgendado = new TimeSpan(0, 11, 0, 0, 0),
+                            QuadraId = new Guid("44444444-4444-4444-4444-444444444444")
+                        },
+                        new
+                        {
+                            Id = new Guid("70000000-0000-0000-0000-000000000005"),
+                            DataAgendada = new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            HorarioAgendado = new TimeSpan(0, 14, 0, 0, 0),
+                            QuadraId = new Guid("55555555-5555-5555-5555-555555555555")
+                        },
+                        new
+                        {
+                            Id = new Guid("70000000-0000-0000-0000-000000000006"),
+                            DataAgendada = new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            HorarioAgendado = new TimeSpan(0, 16, 0, 0, 0),
+                            QuadraId = new Guid("66666666-6666-6666-6666-666666666666")
                         });
                 });
 
@@ -177,8 +351,159 @@ namespace BaseApi.Infrastructure.Migrations
                             Email = "admin@baseapi.com",
                             NomeCompleto = "Administrador do Sistema",
                             PerfilId = 1,
-                            SenhaHash = "$2a$11$EumypWOza5ztixSA9RajKOQjd0GHwdB3FbMBIIYkAHBuZHUK2ONcS"
+                            SenhaHash = "$2a$11$qe/ZZp2H3NFdaEusTUhDdeXw1t4tSC3AxPI1H/m1iFPuX2mnfcPDG"
+                        },
+                        new
+                        {
+                            Id = new Guid("77777777-7777-7777-7777-777777777777"),
+                            Ativo = true,
+                            AtualizadoEm = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CriadoEm = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "admin@playzone.com",
+                            NomeCompleto = "Administrador",
+                            PerfilId = 1,
+                            SenhaHash = "$2a$11$9iWb7Sn8SMPETKWJ.wM7VOTj6UeE/e6Z9jPqDag6jVBjEulEwMNi6"
+                        },
+                        new
+                        {
+                            Id = new Guid("88888888-8888-8888-8888-888888888888"),
+                            Ativo = true,
+                            AtualizadoEm = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CriadoEm = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "joao@playzone.com",
+                            NomeCompleto = "João Silva",
+                            PerfilId = 2,
+                            SenhaHash = "$2a$11$xCNsX9rvvOYaQDTORHQ0fewUUMHFQzPReEMTzCD3zUsnpqFs1YA2W"
+                        },
+                        new
+                        {
+                            Id = new Guid("99999999-9999-9999-9999-999999999999"),
+                            Ativo = true,
+                            AtualizadoEm = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CriadoEm = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "maria@playzone.com",
+                            NomeCompleto = "Maria Souza",
+                            PerfilId = 3,
+                            SenhaHash = "$2a$11$DnANEnZKCyVyXegrf.okm.bK06iqC0Hvp6GhJknmcCfHfdHFFmTna"
                         });
+                });
+
+            modelBuilder.Entity("BaseApi.Domain.Entidades.Vigilantes", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Arena")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<DateTime>("AtualizadoEm")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Cpf")
+                        .IsRequired()
+                        .HasMaxLength(14)
+                        .HasColumnType("varchar(14)");
+
+                    b.Property<DateTime>("CriadoEm")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("DataNascimento")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("varchar(150)");
+
+                    b.Property<string>("FotoPerfil")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<string>("Matricula")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("NomeCompleto")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("Telefone")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Cpf")
+                        .IsUnique();
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.ToTable("vigilantes", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
+                            Arena = "Arena Central",
+                            Ativo = true,
+                            AtualizadoEm = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Cpf = "12345678901",
+                            CriadoEm = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DataNascimento = new DateTime(1988, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "carlos.silva@playzone.com",
+                            FotoPerfil = "https://exemplo.com/fotos/carlos.jpg",
+                            Matricula = "VIG001",
+                            NomeCompleto = "Carlos Eduardo Silva",
+                            Telefone = "(11) 99999-1111"
+                        },
+                        new
+                        {
+                            Id = new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
+                            Arena = "Arena Norte",
+                            Ativo = true,
+                            AtualizadoEm = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Cpf = "98765432100",
+                            CriadoEm = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DataNascimento = new DateTime(1992, 8, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "marcos.souza@playzone.com",
+                            FotoPerfil = "https://exemplo.com/fotos/marcos.jpg",
+                            Matricula = "VIG002",
+                            NomeCompleto = "Marcos Antônio Souza",
+                            Telefone = "(11) 99999-2222"
+                        },
+                        new
+                        {
+                            Id = new Guid("cccccccc-cccc-cccc-cccc-cccccccccccc"),
+                            Arena = "Arena Sul",
+                            Ativo = true,
+                            AtualizadoEm = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Cpf = "45678912345",
+                            CriadoEm = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DataNascimento = new DateTime(1995, 2, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "fernanda.oliveira@playzone.com",
+                            FotoPerfil = "https://exemplo.com/fotos/fernanda.jpg",
+                            Matricula = "VIG003",
+                            NomeCompleto = "Fernanda Oliveira",
+                            Telefone = "(11) 99999-3333"
+                        });
+                });
+
+            modelBuilder.Entity("BaseApi.Domain.Entidades.Reserva", b =>
+                {
+                    b.HasOne("BaseApi.Domain.Entidades.Quadra", null)
+                        .WithMany()
+                        .HasForeignKey("QuadraId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("BaseApi.Domain.Entidades.Usuario", b =>

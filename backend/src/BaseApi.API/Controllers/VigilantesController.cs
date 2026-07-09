@@ -1,4 +1,4 @@
-﻿using BaseApi.Application.Comum.Modelos;
+using BaseApi.Application.Comum.Modelos;
 using BaseApi.Application.Vigilantes.Commands.AtualizarVigilante;
 using BaseApi.Application.Vigilantes.Commands.CriarVigilante;
 using BaseApi.Application.Vigilantes.Commands.ExcluirVigilante;

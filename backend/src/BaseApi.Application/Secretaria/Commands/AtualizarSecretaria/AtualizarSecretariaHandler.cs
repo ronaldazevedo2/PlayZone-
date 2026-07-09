@@ -18,6 +18,7 @@ public class AtualizarSecretariaHandler(IDadosSecretariaRepositorio repositorio)
         secretaria.Endereço = command.Endereço;
         secretaria.Numero = command.Numero;
         secretaria.Bairro = command.Bairro;
+        secretaria.Cidade = command.Cidade;
 
         repositorio.Atualizar(secretaria);
         await repositorio.SalvarAsync(ct);

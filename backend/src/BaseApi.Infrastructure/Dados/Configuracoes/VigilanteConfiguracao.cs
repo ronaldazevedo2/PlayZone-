@@ -1,17 +1,12 @@
 ﻿using BaseApi.Domain.Entidades;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace BaseApi.Infrastructure.Dados.Configuracoes
 {
-    public class VigilanteConfiguracao : IEntityTypeConfiguration<Vigilante>
+    public class VigilanteConfiguracao : IEntityTypeConfiguration<Vigilantes>
     {
-        public void Configure(EntityTypeBuilder<Vigilante> builder)
+        public void Configure(EntityTypeBuilder<Vigilantes> builder)
         {
             // Nome da tabela
             builder.ToTable("vigilantes");

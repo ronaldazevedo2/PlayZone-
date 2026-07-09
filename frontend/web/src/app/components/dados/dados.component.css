@@ -1,0 +1,171 @@
+/* ===================== DADOS TAB STYLES ===================== */
+
+.dados-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.dados-page-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--dark-text);
+  margin: 0 0 4px 0;
+}
+
+.dados-page-subtitle {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.btn-salvar-dados {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 22px;
+  background: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 4px 14px rgba(40, 167, 69, 0.35);
+}
+
+.btn-salvar-dados:hover {
+  background: #218838;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(40, 167, 69, 0.45);
+}
+
+.btn-salvar-dados:active {
+  transform: translateY(0);
+}
+
+.dados-card {
+  background: var(--white);
+  border-radius: 14px;
+  box-shadow: var(--shadow-sm);
+  padding: 28px 30px;
+  margin-bottom: 22px;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.2s;
+}
+
+.dados-card:hover {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.09);
+}
+
+.dados-card-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #f1f3f5;
+}
+
+.dados-card-icon {
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, rgba(40, 167, 69, 0.12), rgba(40, 167, 69, 0.06));
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #28a745;
+  flex-shrink: 0;
+}
+
+.dados-card-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.dados-card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--dark-text);
+  margin: 0 0 3px 0;
+}
+
+.dados-card-sub {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.dados-fields-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.dados-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.dados-field-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.dados-field-group.flex-3 {
+  grid-column: span 1;
+}
+
+.dados-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #495057;
+  letter-spacing: 0.3px;
+}
+
+.dados-input {
+  width: 100%;
+  padding: 11px 16px;
+  border: 1.5px solid #dee2e6;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  color: var(--dark-text);
+  background: #fafafa;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  outline: none;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.dados-input::placeholder {
+  color: #adb5bd;
+}
+
+.dados-input:focus {
+  border-color: #28a745;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.12);
+}
+
+.dados-input:hover:not(:focus) {
+  border-color: #adb5bd;
+}
+
+@media (max-width: 768px) {
+  .dados-fields-grid {
+    grid-template-columns: 1fr;
+  }
+  .dados-field-group.full-width,
+  .dados-field-group.flex-3 {
+    grid-column: 1;
+  }
+  .dados-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
