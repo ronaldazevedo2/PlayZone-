@@ -292,7 +292,7 @@
   <!-- Top Nav Header -->
   <div class="form-header-bar">
     <div class="breadcrumb-container">
-      <h1>Cadastrar Quadra</h1>
+      <h1>{{ quadraEditandoId ? 'Editar Quadra' : 'Cadastrar Quadra' }}</h1>
       <div class="breadcrumb-links">
         <span class="home-icon">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -302,7 +302,7 @@
         </span>
         <span class="bc-link" (click)="cancelarCadastro()">Quadras</span>
         <span class="bc-separator">&gt;</span>
-        <span class="bc-current">Cadastrar quadra</span>
+        <span class="bc-current">{{ quadraEditandoId ? 'Editar quadra' : 'Cadastrar quadra' }}</span>
       </div>
     </div>
 
@@ -315,7 +315,7 @@
           <polyline points="7 3 7 8 15 8"></polyline>
         </svg>
         <span class="spinner-sm" *ngIf="salvando"></span>
-        {{ salvando ? 'Salvando...' : 'Salvar quadra' }}
+        {{ salvando ? 'Salvando...' : (quadraEditandoId ? 'Salvar alterações' : 'Salvar quadra') }}
       </button>
     </div>
   </div>
@@ -344,8 +344,10 @@
           <label>Nome da quadra <span class="required">*</span></label>
           <input 
             type="text" 
-            placeholder="Ex.: Quadra Society 01" 
+            placeholder="Ex.: QUADRA SOCIETY 01" 
             [(ngModel)]="novaQuadra.nome"
+            (ngModelChange)="novaQuadra.nome = $event.toUpperCase()"
+            style="text-transform: uppercase;"
           >
         </div>
 
@@ -383,6 +385,17 @@
             <option *ngFor="let modalidade of opcoesModalidades" [value]="modalidade">
               {{ modalidade }}
             </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-fields-row">
+        <div class="form-field-group">
+          <label>Status <span class="required">*</span></label>
+          <select [(ngModel)]="novaQuadra.status" class="form-select">
+            <option value="Ativa">Ativa</option>
+            <option value="Inativa">Inativa</option>
+            <option value="Manutenção">Manutenção</option>
           </select>
         </div>
       </div>
@@ -510,37 +523,7 @@
       </div>
     </div>
 
-    <!-- 4. Outras Configurações Card -->
-    <div class="form-card">
-      <div class="form-card-header">
-        <h3>Outras configurações</h3>
-        <p>Campos obrigatórios para o funcionamento da plataforma.</p>
-      </div>
 
-      <div class="settings-toggles">
-        <div class="toggle-group-item">
-          <label class="switch-container">
-            <input type="checkbox" checked disabled>
-            <span class="switch-slider"></span>
-          </label>
-          <div class="toggle-text">
-            <strong>Salvar a quadra no banco de dados</strong>
-            <p>A quadra será cadastrada e ficará disponível para reservas.</p>
-          </div>
-        </div>
-
-        <div class="toggle-group-item">
-          <label class="switch-container">
-            <input type="checkbox" checked disabled>
-            <span class="switch-slider"></span>
-          </label>
-          <div class="toggle-text">
-            <strong>Validar campos obrigatórios</strong>
-            <p>Todos os campos obrigatórios serão validados antes de salvar.</p>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <!-- Bottom Important Disclaimer Bar -->
     <div class="disclaimer-bottom-bar">
@@ -556,7 +539,7 @@
         <button class="btn-secondary" (click)="cancelarCadastro()">Cancelar</button>
         <button class="btn-primary" (click)="salvarQuadra()" [disabled]="salvando">
           <span class="spinner-sm" *ngIf="salvando"></span>
-          {{ salvando ? 'Salvando...' : 'Salvar quadra' }}
+          {{ salvando ? 'Salvando...' : (quadraEditandoId ? 'Salvar alterações' : 'Salvar quadra') }}
         </button>
       </div>
     </div>

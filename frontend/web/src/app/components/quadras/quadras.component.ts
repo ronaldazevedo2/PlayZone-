@@ -23,6 +23,7 @@ export class QuadrasComponent implements OnInit {
   
   // Controle de Visualização
   exibirFormularioCadastro = false;
+  quadraEditandoId: string | null = null;
 
   // Filtros e busca da listagem
   buscaTexto = '';
@@ -31,7 +32,7 @@ export class QuadrasComponent implements OnInit {
 
   // Paginação
   paginaAtual = 1;
-  tamanhoPagina = 5;
+  tamanhoPagina = 10;
   totalItens = 0;
   totalPaginas = 1;
 
@@ -53,7 +54,8 @@ export class QuadrasComponent implements OnInit {
     capacidade: 12,
     localizacao: '',
     modalidade: 'Futebol Society',
-    imagemUrl: ''
+    imagemUrl: '',
+    status: 'Ativa'
   };
 
   // Opções de Modalidades (Tipo)
@@ -96,13 +98,8 @@ export class QuadrasComponent implements OnInit {
         this.totalPaginas = res.dados?.totalPaginas ?? 0;
         
         this.quadras = itens.map(q => {
-          let status: 'Ativa' | 'Manutenção' | 'Inativa' = 'Ativa';
+          const status = (q as any).status || 'Ativa';
           const nomeStr = q.nome?.toLowerCase() || '';
-          const descStr = q.descricao?.toLowerCase() || '';
-
-          if (nomeStr.includes('vôlei') || descStr.includes('manutenção')) {
-            status = 'Manutenção';
-          }
 
           const diasDisponiveis = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
           
@@ -211,6 +208,7 @@ export class QuadrasComponent implements OnInit {
   // Ações de cadastro
   adicionarQuadra(): void {
     this.exibirFormularioCadastro = true;
+    this.quadraEditandoId = null;
     this.erro = '';
     this.sucessoMsg = '';
     this.novaQuadra = {
@@ -219,7 +217,8 @@ export class QuadrasComponent implements OnInit {
       capacidade: 12,
       localizacao: '',
       modalidade: 'Futebol Society',
-      imagemUrl: ''
+      imagemUrl: '',
+      status: 'Ativa'
     };
     
     // Inicializa os horários padrão por dia conforme a planilha
@@ -237,6 +236,7 @@ export class QuadrasComponent implements OnInit {
 
   cancelarCadastro(): void {
     this.exibirFormularioCadastro = false;
+    this.quadraEditandoId = null;
     this.erro = '';
   }
 
@@ -279,6 +279,10 @@ export class QuadrasComponent implements OnInit {
   }
 
   salvarQuadra(): void {
+    if (this.novaQuadra.nome) {
+      this.novaQuadra.nome = this.novaQuadra.nome.toUpperCase();
+    }
+
     if (!this.novaQuadra.nome || !this.novaQuadra.localizacao || !this.novaQuadra.capacidade) {
       this.erro = 'Por favor, preencha todos os campos obrigatórios (*).';
       return;
@@ -309,38 +313,78 @@ export class QuadrasComponent implements OnInit {
       capacidade: Number(this.novaQuadra.capacidade)
     } as any;
 
-    this.quadraService.criar(commandToSave).subscribe({
-      next: (res) => {
-        this.salvando = false;
-        this.exibirFormularioCadastro = false;
-        this.carregarQuadras();
-      },
-      error: (err) => {
-        console.error('Erro ao salvar quadra:', err);
-        
-        let mensagemErro = 'Ocorreu um erro ao salvar a quadra na API.';
-        if (err.error) {
-          if (err.error.erros && err.error.erros.length > 0) {
-             mensagemErro = err.error.erros.join(', ');
-          } else if (err.error.mensagem) {
-             mensagemErro = err.error.mensagem;
-          } else if (err.error.errors) {
-             // Tratamento de Erros do ModelState/FluentValidation (.NET)
-             const msgs = Object.values(err.error.errors).flat();
-             mensagemErro = msgs.join(', ');
-          } else if (typeof err.error === 'string') {
-             mensagemErro = err.error;
-          }
+    if (this.quadraEditandoId) {
+      this.quadraService.atualizar(this.quadraEditandoId, commandToSave).subscribe({
+        next: () => {
+          this.salvando = false;
+          this.exibirFormularioCadastro = false;
+          this.quadraEditandoId = null;
+          this.carregarQuadras();
+        },
+        error: (err) => {
+          this.tratarErroSalvar(err);
         }
-        
-        this.erro = mensagemErro;
-        this.salvando = false;
+      });
+    } else {
+      this.quadraService.criar(commandToSave).subscribe({
+        next: (res) => {
+          this.salvando = false;
+          this.exibirFormularioCadastro = false;
+          this.quadraEditandoId = null;
+          this.carregarQuadras();
+        },
+        error: (err) => {
+          this.tratarErroSalvar(err);
+        }
+      });
+    }
+  }
+
+  private tratarErroSalvar(err: any): void {
+    console.error('Erro ao salvar quadra:', err);
+    let mensagemErro = 'Ocorreu um erro ao salvar a quadra na API.';
+    if (err.error) {
+      if (err.error.erros && err.error.erros.length > 0) {
+         mensagemErro = err.error.erros.join(', ');
+      } else if (err.error.mensagem) {
+         mensagemErro = err.error.mensagem;
+      } else if (err.error.errors) {
+         const msgs = Object.values(err.error.errors).flat();
+         mensagemErro = msgs.join(', ');
+      } else if (typeof err.error === 'string') {
+         mensagemErro = err.error;
       }
-    });
+    }
+    this.erro = mensagemErro;
+    this.salvando = false;
   }
 
   editarQuadra(quadra: QuadraExibicao): void {
-    alert(`Editar quadra: ${quadra.nome} (Funcionalidade em desenvolvimento)`);
+    this.exibirFormularioCadastro = true;
+    this.quadraEditandoId = quadra.id;
+    this.erro = '';
+    this.sucessoMsg = '';
+    
+    this.novaQuadra = {
+      nome: quadra.nome || '',
+      descricao: quadra.descricao || '',
+      capacidade: quadra.capacidade || 12,
+      localizacao: quadra.localizacao || '',
+      modalidade: quadra.modalidade || 'Futebol Society',
+      imagemUrl: quadra.imagemUrl || '',
+      status: quadra.status || 'Ativa'
+    };
+    
+    this.diaFormAtivo = 'Seg';
+    this.horariosPorDia = {
+      'Seg': ['18:00', '19:00', '20:00', '21:00'],
+      'Ter': ['18:00', '19:00', '20:00', '21:00'],
+      'Qua': ['18:00', '19:00', '20:00', '21:00'],
+      'Qui': ['18:00', '19:00', '20:00', '21:00'],
+      'Sex': ['18:00', '19:00', '20:00', '21:00'],
+      'Sáb': ['08:00', '09:00', '10:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00'],
+      'Dom': ['08:00', '09:00', '13:00', '14:00', '15:00', '16:00', '17:00']
+    };
   }
 
   abrirOpcoes(quadra: QuadraExibicao): void {

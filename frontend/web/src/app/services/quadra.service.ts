@@ -14,6 +14,7 @@ export interface ReservaQuadraDto {
   capacidade: number;
   modalidade: string;
   imagemUrl: string;
+  status: string;
 }
 
 export interface CriarQuadraCommand {
@@ -23,6 +24,7 @@ export interface CriarQuadraCommand {
   localizacao: string;
   modalidade: string;
   imagemUrl: string;
+  status: string;
 }
 
 export interface AtualizarQuadraRequest {
@@ -32,6 +34,7 @@ export interface AtualizarQuadraRequest {
   capacidade: number;
   modalidade: string;
   imagemUrl: string;
+  status: string;
 }
 
 @Injectable({

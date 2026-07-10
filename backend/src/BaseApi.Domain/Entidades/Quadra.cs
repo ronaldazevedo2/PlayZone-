@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,6 +22,8 @@ namespace BaseApi.Domain.Entidades
         public string Modalidade { get; set; } = string.Empty;
 
         public string ImagemUrl { get; set; } = string.Empty;
+
+        public string Status { get; set; } = "Ativa";
 
 
 
