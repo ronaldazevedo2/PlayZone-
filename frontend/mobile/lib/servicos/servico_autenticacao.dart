@@ -55,8 +55,11 @@ class ServicoAutenticacao {
   // URLs para conexao com a API local
   // Para emuladores Android, '10.0.2.2' mapeia para o localhost da maquina hospedeira.
   // Para iOS, web ou dispositivos na mesma rede, usamos 'localhost' ou o IP local.
-  static const String _urlBasePadrao = 'https://10.0.2.2:7200';
-  static const String _urlBaseAlternativa = 'https://localhost:7200';
+  // IPs locais configurados para conexao em desenvolvimento
+  // 10.72.2.6 e o IP local do computador na rede Wi-Fi (para dispositivos fisicos)
+  // 10.0.2.2 e o IP de loopback do Emulador Android
+  static const String _urlBasePadrao = 'http://10.72.2.6:5200';
+  static const String _urlBaseAlternativa = 'http://10.0.2.2:5200';
 
   static String _urlBaseAtual = _urlBasePadrao;
 
