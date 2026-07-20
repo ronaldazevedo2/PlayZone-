@@ -1,4 +1,4 @@
-﻿using BaseApi.Application.Comum.Modelos;
+using BaseApi.Application.Comum.Modelos;
 using MediatR;
 
 namespace BaseApi.Application.Vigilantes.Queries.ListarVigilantes;
@@ -16,7 +16,7 @@ public record ListarVigilantesQuery(
 /// DTO resumido para listagem
 /// </summary>
 public record VigilanteListaDto(
-    int Id,
+    Guid Id,
     string NomeCompleto,
     string Cpf,
     string Matricula,

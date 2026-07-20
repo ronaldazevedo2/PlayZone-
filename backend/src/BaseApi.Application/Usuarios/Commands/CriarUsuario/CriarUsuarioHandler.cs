@@ -17,7 +17,8 @@ namespace BaseApi.Application.Usuarios.Commands.CriarUsuario;
 /// </summary>
 public class CriarUsuarioHandler(
     IUsuarioRepositorio repositorio,
-    ISenhaServico senhaServico) : IRequestHandler<CriarUsuarioCommand, CriarUsuarioResposta>
+    ISenhaServico senhaServico)
+    : IRequestHandler<CriarUsuarioCommand, CriarUsuarioResposta>
 {
     public async Task<CriarUsuarioResposta> Handle(CriarUsuarioCommand command, CancellationToken ct)
     {
@@ -27,7 +28,9 @@ public class CriarUsuarioHandler(
 
         var usuario = new Usuario
         {
-            NomeCompleto = command.NomeCompleto,
+            NomeCompleto = command.NomeCompleto.Trim(),
+            Cpf = command.Cpf.Trim(),
+            Telefone = command.Telefone.Trim(),
             Email = command.Email.ToLowerInvariant().Trim(),
             SenhaHash = senhaServico.GerarHash(command.Senha),
             PerfilId = command.PerfilId,
@@ -39,6 +42,12 @@ public class CriarUsuarioHandler(
         await repositorio.AdicionarAsync(usuario, ct);
         await repositorio.SalvarAsync(ct);
 
-        return new CriarUsuarioResposta(usuario.Id, usuario.NomeCompleto, usuario.Email);
+        return new CriarUsuarioResposta(
+            usuario.Id,
+            usuario.NomeCompleto,
+            usuario.Email,
+            usuario.Cpf,
+            usuario.Telefone
+        );
     }
 }

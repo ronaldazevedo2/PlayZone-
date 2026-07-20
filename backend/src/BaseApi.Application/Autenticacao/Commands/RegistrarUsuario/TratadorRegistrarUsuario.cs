@@ -19,8 +19,10 @@ public class TratadorRegistrarUsuario(
         CancellationToken tokenCancelamento
     )
     {
-        // Limpar e validar dados de entrada básicos
+        // Limpar dados de entrada
         var emailLimpo = comando.Email.ToLowerInvariant().Trim();
+        var cpfLimpo = comando.Cpf.Trim();
+        var telefoneLimpo = comando.Telefone.Trim();
 
         // Verificar duplicidade de e-mail
         var emailExiste = await repositorioUsuario.EmailExisteAsync(emailLimpo, null, tokenCancelamento);
@@ -33,6 +35,8 @@ public class TratadorRegistrarUsuario(
         var novoUsuario = new Usuario
         {
             NomeCompleto = comando.NomeCompleto.Trim(),
+            Cpf = cpfLimpo,
+            Telefone = telefoneLimpo,
             Email = emailLimpo,
             SenhaHash = servicoSenha.GerarHash(comando.Senha),
             PerfilId = 3,
@@ -47,7 +51,9 @@ public class TratadorRegistrarUsuario(
         return new RespostaRegistrarUsuario(
             novoUsuario.Id,
             novoUsuario.NomeCompleto,
-            novoUsuario.Email
+            novoUsuario.Email,
+            novoUsuario.Cpf,
+            novoUsuario.Telefone
         );
     }
 }
