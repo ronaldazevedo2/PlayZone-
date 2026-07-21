@@ -4,6 +4,7 @@ using BaseApi.Infrastructure.Dados;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BaseApi.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260719221635_AdicionarCpfETelefoneUsuario")]
+    partial class AdicionarCpfETelefoneUsuario
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -161,8 +164,8 @@ namespace BaseApi.Infrastructure.Migrations
 
                     b.Property<string>("ImagemUrl")
                         .IsRequired()
-                        .HasMaxLength(1000000)
-                        .HasColumnType("longtext");
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
 
                     b.Property<string>("Localizacao")
                         .IsRequired()
@@ -179,10 +182,6 @@ namespace BaseApi.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.HasKey("Id");
 
                     b.ToTable("quadras", (string)null);
@@ -196,8 +195,7 @@ namespace BaseApi.Infrastructure.Migrations
                             ImagemUrl = "https://www.aecweb.com.br/revista/materias/projetando-areas-esportivas-conheca-os-materiais-mais-indicados/6698",
                             Localizacao = "São José",
                             Modalidade = "Futebol",
-                            Nome = "GINÁSIO POLIESPORTIVO \"EURICO GUILHERME SCHULZ\"",
-                            Status = "Ativa"
+                            Nome = "GINÁSIO POLIESPORTIVO \"EURICO GUILHERME SCHULZ\""
                         },
                         new
                         {
@@ -207,8 +205,7 @@ namespace BaseApi.Infrastructure.Migrations
                             ImagemUrl = "https://www.newquadras.com.br/images/Projetos/Fotos/ESCOLA%20IPSG%20(2).jpg",
                             Localizacao = "Aviso",
                             Modalidade = "Futebol",
-                            Nome = "GINÁSIO POLIESPORTIVO BAIRRO AVISO",
-                            Status = "Ativa"
+                            Nome = "GINÁSIO POLIESPORTIVO BAIRRO AVISO"
                         },
                         new
                         {
@@ -218,8 +215,7 @@ namespace BaseApi.Infrastructure.Migrations
                             ImagemUrl = "https://exemplo.com/imagens/interlagos.jpg",
                             Localizacao = "Interlagos",
                             Modalidade = "Futebol",
-                            Nome = "GINÁSIO POLIESPORTIVO \"LEANDRO SILVA DOS REIS\"",
-                            Status = "Ativa"
+                            Nome = "GINÁSIO POLIESPORTIVO \"LEANDRO SILVA DOS REIS\""
                         },
                         new
                         {
@@ -229,8 +225,7 @@ namespace BaseApi.Infrastructure.Migrations
                             ImagemUrl = "https://exemplo.com/imagens/araca.jpg",
                             Localizacao = "Araçá",
                             Modalidade = "Futebol",
-                            Nome = "GINÁSIO POLIESPORTIVO BAIRRO ARAÇÁ",
-                            Status = "Ativa"
+                            Nome = "GINÁSIO POLIESPORTIVO BAIRRO ARAÇÁ"
                         });
                 });
 
@@ -373,7 +368,7 @@ namespace BaseApi.Infrastructure.Migrations
                             Email = "admin@baseapi.com",
                             NomeCompleto = "Administrador do Sistema",
                             PerfilId = 1,
-                            SenhaHash = "$2a$11$Rs2w12K9Jsz1DZQ2s4FQ4udFsP1F7FkJhN1DHzxwN16ZrFCPf25hy",
+                            SenhaHash = "$2a$11$XlOWzVJD7e4Rswz6lMMS.e/OUt5H3kfIVpwtZNU4AdNjOWGbNKP4O",
                             Telefone = ""
                         },
                         new
@@ -386,7 +381,7 @@ namespace BaseApi.Infrastructure.Migrations
                             Email = "admin@playzone.com",
                             NomeCompleto = "Administrador",
                             PerfilId = 1,
-                            SenhaHash = "$2a$11$jTLsirZPhHNnIAXwrcPx2eYKPt7bT8dZd3W122S2iJBpsSKEJnTmG",
+                            SenhaHash = "$2a$11$py1rW8/4XcZ4lI2izMcG4uDVrTD7PwjOupX0SE.UNPQdPLNSdgqS.",
                             Telefone = ""
                         },
                         new
@@ -399,7 +394,7 @@ namespace BaseApi.Infrastructure.Migrations
                             Email = "joao@playzone.com",
                             NomeCompleto = "João Silva",
                             PerfilId = 2,
-                            SenhaHash = "$2a$11$nG.5aav0E.X12cJuvKVmVuOMmVM.pPcnPHoiZgvmKEvEjfTdq5MdC",
+                            SenhaHash = "$2a$11$UCHE0nmY6Lc47ECZptv7T.ieURrdm6/HoSMJJvacR0LPeJJzVUIXe",
                             Telefone = ""
                         },
                         new
@@ -412,7 +407,7 @@ namespace BaseApi.Infrastructure.Migrations
                             Email = "maria@playzone.com",
                             NomeCompleto = "Maria Souza",
                             PerfilId = 3,
-                            SenhaHash = "$2a$11$Z2reOjYx6S.CQUhU0WCbkeUaqDiL30StHpDmLgkbF0r5u3bNsX5qi",
+                            SenhaHash = "$2a$11$7DvJgn3vOobjKBkLuL6lS.1U4lK9ifc0KLU9uYIXKU8IEXzss7ib.",
                             Telefone = ""
                         });
                 });

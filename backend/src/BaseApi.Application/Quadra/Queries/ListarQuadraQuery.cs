@@ -1,4 +1,4 @@
-﻿using BaseApi.Application.Comum.Modelos;
+using BaseApi.Application.Comum.Modelos;
 using MediatR;
 
 namespace BaseApi.Application.Telefones.Queries.ListarTelefones;
@@ -20,5 +20,6 @@ public record ReservaQuadraDto(
     string Localizacao,
     int Capacidade,
     string Modalidade,
-    string ImagemUrl
+    string ImagemUrl,
+    string Status
 );

@@ -38,7 +38,7 @@ namespace BaseApi.Infrastructure.Dados.Configuracoes
                 .HasMaxLength(50);
 
             builder.Property(q => q.ImagemUrl)
-                .HasMaxLength(500);
+                .HasMaxLength(1000000);
         }
 
     }

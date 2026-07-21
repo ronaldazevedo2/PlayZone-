@@ -1,4 +1,4 @@
-﻿using BaseApi.Application.Quadra.Commands.AtualizarQuadra;
+using BaseApi.Application.Quadra.Commands.AtualizarQuadra;
 using BaseApi.Domain.Excecoes;
 using BaseApi.Domain.Interfaces.Repositorios;
 using MediatR;
@@ -21,6 +21,9 @@ public class AtualizarQuadraHandler(IQuadraRepositorio repositorio)
         quadra.Localizacao = command.Localizacao;
         quadra.Modalidade = command.Modalidade;
         quadra.ImagemUrl = command.ImagemUrl;
+        if (!string.IsNullOrWhiteSpace(command.Status)) {
+            quadra.Status = command.Status;
+        }
 
         repositorio.Atualizar(quadra);
         await repositorio.SalvarAsync(ct);

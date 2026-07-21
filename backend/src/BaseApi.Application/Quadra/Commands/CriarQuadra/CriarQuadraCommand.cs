@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 
 namespace BaseApi.Application.Quadra.Commands.AdicionarQuadra
 {
@@ -9,14 +9,11 @@ namespace BaseApi.Application.Quadra.Commands.AdicionarQuadra
     int Capacidade,
     string Localizacao,
     string Modalidade,
-    string ImagemUrl
-    
-     
-
-
+    string ImagemUrl,
+    string Status
 ) : IRequest<CriarQuadraResposta>;
 
     /// <summary>DTO retornado após criação bem-sucedida</summary>
-    public record CriarQuadraResposta(Guid Id, string Nome, string Descricao, int Capacidade, string Localizacao, string Modalidade, string ImagemUrl);
+    public record CriarQuadraResposta(Guid Id, string Nome, string Descricao, int Capacidade, string Localizacao, string Modalidade, string ImagemUrl, string Status);
 
 }

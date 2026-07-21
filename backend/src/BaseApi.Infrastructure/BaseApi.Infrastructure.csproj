@@ -1,6 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <Compile Remove="Migrations\20260708225755_Inicial.cs" />
+    <Compile Remove="Migrations\20260708225755_Inicial.Designer.cs" />
     <Compile Remove="Repositorios\DadosSecretaria.cs" />
   </ItemGroup>
 

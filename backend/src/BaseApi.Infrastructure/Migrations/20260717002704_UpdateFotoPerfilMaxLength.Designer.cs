@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BaseApi.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260708225755_Inicial")]
-    partial class Inicial
+    [Migration("20260717002704_UpdateFotoPerfilMaxLength")]
+    partial class UpdateFotoPerfilMaxLength
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -354,7 +354,7 @@ namespace BaseApi.Infrastructure.Migrations
                             Email = "admin@baseapi.com",
                             NomeCompleto = "Administrador do Sistema",
                             PerfilId = 1,
-                            SenhaHash = "$2a$11$qe/ZZp2H3NFdaEusTUhDdeXw1t4tSC3AxPI1H/m1iFPuX2mnfcPDG"
+                            SenhaHash = "$2a$11$ybSNeQz4s1RkLfJqJliDkOw/RlLDIw1H3h86sj4KFzTGiZ8Lf6kNa"
                         },
                         new
                         {
@@ -365,7 +365,7 @@ namespace BaseApi.Infrastructure.Migrations
                             Email = "admin@playzone.com",
                             NomeCompleto = "Administrador",
                             PerfilId = 1,
-                            SenhaHash = "$2a$11$9iWb7Sn8SMPETKWJ.wM7VOTj6UeE/e6Z9jPqDag6jVBjEulEwMNi6"
+                            SenhaHash = "$2a$11$phsEXOTXhrwpOB23DvRW/O1mL47MBSyoW4Kcmkxo6TvsdxVWE3SB6"
                         },
                         new
                         {
@@ -376,7 +376,7 @@ namespace BaseApi.Infrastructure.Migrations
                             Email = "joao@playzone.com",
                             NomeCompleto = "João Silva",
                             PerfilId = 2,
-                            SenhaHash = "$2a$11$xCNsX9rvvOYaQDTORHQ0fewUUMHFQzPReEMTzCD3zUsnpqFs1YA2W"
+                            SenhaHash = "$2a$11$i65Vh2qEwys3JCiUzDiaZeaVq8chWmVkTOjTar0LZBLO4DDY9ex/W"
                         },
                         new
                         {
@@ -387,7 +387,7 @@ namespace BaseApi.Infrastructure.Migrations
                             Email = "maria@playzone.com",
                             NomeCompleto = "Maria Souza",
                             PerfilId = 3,
-                            SenhaHash = "$2a$11$DnANEnZKCyVyXegrf.okm.bK06iqC0Hvp6GhJknmcCfHfdHFFmTna"
+                            SenhaHash = "$2a$11$/H6UR9mex2GV/AxQtyGel.X.3DksbMQjxpiZh88hbqFMp3ndayv46"
                         });
                 });
 
@@ -425,8 +425,7 @@ namespace BaseApi.Infrastructure.Migrations
 
                     b.Property<string>("FotoPerfil")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Matricula")
                         .IsRequired()

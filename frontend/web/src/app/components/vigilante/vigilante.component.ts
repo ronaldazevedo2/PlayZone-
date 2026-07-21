@@ -5,13 +5,15 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';
 
 export interface Vigilante {
-  id?: number;
+  id?: string;
   nomeCompleto: string;
   cpf: string;
   email: string;
   telefone: string;
   dataNascimento: string;
-  fotoPerfil: string;
+  fotoPerfil?: string;
+  matricula: string;
+  arena: string;
   ativo: boolean;
 }
 
@@ -52,8 +54,10 @@ export class VigilanteComponent implements OnInit {
   telefone = '';
   dataNascimento = '';
   fotoPerfil = '';
+  matricula = '';
+  arena = '';
 
-  private readonly API_URL = 'https://localhost:7218/api/Vigilantes';
+  private readonly API_URL = 'https://localhost:7200/api/Vigilantes';
 
   constructor(private http: HttpClient, private authService: AuthService) { }
 
@@ -114,6 +118,8 @@ export class VigilanteComponent implements OnInit {
     this.telefone = '';
     this.dataNascimento = '';
     this.fotoPerfil = '';
+    this.matricula = '';
+    this.arena = '';
     this.errorMessage = '';
     this.successMessage = '';
   }
@@ -193,7 +199,9 @@ export class VigilanteComponent implements OnInit {
       email: this.email,
       telefone: sanitizedTelefone,
       dataNascimento: isoDate,
-      fotoPerfil: this.fotoPerfil
+      fotoPerfil: this.fotoPerfil,
+      matricula: this.matricula,
+      arena: this.arena
     };
 
     this.isLoading = true;

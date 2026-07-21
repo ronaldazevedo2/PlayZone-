@@ -14,10 +14,21 @@ public class ValidadorRegistrarUsuario : AbstractValidator<ComandoRegistrarUsuar
             .NotEmpty().WithMessage("Nome completo é obrigatório.")
             .MaximumLength(150).WithMessage("Nome deve ter no máximo 150 caracteres.");
 
+        RuleFor(x => x.Cpf)
+            .NotEmpty().WithMessage("CPF é obrigatório.")
+            .Matches(@"^\d{11}$")
+            .WithMessage("CPF deve conter exatamente 11 números.");
+
+        RuleFor(x => x.Telefone)
+            .NotEmpty().WithMessage("Telefone é obrigatório.")
+            .Matches(@"^\d{10,11}$")
+            .WithMessage("Telefone deve conter 10 ou 11 números (DDD + número).");
+
         RuleFor(x => x.Email)
             .NotEmpty().WithMessage("E-mail é obrigatório.")
             .EmailAddress().WithMessage("E-mail inválido.")
-            .MustAsync(async (email, tokenCancelamento) => !await repositorioUsuario.EmailExisteAsync(email, null, tokenCancelamento))
+            .MustAsync(async (email, tokenCancelamento) =>
+                !await repositorioUsuario.EmailExisteAsync(email, null, tokenCancelamento))
             .WithMessage("Este e-mail já está cadastrado.");
 
         RuleFor(x => x.Senha)

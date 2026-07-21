@@ -105,6 +105,8 @@
             <th>E-mail</th>
             <th>Telefone</th>
             <th>Data de Nascimento</th>
+            <th>Matrícula</th>
+            <th>Arena</th>
             <th>Status</th>
           </tr>
         </thead>
@@ -123,6 +125,8 @@
             <td>{{ guard.email }}</td>
             <td>{{ guard.telefone }}</td>
             <td>{{ guard.dataNascimento | date:'dd/MM/yyyy':'UTC' }}</td>
+            <td>{{ guard.matricula }}</td>
+            <td>{{ guard.arena }}</td>
             <td>
               <span class="status-indicator" [class.active-status]="guard.ativo" [class.inactive-status]="!guard.ativo">
                 {{ guard.ativo ? 'Ativo' : 'Inativo' }}
@@ -209,6 +213,18 @@
             <label for="telefone">Telefone <span class="required">*</span></label>
             <input type="text" id="telefone" [(ngModel)]="telefone" name="telefone" (input)="applyPhoneMask($event)"
               placeholder="(00) 00000-0000" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group half-width">
+            <label for="matricula">Matrícula <span class="required">*</span></label>
+            <input type="text" id="matricula" [(ngModel)]="matricula" name="matricula" placeholder="Digite a matrícula" required>
+          </div>
+
+          <div class="form-group half-width">
+            <label for="arena">Arena <span class="required">*</span></label>
+            <input type="text" id="arena" [(ngModel)]="arena" name="arena" placeholder="Digite a arena" required>
           </div>
         </div>
 

@@ -8,6 +8,8 @@ namespace BaseApi.Application.Autenticacao.Commands.RegistrarUsuario;
 public record ComandoRegistrarUsuario(
     string NomeCompleto,
     string Email,
+    string Cpf,
+    string Telefone,
     string Senha
 ) : IRequest<RespostaRegistrarUsuario>;
 
@@ -17,5 +19,7 @@ public record ComandoRegistrarUsuario(
 public record RespostaRegistrarUsuario(
     Guid Id,
     string NomeCompleto,
-    string Email
+    string Email,
+    string Cpf,
+    string Telefone
 );

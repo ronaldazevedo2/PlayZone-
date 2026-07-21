@@ -13,6 +13,8 @@ public class AtualizarUsuarioHandler(IUsuarioRepositorio repositorio) : IRequest
 
         usuario.NomeCompleto = command.NomeCompleto;
         usuario.Email = command.Email.ToLowerInvariant().Trim();
+        usuario.Cpf = command.Cpf.Trim();
+        usuario.Telefone = command.Telefone.Trim();
         usuario.PerfilId = command.PerfilId;
         usuario.Ativo = command.Ativo;
         usuario.AtualizadoEm = DateTime.UtcNow;

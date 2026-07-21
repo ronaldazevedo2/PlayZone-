@@ -20,9 +20,11 @@ namespace BaseApi.Application.Usuarios.Commands.CriarUsuario;
 public record CriarUsuarioCommand(
     string NomeCompleto,
     string Email,
+    string Cpf,
+    string Telefone,
     string Senha,
     int PerfilId
 ) : IRequest<CriarUsuarioResposta>;
 
 /// <summary>DTO retornado após criação bem-sucedida</summary>
-public record CriarUsuarioResposta(Guid Id, string NomeCompleto, string Email);
+public record CriarUsuarioResposta(Guid Id, string NomeCompleto, string Email, string Cpf, string Telefone);

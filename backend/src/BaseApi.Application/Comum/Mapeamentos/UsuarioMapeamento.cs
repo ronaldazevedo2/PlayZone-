@@ -1,6 +1,6 @@
 using BaseApi.Application.Usuarios.Commands.CriarUsuario;
-using BaseApi.Application.Usuarios.Queries.ObterUsuarioPorId;
 using BaseApi.Application.Usuarios.Queries.ListarUsuarios;
+using BaseApi.Application.Usuarios.Queries.ObterUsuarioPorId;
 using BaseApi.Domain.Entidades;
 using Mapster;
 
@@ -19,14 +19,20 @@ public class UsuarioMapeamento : IRegister
     {
         // Usuario → UsuarioDetalheDto
         config.NewConfig<Usuario, UsuarioDetalheDto>()
-            .Map(dest => dest.NomePerfil, src => src.Perfil != null ? src.Perfil.Nome : string.Empty);
+            .Map(dest => dest.NomePerfil, src => src.Perfil != null ? src.Perfil.Nome : string.Empty)
+            .Map(dest => dest.Cpf, src => src.Cpf)
+            .Map(dest => dest.Telefone, src => src.Telefone);
 
         // Usuario → UsuarioListaDto
         config.NewConfig<Usuario, UsuarioListaDto>()
-            .Map(dest => dest.NomePerfil, src => src.Perfil != null ? src.Perfil.Nome : string.Empty);
+            .Map(dest => dest.NomePerfil, src => src.Perfil != null ? src.Perfil.Nome : string.Empty)
+            .Map(dest => dest.Cpf, src => src.Cpf)
+            .Map(dest => dest.Telefone, src => src.Telefone);
 
-        // CriarUsuarioCommand → Usuario (sem mapear SenhaHash aqui, é feito no Handler)
+        // CriarUsuarioCommand → Usuario
         config.NewConfig<CriarUsuarioCommand, Usuario>()
+            .Map(dest => dest.Cpf, src => src.Cpf)
+            .Map(dest => dest.Telefone, src => src.Telefone)
             .Ignore(dest => dest.SenhaHash)
             .Ignore(dest => dest.Id)
             .Ignore(dest => dest.CriadoEm)
