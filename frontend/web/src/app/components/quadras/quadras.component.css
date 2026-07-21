@@ -8,6 +8,103 @@
 }
 
 /* =========================================================
+   TOAST NOTIFICATION
+   ========================================================= */
+.toast-notification {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  max-width: 440px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.14);
+  animation: toastSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  border-left: 4px solid transparent;
+}
+
+@keyframes toastSlideIn {
+  from { opacity: 0; transform: translateX(60px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.toast-aviso {
+  background-color: #fffbeb;
+  border-left-color: #f59e0b;
+}
+
+.toast-erro {
+  background-color: #fff1f2;
+  border-left-color: #ef4444;
+}
+
+.toast-sucesso {
+  background-color: #f0fdf4;
+  border-left-color: #22c55e;
+}
+
+.toast-icon {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  margin-top: 2px;
+}
+
+.toast-aviso .toast-icon { color: #d97706; }
+.toast-erro .toast-icon  { color: #dc2626; }
+.toast-sucesso .toast-icon { color: #16a34a; }
+
+.toast-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.toast-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.toast-title {
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: #1e293b;
+  display: block;
+}
+
+.toast-body {
+  font-size: 0.85rem;
+  color: #475569;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.toast-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #94a3b8;
+  padding: 2px;
+  flex-shrink: 0;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s;
+}
+
+.toast-close:hover { color: #475569; }
+
+.toast-close svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* =========================================================
    HEADER SECTION & BREADCRUMBS
    ========================================================= */
 .quadras-header {
@@ -1062,6 +1159,75 @@ input:checked + .switch-slider:before {
 .options-btn:hover {
   background-color: #f1f3f5;
   color: var(--text-dark);
+}
+
+/* Options Dropdown */
+.options-wrapper {
+  position: relative;
+}
+
+.options-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  background-color: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  min-width: 180px;
+  z-index: 100;
+  overflow: hidden;
+  animation: dropdownFadeIn 0.15s ease-out;
+}
+
+@keyframes dropdownFadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 16px;
+  background: none;
+  border: none;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text-dark);
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.15s ease;
+}
+
+.dropdown-item svg {
+  width: 16px;
+  height: 16px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background-color: var(--border-color);
+  margin: 4px 0;
+}
+
+.dropdown-item-danger {
+  color: #dc3545;
+}
+
+.dropdown-item-danger svg {
+  color: #dc3545;
+}
+
+.dropdown-item-danger:hover {
+  background-color: rgba(220, 53, 69, 0.05);
 }
 
 /* =========================================================

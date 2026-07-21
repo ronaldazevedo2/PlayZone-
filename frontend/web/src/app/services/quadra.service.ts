@@ -60,6 +60,17 @@ export class QuadraService {
     });
   }
 
+  private getDeleteHeaders(): HttpHeaders {
+    const token = this.authService.getToken();
+    if (!token) {
+      throw new Error('Usuário não autenticado.');
+    }
+    return new HttpHeaders({
+      'Accept': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+  }
+
   listar(
     pagina = 1,
     tamanhoPagina = 10,
@@ -110,16 +121,19 @@ export class QuadraService {
       .pipe(catchError(this.handleError));
   }
 
-  excluir(quadraId: string): Observable<RespostaApi<null>> {
+  excluir(quadraId: string): Observable<any> {
     return this.http
-      .delete<RespostaApi<null>>(
+      .delete<any>(
         `${this.BASE_URL}/${quadraId}`,
-        { headers: this.getHeaders() }
+        { headers: this.getDeleteHeaders() }
       )
-      .pipe(catchError(this.handleError));
+      .pipe(catchError((error) => {
+        console.error('[QuadraService] Erro na exclusão:', error);
+        return throwError(() => error);
+      }));
   }
 
-  private handleError(error: any): Observable<never> {
+  private handleError = (error: any): Observable<never> => {
     console.error('[QuadraService] Erro na requisição:', error);
     return throwError(() => error);
   }

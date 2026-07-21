@@ -31,7 +31,7 @@ namespace BaseApi.Application.Quadra.Commands.CriarQuadra
 
             RuleFor(x => x.ImagemUrl)
                 .NotEmpty().WithMessage("A Imagem é obrigatória.")
-                .MaximumLength(200);
+                .MaximumLength(1000000);
            
         }
     }

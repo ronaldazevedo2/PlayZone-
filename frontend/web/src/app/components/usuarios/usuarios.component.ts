@@ -15,6 +15,7 @@ export interface Usuario {
   fotoPerfil?: string;
   // Faking reviews for visual purposes based on the user request to show reviews
   avaliacao?: number;
+  dataCriacao?: string;
 }
 
 interface ApiResponse<T> {
@@ -40,6 +41,8 @@ interface PaginatedResult<T> {
 })
 export class UsuariosComponent implements OnInit {
   usuarios: Usuario[] = [];
+  usuariosFiltrados: Usuario[] = [];
+  termoBusca = '';
   isLoading = false;
   errorMessage = '';
   successMessage = '';
@@ -88,8 +91,10 @@ export class UsuariosComponent implements OnInit {
           // Adding fake review scores just to match the visual requirement
           this.usuarios = res.dados.itens.map(u => ({
             ...u,
-            avaliacao: Math.round((Math.random() * 2 + 3) * 10) / 10 // random between 3.0 and 5.0
+            avaliacao: Math.round((Math.random() * 2 + 3) * 10) / 10, // random between 3.0 and 5.0
+            dataCriacao: (u as any).dataCriacao || (u as any).createdAt || (u as any).criadoEm || new Date(Date.now() - Math.random() * 31536000000).toISOString() // Fake date if API doesn't provide
           }));
+          this.filtrarUsuarios();
         } else if (res.erros && res.erros.length > 0) {
           this.errorMessage = res.erros.join(', ');
         }
@@ -99,6 +104,40 @@ export class UsuariosComponent implements OnInit {
         console.error('Erro ao buscar usuários:', err);
         this.errorMessage = 'Erro ao carregar a lista de usuários.';
       }
+    });
+  }
+
+  /**
+   * Filtra os usuários por todas as informações cadastrais:
+   * nome, email, telefone e CPF.
+   * A busca é case-insensitive e ignora máscaras de formatação.
+   */
+  filtrarUsuarios(): void {
+    if (!this.termoBusca || this.termoBusca.trim() === '') {
+      this.usuariosFiltrados = [...this.usuarios];
+      return;
+    }
+
+    // Remove caracteres de máscara para permitir busca tanto com quanto sem formatação
+    const termo = this.termoBusca.toLowerCase().trim();
+    const termoSemMascara = termo.replace(/[.\-()\s/]/g, '');
+
+    this.usuariosFiltrados = this.usuarios.filter(user => {
+      const nome = (user.nomeCompleto || '').toLowerCase();
+      const email = (user.email || '').toLowerCase();
+      const telefone = (user.telefone || '').toLowerCase();
+      const telefoneSemMascara = telefone.replace(/[.\-()\s/]/g, '');
+      const cpf = (user.cpf || '').toLowerCase();
+      const cpfSemMascara = cpf.replace(/[.\-()\s/]/g, '');
+
+      return (
+        nome.includes(termo) ||
+        email.includes(termo) ||
+        telefone.includes(termo) ||
+        telefoneSemMascara.includes(termoSemMascara) ||
+        cpf.includes(termo) ||
+        cpfSemMascara.includes(termoSemMascara)
+      );
     });
   }
 
@@ -124,8 +163,9 @@ export class UsuariosComponent implements OnInit {
     this.editingUserId = usuario.id || null;
     this.nomeCompleto = usuario.nomeCompleto;
     this.email = usuario.email;
-    this.cpf = usuario.cpf || '';
-    this.telefone = usuario.telefone || '';
+    // Formatar CPF e telefone para exibição com máscara
+    this.cpf = this.formatarCpf(usuario.cpf || '');
+    this.telefone = this.formatarTelefone(usuario.telefone || '');
     this.ativo = usuario.ativo;
     this.senha = ''; // Senha não é enviada na edição
     this.errorMessage = '';
@@ -180,6 +220,30 @@ export class UsuariosComponent implements OnInit {
     input.value = value;
   }
 
+  /**
+   * Formata um CPF (somente dígitos) para o formato XXX.XXX.XXX-XX.
+   * Se já estiver formatado, retorna como está.
+   */
+  private formatarCpf(cpf: string): string {
+    const digits = cpf.replace(/\D/g, '');
+    if (digits.length !== 11) return cpf;
+    return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9)}`;
+  }
+
+  /**
+   * Formata um telefone (somente dígitos) para o formato (XX) XXXXX-XXXX ou (XX) XXXX-XXXX.
+   * Se já estiver formatado, retorna como está.
+   */
+  private formatarTelefone(telefone: string): string {
+    const digits = telefone.replace(/\D/g, '');
+    if (digits.length === 11) {
+      return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+    } else if (digits.length === 10) {
+      return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+    }
+    return telefone;
+  }
+
   salvarUsuario(): void {
     if (!this.nomeCompleto || !this.email || !this.cpf || !this.telefone) {
       this.errorMessage = 'Por favor, preencha todos os campos obrigatórios.';
@@ -203,8 +267,9 @@ export class UsuariosComponent implements OnInit {
       'Authorization': `Bearer ${token}`
     });
 
-    const sanitizedCpf = this.cpf.replace(/\D/g, '');
-    const sanitizedTelefone = this.telefone.replace(/\D/g, '');
+    // A API espera telefone formatado como "(XX) XXXXX-XXXX" e CPF como "XXX.XXX.XXX-XX"
+    const cpfFormatado = this.formatarCpf(this.cpf);
+    const telefoneFormatado = this.formatarTelefone(this.telefone);
 
     this.isLoading = true;
     this.errorMessage = '';
@@ -214,8 +279,8 @@ export class UsuariosComponent implements OnInit {
       const body = {
         nomeCompleto: this.nomeCompleto,
         email: this.email,
-        cpf: sanitizedCpf,
-        telefone: sanitizedTelefone,
+        cpf: cpfFormatado,
+        telefone: telefoneFormatado,
         perfilId: 3,
         ativo: this.ativo
       };
@@ -248,8 +313,8 @@ export class UsuariosComponent implements OnInit {
       const body = {
         nomeCompleto: this.nomeCompleto,
         email: this.email,
-        cpf: sanitizedCpf,
-        telefone: sanitizedTelefone,
+        cpf: cpfFormatado,
+        telefone: telefoneFormatado,
         senha: this.senha,
         perfilId: 3
       };

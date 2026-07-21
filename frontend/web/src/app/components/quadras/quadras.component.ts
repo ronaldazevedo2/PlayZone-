@@ -46,6 +46,13 @@ export class QuadrasComponent implements OnInit {
   salvando = false;
   erro = '';
   sucessoMsg = '';
+  menuAbertoId: string | null = null;
+
+  // Toast notification
+  toastMensagem = '';
+  toastTitulo = '';
+  toastTipo: 'erro' | 'aviso' | 'sucesso' = 'erro';
+  private toastTimer: any = null;
 
   // Estado do Formulário de Cadastro
   novaQuadra: CriarQuadraCommand = {
@@ -85,6 +92,20 @@ export class QuadrasComponent implements OnInit {
 
   ngOnInit(): void {
     this.carregarQuadras();
+  }
+
+  mostrarToast(titulo: string, mensagem: string, tipo: 'erro' | 'aviso' | 'sucesso' = 'erro', duracaoMs = 6000): void {
+    if (this.toastTimer) clearTimeout(this.toastTimer);
+    this.toastTitulo = titulo;
+    this.toastMensagem = mensagem;
+    this.toastTipo = tipo;
+    this.toastTimer = setTimeout(() => this.fecharToast(), duracaoMs);
+  }
+
+  fecharToast(): void {
+    this.toastMensagem = '';
+    this.toastTitulo = '';
+    if (this.toastTimer) { clearTimeout(this.toastTimer); this.toastTimer = null; }
   }
 
   carregarQuadras(): void {
@@ -387,7 +408,77 @@ export class QuadrasComponent implements OnInit {
     };
   }
 
-  abrirOpcoes(quadra: QuadraExibicao): void {
-    alert(`Opções para quadra: ${quadra.nome}`);
+  abrirOpcoes(quadra: QuadraExibicao, event: MouseEvent): void {
+    event.stopPropagation();
+    this.menuAbertoId = this.menuAbertoId === quadra.id ? null : quadra.id;
+  }
+
+  fecharMenus(): void {
+    this.menuAbertoId = null;
+  }
+
+  excluirQuadra(quadra: QuadraExibicao): void {
+    this.menuAbertoId = null;
+    if (!confirm(`Tem certeza que deseja excluir a quadra "${quadra.nome}"?`)) return;
+
+    this.carregando = true;
+    this.quadraService.excluir(quadra.id).subscribe({
+      next: (res) => {
+        if (res && res.ok === false) {
+          // API returned 200 but with ok: false (business rule error)
+          const rawMsg = (res.erros?.join(' ') || res.mensagem || '').toLowerCase();
+          const msgFriendly = this.traduzirErroExclusao(rawMsg, res.erros?.join(', ') || res.mensagem);
+          this.mostrarToast('Não foi possível excluir', msgFriendly, 'aviso');
+        } else {
+          this.quadras = this.quadras.filter(q => q.id !== quadra.id);
+          this.quadrasFiltradas = this.quadrasFiltradas.filter(q => q.id !== quadra.id);
+          this.totalItens = Math.max(0, this.totalItens - 1);
+          this.mostrarToast('Quadra excluída', `A quadra "${quadra.nome}" foi removida com sucesso.`, 'sucesso', 4000);
+          this.carregarQuadras();
+        }
+        this.carregando = false;
+      },
+      error: (err) => {
+        this.carregando = false;
+        const rawMsg = (
+          err.error?.erros?.join(' ') ||
+          err.error?.mensagem ||
+          err.error?.title ||
+          (typeof err.error === 'string' ? err.error : '') ||
+          ''
+        ).toLowerCase();
+        const msgFriendly = this.traduzirErroExclusao(rawMsg,
+          err.error?.erros?.join(', ') || err.error?.mensagem || err.error?.title || err.message || '');
+        const titulo = err.status === 403 ? 'Acesso negado' : 'Não foi possível excluir';
+        this.mostrarToast(titulo, msgFriendly, 'aviso');
+      }
+    });
+  }
+
+  private traduzirErroExclusao(rawLower: string, original: string): string {
+    // Reservation-linked patterns (portuguese + english from .NET EF/SQL)
+    const reservaPatterns = ['reserva', 'agendamento', 'booking', 'foreign key', 'constraint', 'fk_', 'reference', 'related', 'vinculad', 'depend'];
+    if (reservaPatterns.some(p => rawLower.includes(p))) {
+      return 'Esta quadra possui reservas vinculadas e não pode ser excluída. Cancele ou conclua todas as reservas associadas antes de removê-la.';
+    }
+    if (rawLower.includes('not found') || rawLower.includes('não encontrad') || rawLower.includes('404')) {
+      return 'Quadra não encontrada. Ela pode já ter sido excluída.';
+    }
+    if (rawLower.includes('unauthorized') || rawLower.includes('forbidden') || rawLower.includes('permiss')) {
+      return 'Você não tem permissão para excluir esta quadra.';
+    }
+    // Fallback: show original but cleaned up
+    return original || 'Ocorreu um erro ao tentar excluir a quadra. Tente novamente.';
+  }
+
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.novaQuadra.imagemUrl = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
   }
 }
