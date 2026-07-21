@@ -4,14 +4,6 @@ import '../modelos/modelo_quadra.dart';
 import 'servico_autenticacao.dart';
 
 class ServicoQuadras {
-  // URLs para conexao com a API local
-  // Para emuladores Android, '10.0.2.2' mapeia para o localhost da maquina hospedeira.
-  // Para iOS, web ou dispositivos na mesma rede, usamos 'localhost' ou o IP local.
-  static const String _urlBasePadrao = 'https://10.0.2.2:7200';
-  static const String _urlBaseAlternativa = 'https://localhost:7200';
-
-  static String _urlBaseAtual = _urlBasePadrao;
-
   /// Retorna o cabeçalho base com tipo de conteúdo JSON e autorização se logado
   static Future<Map<String, String>> _obterCabecalhos() async {
     final sessao = await ServicoAutenticacao.obterSessao();
@@ -31,33 +23,33 @@ class ServicoQuadras {
     String rota,
     dynamic corpo,
   ) async {
-    final url1 = Uri.parse('$_urlBaseAtual$rota');
+    final url1 = Uri.parse('${ServicoAutenticacao.obterUrlBase()}$rota');
     final corpoString = corpo != null ? jsonEncode(corpo) : null;
     final cabecalhos = await _obterCabecalhos();
 
     try {
       if (metodo == 'GET') {
-        return await http.get(url1, headers: cabecalhos).timeout(const Duration(seconds: 5));
+        return await http.get(url1, headers: cabecalhos).timeout(const Duration(seconds: 4));
       } else if (metodo == 'POST') {
-        return await http.post(url1, headers: cabecalhos, body: corpoString).timeout(const Duration(seconds: 5));
+        return await http.post(url1, headers: cabecalhos, body: corpoString).timeout(const Duration(seconds: 4));
       } else if (metodo == 'PUT') {
-        return await http.put(url1, headers: cabecalhos, body: corpoString).timeout(const Duration(seconds: 5));
+        return await http.put(url1, headers: cabecalhos, body: corpoString).timeout(const Duration(seconds: 4));
       } else if (metodo == 'DELETE') {
-        return await http.delete(url1, headers: cabecalhos).timeout(const Duration(seconds: 5));
+        return await http.delete(url1, headers: cabecalhos).timeout(const Duration(seconds: 4));
       }
       throw Exception('Método HTTP não suportado: $metodo');
     } catch (_) {
       try {
-        _urlBaseAtual = _urlBaseAtual == _urlBasePadrao ? _urlBaseAlternativa : _urlBasePadrao;
-        final urlNova = Uri.parse('$_urlBaseAtual$rota');
+        ServicoAutenticacao.alternarUrlBase();
+        final urlNova = Uri.parse('${ServicoAutenticacao.obterUrlBase()}$rota');
         if (metodo == 'GET') {
-          return await http.get(urlNova, headers: cabecalhos).timeout(const Duration(seconds: 5));
+          return await http.get(urlNova, headers: cabecalhos).timeout(const Duration(seconds: 4));
         } else if (metodo == 'POST') {
-          return await http.post(urlNova, headers: cabecalhos, body: corpoString).timeout(const Duration(seconds: 5));
+          return await http.post(urlNova, headers: cabecalhos, body: corpoString).timeout(const Duration(seconds: 4));
         } else if (metodo == 'PUT') {
-          return await http.put(urlNova, headers: cabecalhos, body: corpoString).timeout(const Duration(seconds: 5));
+          return await http.put(urlNova, headers: cabecalhos, body: corpoString).timeout(const Duration(seconds: 4));
         } else if (metodo == 'DELETE') {
-          return await http.delete(urlNova, headers: cabecalhos).timeout(const Duration(seconds: 5));
+          return await http.delete(urlNova, headers: cabecalhos).timeout(const Duration(seconds: 4));
         }
         throw Exception('Método HTTP não suportado: $metodo');
       } catch (erroConexao) {

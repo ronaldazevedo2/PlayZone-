@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -52,16 +53,32 @@ class ServicoAutenticacao {
   static const String _tokenAdminPadrao =
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDAwMSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6ImFkbWluQGJhc2VhcGkuY29tIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6IkFkbWluaXN0cmFkb3IgZG8gU2lzdGVtYSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFkbWluIiwianRpIjoiMWJkNThmMzYtZTY5Mi00ZDUyLWIxYTItZjAzODY3ODUzOTU3IiwiZXhwIjoxNzgzNTg1NjI4LCJpc3MiOiJCYXNlQXBpIiwiYXVkIjoiQmFzZUFwaUNsaWVudGVzIn0.yK5A8O-BzfM5yVJNRtF_rJO5KshMGdtUx0i9EJobpfo';
 
-  // URLs para conexao com a API local
-  // Para emuladores Android, '10.0.2.2' mapeia para o localhost da maquina hospedeira.
-  // Para iOS, web ou dispositivos na mesma rede, usamos 'localhost' ou o IP local.
-  // IPs locais configurados para conexao em desenvolvimento
-  // 10.72.2.6 e o IP local do computador na rede Wi-Fi (para dispositivos fisicos)
-  // 10.0.2.2 e o IP de loopback do Emulador Android
-  static const String _urlBasePadrao = 'http://10.72.2.6:5200';
-  static const String _urlBaseAlternativa = 'http://10.0.2.2:5200';
+  static String _obterUrlPadrao() {
+    if (!kIsWeb && Platform.isAndroid) {
+      return 'https://10.0.2.2:7200';
+    }
+    return 'https://localhost:7200';
+  }
 
-  static String _urlBaseAtual = _urlBasePadrao;
+  static String _obterUrlAlternativa() {
+    if (!kIsWeb && Platform.isAndroid) {
+      return 'http://10.0.2.2:5200';
+    }
+    return 'http://localhost:5200';
+  }
+
+  static String? _urlBaseAtual;
+
+  static String obterUrlBase() {
+    _urlBaseAtual ??= _obterUrlPadrao();
+    return _urlBaseAtual!;
+  }
+
+  static void alternarUrlBase() {
+    final urlPadrao = _obterUrlPadrao();
+    final urlAlternativa = _obterUrlAlternativa();
+    _urlBaseAtual = (_urlBaseAtual == urlPadrao) ? urlAlternativa : urlPadrao;
+  }
 
   /// Retorna o cabeçalho base com tipo de conteúdo JSON e autorização se logado
   static Future<Map<String, String>> _obterCabecalhos() async {
@@ -94,7 +111,7 @@ class ServicoAutenticacao {
     String rota,
     Map<String, dynamic>? corpo,
   ) async {
-    final url1 = Uri.parse('$_urlBaseAtual$rota');
+    final url1 = Uri.parse('${obterUrlBase()}$rota');
     final corpoString = corpo != null ? jsonEncode(corpo) : null;
     final cabecalhos = await _obterCabecalhos();
 
@@ -102,27 +119,25 @@ class ServicoAutenticacao {
       if (metodo == 'POST') {
         return await http
             .post(url1, headers: cabecalhos, body: corpoString)
-            .timeout(const Duration(seconds: 5));
+            .timeout(const Duration(seconds: 4));
       } else {
         return await http
             .get(url1, headers: cabecalhos)
-            .timeout(const Duration(seconds: 5));
+            .timeout(const Duration(seconds: 4));
       }
     } catch (_) {
       // Tenta a URL alternativa se a primeira falhar (ex: conexão recusada)
       try {
-        _urlBaseAtual = _urlBaseAtual == _urlBasePadrao
-            ? _urlBaseAlternativa
-            : _urlBasePadrao;
-        final urlNova = Uri.parse('$_urlBaseAtual$rota');
+        alternarUrlBase();
+        final urlNova = Uri.parse('${obterUrlBase()}$rota');
         if (metodo == 'POST') {
           return await http
               .post(urlNova, headers: cabecalhos, body: corpoString)
-              .timeout(const Duration(seconds: 5));
+              .timeout(const Duration(seconds: 4));
         } else {
           return await http
               .get(urlNova, headers: cabecalhos)
-              .timeout(const Duration(seconds: 5));
+              .timeout(const Duration(seconds: 4));
         }
       } catch (erroConexao) {
         throw Exception(
@@ -248,6 +263,63 @@ class ServicoAutenticacao {
       return SessaoUsuario.deJson(mapa);
     } catch (_) {
       return null;
+    }
+  }
+
+  /// Solcita o envio do e-mail de recuperação de senha
+  static Future<String> solicitarRecuperacaoSenha({required String email}) async {
+    try {
+      final resposta = await _fazerRequisicao(
+        'POST',
+        '/api/Autenticacao/esqueceu-senha',
+        {'email': email},
+      );
+
+      final dadosResposta = jsonDecode(resposta.body);
+      if (resposta.statusCode == 200) {
+        return dadosResposta['mensagem'] ??
+            'Se existir uma conta vinculada a este e-mail, você receberá um link para redefinição de senha.';
+      } else {
+        final String msg = dadosResposta['mensagem'] ??
+            'Se existir uma conta vinculada a este e-mail, você receberá um link para redefinição de senha.';
+        return msg;
+      }
+    } catch (_) {
+      // Retorna mensagem genérica de segurança em caso de falha de conexão/offline
+      return 'Se existir uma conta vinculada a este e-mail, você receberá um link para redefinição de senha.';
+    }
+  }
+
+  /// Redefine a senha do usuário com o token recebido
+  static Future<void> redefinirSenha({
+    required String token,
+    required String novaSenha,
+    required String confirmacaoSenha,
+  }) async {
+    final resposta = await _fazerRequisicao(
+      'POST',
+      '/api/Autenticacao/redefinir-senha',
+      {
+        'token': token,
+        'novaSenha': novaSenha,
+        'confirmacaoSenha': confirmacaoSenha,
+      },
+    );
+
+    final dadosResposta = jsonDecode(resposta.body);
+
+    if (resposta.statusCode == 200) {
+      final bool ok = dadosResposta['ok'] ?? true;
+      if (!ok) {
+        throw Exception(dadosResposta['mensagem'] ?? 'Erro ao redefinir senha.');
+      }
+    } else {
+      final List<dynamic>? erros = dadosResposta['erros'];
+      if (erros != null && erros.isNotEmpty) {
+        throw Exception(erros.join('\n'));
+      }
+      final String msg = dadosResposta['mensagem'] ?? 'Token inválido ou expirado.';
+      throw Exception(msg);
     }
   }
 

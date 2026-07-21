@@ -3,6 +3,7 @@ import '../componentes/cabecalho_autenticacao.dart';
 import '../componentes/campo_texto.dart';
 import '../servicos/servico_autenticacao.dart';
 import 'tela_cadastro_usuario.dart';
+import 'tela_esqueceu_senha.dart';
 import 'tela_inicial.dart';
 
 class TelaLoginUsuario extends StatefulWidget {
@@ -176,13 +177,9 @@ class _TelaLoginUsuarioEstado extends State<TelaLoginUsuario> {
   }
 
   void _irParaEsqueciSenha() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Funcionalidade "Esqueci minha senha" em desenvolvimento.',
-        ),
-        duration: Duration(seconds: 2),
-      ),
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const TelaEsqueceuSenha()),
     );
   }
 

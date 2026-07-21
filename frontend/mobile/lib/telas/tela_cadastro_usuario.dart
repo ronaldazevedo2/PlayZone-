@@ -97,6 +97,51 @@ class MascaraTelefoneFormatter extends TextInputFormatter {
   }
 }
 
+/// Formatter personalizado para aplicar a máscara de Data (DD/MM/AAAA) automaticamente ao digitar
+class MascaraDataFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue valorAntigo,
+    TextEditingValue valorNovo,
+  ) {
+    if (valorNovo.text.length < valorAntigo.text.length) {
+      return valorNovo;
+    }
+
+    final textoLimpo = valorNovo.text.replaceAll(RegExp(r'\D'), '');
+    final comprimento = textoLimpo.length;
+    final resultado = StringBuffer();
+
+    if (comprimento > 0) {
+      if (comprimento <= 2) {
+        resultado.write(textoLimpo);
+        if (comprimento == 2) {
+          resultado.write('/');
+        }
+      } else {
+        resultado.write(textoLimpo.substring(0, 2));
+        resultado.write('/');
+        if (comprimento <= 4) {
+          resultado.write(textoLimpo.substring(2));
+          if (comprimento == 4) {
+            resultado.write('/');
+          }
+        } else {
+          resultado.write(textoLimpo.substring(2, 4));
+          resultado.write('/');
+          resultado.write(textoLimpo.substring(4, math.min(8, comprimento)));
+        }
+      }
+    }
+
+    final textoFormatado = resultado.toString();
+    return TextEditingValue(
+      text: textoFormatado,
+      selection: TextSelection.collapsed(offset: textoFormatado.length),
+    );
+  }
+}
+
 class TelaCadastroUsuario extends StatefulWidget {
   const TelaCadastroUsuario({super.key});
 
@@ -619,17 +664,22 @@ class _TelaCadastroUsuarioEstado extends State<TelaCadastroUsuario> {
                       ),
                       const SizedBox(height: 18),
 
-                      // Data de nascimento
+                      // Data de nascimento (com máscara de barras automática)
                       CampoTexto(
                         rotulo: 'Data de nascimento',
-                        dicaTexto: 'Selecione sua data',
+                        dicaTexto: 'DD/MM/AAAA',
                         icone: Icons.calendar_today_outlined,
                         corIcone: corCinzaIcones,
                         controlador: _controladorDataNascimento,
-                        somenteLeitura: true,
-                        tipoTeclado: TextInputType.datetime,
-                        aoClicar: _abrirSeletorData,
+                        somenteLeitura: false,
+                        tipoTeclado: TextInputType.number,
+                        iconeSufixo: Icons.calendar_month_outlined,
+                        aoClicarIconeSufixo: _abrirSeletorData,
                         validador: _validarDataNascimento,
+                        formatadores: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          MascaraDataFormatter(),
+                        ],
                       ),
                       const SizedBox(height: 20),
 

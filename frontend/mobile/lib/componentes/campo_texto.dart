@@ -16,6 +16,8 @@ class CampoTexto extends StatefulWidget {
   final void Function(String)? aoSubmeter;
   final List<TextInputFormatter>? formatadores;
   final Color? corIcone;
+  final IconData? iconeSufixo;
+  final VoidCallback? aoClicarIconeSufixo;
 
   const CampoTexto({
     super.key,
@@ -33,6 +35,8 @@ class CampoTexto extends StatefulWidget {
     this.aoSubmeter,
     this.formatadores,
     this.corIcone,
+    this.iconeSufixo,
+    this.aoClicarIconeSufixo,
   });
 
   @override
@@ -111,13 +115,21 @@ class _CampoTextoState extends State<CampoTexto> {
                       });
                     },
                   )
-                : widget.somenteLeitura &&
-                      widget.tipoTeclado == TextInputType.datetime
-                ? const Icon(
-                    Icons.calendar_today_outlined,
-                    color: Color(0xFF64748B),
-                  )
-                : null,
+                : widget.aoClicarIconeSufixo != null
+                    ? IconButton(
+                        icon: Icon(
+                          widget.iconeSufixo ?? Icons.calendar_today_outlined,
+                          color: const Color(0xFF64748B),
+                        ),
+                        onPressed: widget.aoClicarIconeSufixo,
+                      )
+                    : widget.somenteLeitura &&
+                          widget.tipoTeclado == TextInputType.datetime
+                    ? const Icon(
+                        Icons.calendar_today_outlined,
+                        color: Color(0xFF64748B),
+                      )
+                    : null,
             contentPadding: const EdgeInsets.symmetric(
               vertical: 16.0,
               horizontal: 16.0,

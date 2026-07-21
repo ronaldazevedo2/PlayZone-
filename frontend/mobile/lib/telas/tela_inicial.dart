@@ -684,15 +684,26 @@ class _TelaInicialEstado extends State<TelaInicial> {
     );
   }
 
-  // WIDGET: Seção Explorar por Bairro
+  // WIDGET: Seção Explorar por Localidade (carregada dinamicamente do Banco de Dados / API)
   Widget _construirSecaoBairros() {
+    final mapaLocalidades = _obterLocalidadesComContagem();
+    final iconesDisponiveis = [
+      Icons.home_work_outlined,
+      Icons.domain_outlined,
+      Icons.apartment_outlined,
+      Icons.location_city_outlined,
+      Icons.map_outlined,
+    ];
+
+    final entradas = mapaLocalidades.entries.toList();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: 20.0),
           child: Text(
-            'EXPLORAR POR BAIRRO',
+            'EXPLORAR POR LOCALIDADE',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w900,
@@ -703,23 +714,37 @@ class _TelaInicialEstado extends State<TelaInicial> {
         ),
         const SizedBox(height: 16),
 
-        _construirItemBairro(
-          nomeBairro: 'Vila Madalena',
-          quantidadeQuadras: 12, // Usando o número mockado da imagem
-          icone: Icons.home_work_outlined,
-        ),
-        _construirItemBairro(
-          nomeBairro: 'Itaim Bibi',
-          quantidadeQuadras: 8, // Usando o número mockado da imagem
-          icone: Icons.domain_outlined,
-        ),
-        _construirItemBairro(
-          nomeBairro: 'Moema',
-          quantidadeQuadras: 15, // Usando o número mockado da imagem
-          icone: Icons.apartment_outlined,
-        ),
+        if (entradas.isEmpty)
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+            child: Text(
+              'Nenhuma localidade encontrada no banco de dados.',
+              style: TextStyle(color: Color(0xFF64748B), fontSize: 14),
+            ),
+          )
+        else
+          ...entradas.asMap().entries.map((itemIndice) {
+            final indice = itemIndice.key;
+            final item = itemIndice.value;
+            final icone = iconesDisponiveis[indice % iconesDisponiveis.length];
+
+            return _construirItemBairro(
+              nomeBairro: item.key,
+              quantidadeQuadras: item.value,
+              icone: icone,
+            );
+          }),
       ],
     );
+  }
+
+  Map<String, int> _obterLocalidadesComContagem() {
+    final Map<String, int> mapaLocalidades = {};
+    for (final quadra in _todasAsQuadras) {
+      final localidade = quadra.bairro.trim().isNotEmpty ? quadra.bairro.trim() : 'Centro';
+      mapaLocalidades[localidade] = (mapaLocalidades[localidade] ?? 0) + 1;
+    }
+    return mapaLocalidades;
   }
 
   // WIDGET: Item de Bairro Individual

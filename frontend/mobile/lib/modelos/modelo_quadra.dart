@@ -29,7 +29,7 @@ class QuadraEsportiva {
     final id = json['id'] ?? '';
     final nome = json['nome'] ?? 'Sem Nome';
     final modalidade = json['modalidade'] ?? 'Poliesportiva';
-    final localizacao = json['localizacao'] ?? 'Centro';
+    final localizacao = json['localizacao'] ?? json['localidade'] ?? 'Centro';
     final capacidade = json['capacidade'] ?? 10;
     final descricao = json['descricao'] ?? 'Quadra esportiva para jogos e treinos.';
     final imagemUrl = json['imagemUrl'];
