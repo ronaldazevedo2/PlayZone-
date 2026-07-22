@@ -19,7 +19,7 @@ public class QuadraController(IMediator mediator) : ControllerBase
 {
     // GET /api/quadra
     [HttpGet]
-    [Authorize]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(RespostaApi<ResultadoPaginado<ReservaQuadraDto>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Listar(
         [FromQuery] int pagina = 1,
@@ -38,7 +38,7 @@ public class QuadraController(IMediator mediator) : ControllerBase
 
     // GET /api/quadra/{quadraId}
     [HttpGet("{quadraId:guid}")]
-    [Authorize]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(RespostaApi<QuadraDetalheDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(RespostaApi), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ObterPorId(

@@ -18,7 +18,7 @@ class _TelaInicialEstado extends State<TelaInicial> {
   late SessaoUsuario _sessaoAtual;
   final TextEditingController _controladorBusca = TextEditingController();
   final FocusNode _buscaFoco = FocusNode();
-  
+
   String? _bairroFiltrado;
   List<QuadraEsportiva> _quadrasFiltradas = [];
   int _abaSelecionada = 0;
@@ -27,95 +27,13 @@ class _TelaInicialEstado extends State<TelaInicial> {
   List<QuadraEsportiva> _todasAsQuadras = [];
   bool _estaCarregando = false;
 
-  // Dados mockados locais para fallback offline
-  static const List<QuadraEsportiva> _quadrasMockadas = [
-    QuadraEsportiva(
-      id: '1',
-      nome: 'Arena Central Park',
-      modalidade: 'Basquete',
-      bairro: 'Jardins',
-      endereco: 'Alameda Lorena, 1200',
-      capacidade: 12,
-      descricao: 'Excelente quadra de basquete profissional com piso oficial de madeira, iluminação LED de última geração e vestiários completos. Ideal para partidas amadoras e treinos de alto rendimento.',
-      precoPorHora: 120.0,
-      estaDisponivel: true,
-      distanciaEmKm: 1.2,
-      caminhoImagem: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=600&auto=format&fit=crop',
-    ),
-    QuadraEsportiva(
-      id: '2',
-      nome: 'Tennis Club',
-      modalidade: 'Tênis',
-      bairro: 'Pinheiros',
-      endereco: 'Rua dos Pinheiros, 450',
-      capacidade: 4,
-      descricao: 'Quadra de tênis de saibro coberta. Possui arquibancada, lanchonete e professores disponíveis para aluguel de equipamentos e raquetes no local. Ideal para jogos de simples e duplas.',
-      precoPorHora: 150.0,
-      estaDisponivel: true,
-      distanciaEmKm: 2.5,
-      caminhoImagem: 'https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?q=80&w=600&auto=format&fit=crop',
-    ),
-    QuadraEsportiva(
-      id: '3',
-      nome: 'Soccer Arena',
-      modalidade: 'Futebol',
-      bairro: 'Vila Madalena',
-      endereco: 'Rua Harmonia, 800',
-      capacidade: 14,
-      descricao: 'Quadra de futebol society com grama sintética premium de padrão internacional, amortecimento de impacto e rede de proteção de alta segurança. Perfeito para o churrasco pós-jogo com os amigos.',
-      precoPorHora: 180.0,
-      estaDisponivel: true,
-      distanciaEmKm: 3.1,
-      caminhoImagem: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=600&auto=format&fit=crop',
-    ),
-    QuadraEsportiva(
-      id: '4',
-      nome: 'Itaim Society',
-      modalidade: 'Futebol',
-      bairro: 'Itaim Bibi',
-      endereco: 'Rua Tabapuã, 1050',
-      capacidade: 12,
-      descricao: 'Localizado no coração do Itaim, com vestiário moderno, área gourmet para eventos e grama de alta durabilidade. Ótima localização com estacionamento próprio no subsolo.',
-      precoPorHora: 200.0,
-      estaDisponivel: true,
-      distanciaEmKm: 4.0,
-      caminhoImagem: 'https://images.unsplash.com/photo-1529900748604-07564a03e7a6?q=80&w=600&auto=format&fit=crop',
-    ),
-    QuadraEsportiva(
-      id: '5',
-      nome: 'Moema Sports',
-      modalidade: 'Futebol',
-      bairro: 'Moema',
-      endereco: 'Avenida Moema, 300',
-      capacidade: 10,
-      descricao: 'Quadra poliesportiva coberta ideal para futsal, basquete e vôlei. Totalmente protegida contra chuva e ventos. Conta com placar digital interativo.',
-      precoPorHora: 160.0,
-      estaDisponivel: true,
-      distanciaEmKm: 4.8,
-      caminhoImagem: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=600&auto=format&fit=crop',
-    ),
-    QuadraEsportiva(
-      id: '6',
-      nome: 'Vila Basquete',
-      modalidade: 'Basquete',
-      bairro: 'Vila Madalena',
-      endereco: 'Rua Aspicuelta, 120',
-      capacidade: 10,
-      descricao: 'Quadra de basquete 3x3 urbana com grafites exclusivos nas paredes, aro com mola profissional e som ambiente. Perfeito para rachas e estilo streetball.',
-      precoPorHora: 110.0,
-      estaDisponivel: true,
-      distanciaEmKm: 1.8,
-      caminhoImagem: 'https://images.unsplash.com/photo-1519766304817-4f37bda74a27?q=80&w=600&auto=format&fit=crop',
-    ),
-  ];
-
   @override
   void initState() {
     super.initState();
     _sessaoAtual = widget.sessao;
     _controladorBusca.addListener(_filtrarQuadras);
-    
-    // Busca assíncrona das quadras na API da Quadra
+
+    // Busca assíncrona das quadras diretamente da API ao carregar a página
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _buscarQuadrasDaApi();
     });
@@ -135,22 +53,13 @@ class _TelaInicialEstado extends State<TelaInicial> {
         _filtrarQuadras(); // Aplica filtros e ordena
         _estaCarregando = false;
       });
-    } catch (_) {
-      // Fallback offline se a API estiver inacessível
+    } catch (erro) {
       if (!mounted) return;
       setState(() {
-        _todasAsQuadras = List.from(_quadrasMockadas);
+        _todasAsQuadras = [];
         _filtrarQuadras();
         _estaCarregando = false;
       });
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Conectado offline. Exibindo dados locais de demonstração.'),
-          backgroundColor: Colors.orange,
-          duration: Duration(seconds: 4),
-        ),
-      );
     }
   }
 
@@ -163,7 +72,9 @@ class _TelaInicialEstado extends State<TelaInicial> {
   }
 
   void _ordenarPorDistancia() {
-    _quadrasFiltradas.sort((a, b) => a.distanciaEmKm.compareTo(b.distanciaEmKm));
+    _quadrasFiltradas.sort(
+      (a, b) => a.distanciaEmKm.compareTo(b.distanciaEmKm),
+    );
   }
 
   void _filtrarQuadras() {
@@ -171,8 +82,11 @@ class _TelaInicialEstado extends State<TelaInicial> {
     setState(() {
       _quadrasFiltradas = _todasAsQuadras.where((quadra) {
         final matchesNome = quadra.nome.toLowerCase().contains(query);
-        final matchesModalidade = quadra.modalidade.toLowerCase().contains(query);
-        final matchesBairro = _bairroFiltrado == null || quadra.bairro == _bairroFiltrado;
+        final matchesModalidade = quadra.modalidade.toLowerCase().contains(
+          query,
+        );
+        final matchesBairro =
+            _bairroFiltrado == null || quadra.bairro == _bairroFiltrado;
         return (matchesNome || matchesModalidade) && matchesBairro;
       }).toList();
       _ordenarPorDistancia();
@@ -184,7 +98,7 @@ class _TelaInicialEstado extends State<TelaInicial> {
       _bairroFiltrado = bairro;
       _filtrarQuadras();
     });
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Filtrando quadras em $bairro'),
@@ -229,23 +143,23 @@ class _TelaInicialEstado extends State<TelaInicial> {
               children: [
                 // 1. Cabeçalho Customizado
                 _construirCabecalho(),
-                
+
                 // Indicador de progresso se estiver carregando
                 if (_estaCarregando)
                   const LinearProgressIndicator(
                     color: Color(0xFF22C55E),
                     backgroundColor: Color(0xFFEFF6FF),
                   ),
-                
+
                 const SizedBox(height: 16),
-  
+
                 // 2. Barra de Busca
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: _construirBarraBusca(),
                 ),
                 const SizedBox(height: 8),
-  
+
                 // Indicador de filtro ativo (Bairro)
                 if (_bairroFiltrado != null)
                   Padding(
@@ -255,7 +169,10 @@ class _TelaInicialEstado extends State<TelaInicial> {
                         InputChip(
                           label: Text(
                             'Bairro: $_bairroFiltrado',
-                            style: const TextStyle(color: Color(0xFF254EDB), fontWeight: FontWeight.bold),
+                            style: const TextStyle(
+                              color: Color(0xFF254EDB),
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           backgroundColor: const Color(0xFFEFF6FF),
                           deleteIconColor: const Color(0xFF254EDB),
@@ -265,15 +182,15 @@ class _TelaInicialEstado extends State<TelaInicial> {
                     ),
                   ),
                 const SizedBox(height: 24),
-  
+
                 // 3. Seção Quadras Próximas
                 _construirSecaoQuadrasProximas(),
                 const SizedBox(height: 32),
-  
+
                 // 4. Seção Explorar por Bairro
                 _construirSecaoBairros(),
                 const SizedBox(height: 32),
-  
+
                 // 5. Banner Premium
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -309,16 +226,12 @@ class _TelaInicialEstado extends State<TelaInicial> {
                   shape: BoxShape.circle,
                 ),
                 child: const Center(
-                  child: Icon(
-                    Icons.person,
-                    color: Colors.white,
-                    size: 26,
-                  ),
+                  child: Icon(Icons.person, color: Colors.white, size: 26),
                 ),
               ),
             ),
           ),
-          
+
           // Logotipo: PLAYZONE
           RichText(
             text: const TextSpan(
@@ -387,11 +300,7 @@ class _TelaInicialEstado extends State<TelaInicial> {
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Row(
         children: [
-          const Icon(
-            Icons.search,
-            color: Color(0xFF64748B),
-            size: 22,
-          ),
+          const Icon(Icons.search, color: Color(0xFF64748B), size: 22),
           const SizedBox(width: 12),
           Expanded(
             child: TextField(
@@ -451,7 +360,9 @@ class _TelaInicialEstado extends State<TelaInicial> {
                   _limparFiltroBairro();
                   _controladorBusca.clear();
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Exibindo todas as quadras registradas.')),
+                    const SnackBar(
+                      content: Text('Exibindo todas as quadras registradas.'),
+                    ),
                   );
                 },
                 child: const Row(
@@ -464,7 +375,11 @@ class _TelaInicialEstado extends State<TelaInicial> {
                         color: Color(0xFF254EDB),
                       ),
                     ),
-                    Icon(Icons.chevron_right, color: Color(0xFF254EDB), size: 18),
+                    Icon(
+                      Icons.chevron_right,
+                      color: Color(0xFF254EDB),
+                      size: 18,
+                    ),
                   ],
                 ),
               ),
@@ -472,14 +387,18 @@ class _TelaInicialEstado extends State<TelaInicial> {
           ),
         ),
         const SizedBox(height: 16),
-        
+
         _quadrasFiltradas.isEmpty
             ? const Padding(
                 padding: EdgeInsets.symmetric(vertical: 40.0),
                 child: Center(
                   child: Text(
-                    'Nenhuma quadra encontrada.',
-                    style: TextStyle(color: Color(0xFF64748B), fontSize: 15),
+                    'Não há quadras disponíveis.',
+                    style: TextStyle(
+                      color: Color(0xFF64748B),
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               )
@@ -553,7 +472,10 @@ class _TelaInicialEstado extends State<TelaInicial> {
                       top: 12,
                       right: 12,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20),
@@ -646,7 +568,10 @@ class _TelaInicialEstado extends State<TelaInicial> {
                             color: Color(0xFF0F172A),
                           ),
                           children: [
-                            TextSpan(text: 'R\$ ${quadra.precoPorHora.toStringAsFixed(0)}'),
+                            TextSpan(
+                              text:
+                                  'R\$ ${quadra.precoPorHora.toStringAsFixed(0)}',
+                            ),
                             const TextSpan(
                               text: '/hr',
                               style: TextStyle(
@@ -659,7 +584,10 @@ class _TelaInicialEstado extends State<TelaInicial> {
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
                           color: const Color(0xFF22C55E),
                           borderRadius: BorderRadius.circular(20),
@@ -718,7 +646,7 @@ class _TelaInicialEstado extends State<TelaInicial> {
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
             child: Text(
-              'Nenhuma localidade encontrada no banco de dados.',
+              'Não há quadras disponíveis.',
               style: TextStyle(color: Color(0xFF64748B), fontSize: 14),
             ),
           )
@@ -741,7 +669,9 @@ class _TelaInicialEstado extends State<TelaInicial> {
   Map<String, int> _obterLocalidadesComContagem() {
     final Map<String, int> mapaLocalidades = {};
     for (final quadra in _todasAsQuadras) {
-      final localidade = quadra.bairro.trim().isNotEmpty ? quadra.bairro.trim() : 'Centro';
+      final localidade = quadra.bairro.trim().isNotEmpty
+          ? quadra.bairro.trim()
+          : 'Centro';
       mapaLocalidades[localidade] = (mapaLocalidades[localidade] ?? 0) + 1;
     }
     return mapaLocalidades;
@@ -763,7 +693,9 @@ class _TelaInicialEstado extends State<TelaInicial> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: estaSelecionado ? const Color(0xFF254EDB) : const Color(0xFFE2E8F0),
+            color: estaSelecionado
+                ? const Color(0xFF254EDB)
+                : const Color(0xFFE2E8F0),
             width: estaSelecionado ? 1.5 : 1.0,
           ),
           boxShadow: [
@@ -784,11 +716,7 @@ class _TelaInicialEstado extends State<TelaInicial> {
                 color: const Color(0xFF0F2C59), // Azul escuro
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(
-                icone,
-                color: Colors.white,
-                size: 20,
-              ),
+              child: Icon(icone, color: Colors.white, size: 20),
             ),
             const SizedBox(width: 16),
 
@@ -818,11 +746,7 @@ class _TelaInicialEstado extends State<TelaInicial> {
             ),
 
             // Chevron de navegação
-            const Icon(
-              Icons.chevron_right,
-              color: Color(0xFF64748B),
-              size: 20,
-            ),
+            const Icon(Icons.chevron_right, color: Color(0xFF64748B), size: 20),
           ],
         ),
       ),
@@ -878,13 +802,18 @@ class _TelaInicialEstado extends State<TelaInicial> {
                 ElevatedButton(
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Serviço Premium em breve!')),
+                      const SnackBar(
+                        content: Text('Serviço Premium em breve!'),
+                      ),
                     );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: const Color(0xFF0A2240),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
@@ -922,10 +851,7 @@ class _TelaInicialEstado extends State<TelaInicial> {
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border(
-          top: BorderSide(
-            color: const Color(0xFFE2E8F0),
-            width: 1.0,
-          ),
+          top: BorderSide(color: const Color(0xFFE2E8F0), width: 1.0),
         ),
       ),
       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -963,14 +889,21 @@ class _TelaInicialEstado extends State<TelaInicial> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 6.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 18.0,
+              vertical: 6.0,
+            ),
             decoration: BoxDecoration(
-              color: estaAtivo ? const Color(0xFFDCFCE7) : Colors.transparent, // Fundo verde claro para ativo
+              color: estaAtivo
+                  ? const Color(0xFFDCFCE7)
+                  : Colors.transparent, // Fundo verde claro para ativo
               borderRadius: BorderRadius.circular(16),
             ),
             child: Icon(
               icone,
-              color: estaAtivo ? const Color(0xFF22C55E) : const Color(0xFF64748B),
+              color: estaAtivo
+                  ? const Color(0xFF22C55E)
+                  : const Color(0xFF64748B),
               size: 22,
             ),
           ),
@@ -980,7 +913,9 @@ class _TelaInicialEstado extends State<TelaInicial> {
             style: TextStyle(
               fontSize: 10.5,
               fontWeight: estaAtivo ? FontWeight.bold : FontWeight.normal,
-              color: estaAtivo ? const Color(0xFF22C55E) : const Color(0xFF64748B),
+              color: estaAtivo
+                  ? const Color(0xFF22C55E)
+                  : const Color(0xFF64748B),
             ),
           ),
         ],
