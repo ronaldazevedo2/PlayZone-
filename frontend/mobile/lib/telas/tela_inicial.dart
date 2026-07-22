@@ -60,6 +60,16 @@ class _TelaInicialEstado extends State<TelaInicial> {
         _filtrarQuadras();
         _estaCarregando = false;
       });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Erro ao carregar quadras: ${erro.toString().replaceAll('Exception: ', '')}',
+          ),
+          backgroundColor: Colors.redAccent,
+          duration: const Duration(seconds: 4),
+        ),
+      );
     }
   }
 

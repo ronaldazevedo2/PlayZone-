@@ -101,18 +101,13 @@ class _TelaRedefinirSenhaEstado extends State<TelaRedefinirSenha> {
 
       final msgErro = erro.toString().replaceAll('Exception: ', '');
 
-      // Se der erro por conta da API inacessível, simula com sucesso demonstrativo
-      if (msgErro.contains('Sem conexão com o servidor')) {
-        _exibirSucessoEIrParaLogin(offlineSimulado: true);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(msgErro),
-            backgroundColor: Colors.redAccent,
-            duration: const Duration(seconds: 4),
-          ),
-        );
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(msgErro),
+          backgroundColor: Colors.redAccent,
+          duration: const Duration(seconds: 4),
+        ),
+      );
     } finally {
       if (mounted) {
         setState(() {
@@ -122,16 +117,12 @@ class _TelaRedefinirSenhaEstado extends State<TelaRedefinirSenha> {
     }
   }
 
-  void _exibirSucessoEIrParaLogin({bool offlineSimulado = false}) {
+  void _exibirSucessoEIrParaLogin() {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          offlineSimulado
-              ? 'Senha alterada com sucesso! (Modo de Demonstração)'
-              : 'Senha alterada com sucesso.',
-        ),
-        backgroundColor: const Color(0xFF22C55E),
-        duration: const Duration(seconds: 3),
+      const SnackBar(
+        content: Text('Senha alterada com sucesso.'),
+        backgroundColor: Color(0xFF22C55E),
+        duration: Duration(seconds: 3),
       ),
     );
 

@@ -29,13 +29,21 @@ class ServicoQuadras {
 
     try {
       if (metodo == 'GET') {
-        return await http.get(url1, headers: cabecalhos).timeout(const Duration(seconds: 4));
+        return await http
+            .get(url1, headers: cabecalhos)
+            .timeout(const Duration(seconds: 4));
       } else if (metodo == 'POST') {
-        return await http.post(url1, headers: cabecalhos, body: corpoString).timeout(const Duration(seconds: 4));
+        return await http
+            .post(url1, headers: cabecalhos, body: corpoString)
+            .timeout(const Duration(seconds: 4));
       } else if (metodo == 'PUT') {
-        return await http.put(url1, headers: cabecalhos, body: corpoString).timeout(const Duration(seconds: 4));
+        return await http
+            .put(url1, headers: cabecalhos, body: corpoString)
+            .timeout(const Duration(seconds: 4));
       } else if (metodo == 'DELETE') {
-        return await http.delete(url1, headers: cabecalhos).timeout(const Duration(seconds: 4));
+        return await http
+            .delete(url1, headers: cabecalhos)
+            .timeout(const Duration(seconds: 4));
       }
       throw Exception('Método HTTP não suportado: $metodo');
     } catch (_) {
@@ -43,25 +51,39 @@ class ServicoQuadras {
         ServicoAutenticacao.alternarUrlBase();
         final urlNova = Uri.parse('${ServicoAutenticacao.obterUrlBase()}$rota');
         if (metodo == 'GET') {
-          return await http.get(urlNova, headers: cabecalhos).timeout(const Duration(seconds: 4));
+          return await http
+              .get(urlNova, headers: cabecalhos)
+              .timeout(const Duration(seconds: 4));
         } else if (metodo == 'POST') {
-          return await http.post(urlNova, headers: cabecalhos, body: corpoString).timeout(const Duration(seconds: 4));
+          return await http
+              .post(urlNova, headers: cabecalhos, body: corpoString)
+              .timeout(const Duration(seconds: 4));
         } else if (metodo == 'PUT') {
-          return await http.put(urlNova, headers: cabecalhos, body: corpoString).timeout(const Duration(seconds: 4));
+          return await http
+              .put(urlNova, headers: cabecalhos, body: corpoString)
+              .timeout(const Duration(seconds: 4));
         } else if (metodo == 'DELETE') {
-          return await http.delete(urlNova, headers: cabecalhos).timeout(const Duration(seconds: 4));
+          return await http
+              .delete(urlNova, headers: cabecalhos)
+              .timeout(const Duration(seconds: 4));
         }
         throw Exception('Método HTTP não suportado: $metodo');
       } catch (erroConexao) {
-        throw Exception('Sem conexão com o servidor de quadras ($erroConexao).');
+        throw Exception(
+          'Sem conexão com o servidor de quadras ($erroConexao).',
+        );
       }
     }
   }
 
   /// Busca a lista completa de quadras
   static Future<List<QuadraEsportiva>> obterQuadras() async {
-    final resposta = await _fazerRequisicao('GET', '/api/Quadra?pagina=1&tamanhoPagina=100', null);
-    
+    final resposta = await _fazerRequisicao(
+      'GET',
+      '/api/Quadra?pagina=1&tamanhoPagina=100',
+      null,
+    );
+
     if (resposta.statusCode == 200) {
       final dadosResposta = jsonDecode(resposta.body);
       final bool ok = dadosResposta['ok'] ?? false;
@@ -80,14 +102,16 @@ class ServicoQuadras {
   /// Busca uma quadra específica pelo seu ID
   static Future<QuadraEsportiva> obterQuadraPorId(String id) async {
     final resposta = await _fazerRequisicao('GET', '/api/Quadra/$id', null);
-    
+
     if (resposta.statusCode == 200) {
       final dadosResposta = jsonDecode(resposta.body);
       final bool ok = dadosResposta['ok'] ?? false;
       if (ok && dadosResposta['dados'] != null) {
         return QuadraEsportiva.deJson(dadosResposta['dados']);
       }
-      throw Exception(dadosResposta['mensagem'] ?? 'Erro desconhecido ao obter quadra.');
+      throw Exception(
+        dadosResposta['mensagem'] ?? 'Erro desconhecido ao obter quadra.',
+      );
     } else {
       throw Exception('Quadra não encontrada (${resposta.statusCode})');
     }
@@ -95,15 +119,21 @@ class ServicoQuadras {
 
   /// Cria uma nova quadra na API
   static Future<QuadraEsportiva> criarQuadra(QuadraEsportiva quadra) async {
-    final resposta = await _fazerRequisicao('POST', '/api/Quadra', quadra.paraJson());
-    
+    final resposta = await _fazerRequisicao(
+      'POST',
+      '/api/Quadra',
+      quadra.paraJson(),
+    );
+
     if (resposta.statusCode == 201 || resposta.statusCode == 200) {
       final dadosResposta = jsonDecode(resposta.body);
       final bool ok = dadosResposta['ok'] ?? false;
       if (ok && dadosResposta['dados'] != null) {
         return QuadraEsportiva.deJson(dadosResposta['dados']);
       }
-      throw Exception(dadosResposta['mensagem'] ?? 'Erro desconhecido ao criar quadra.');
+      throw Exception(
+        dadosResposta['mensagem'] ?? 'Erro desconhecido ao criar quadra.',
+      );
     } else {
       throw Exception('Falha ao criar quadra (${resposta.statusCode})');
     }
@@ -111,11 +141,16 @@ class ServicoQuadras {
 
   /// Atualiza os dados de uma quadra específica
   static Future<void> atualizarQuadra(QuadraEsportiva quadra) async {
-    final resposta = await _fazerRequisicao('PUT', '/api/Quadra/${quadra.id}', quadra.paraJson());
-    
+    final resposta = await _fazerRequisicao(
+      'PUT',
+      '/api/Quadra/${quadra.id}',
+      quadra.paraJson(),
+    );
+
     if (resposta.statusCode != 200) {
       final dadosResposta = jsonDecode(resposta.body);
-      final String msg = dadosResposta['mensagem'] ?? 'Erro ao atualizar quadra.';
+      final String msg =
+          dadosResposta['mensagem'] ?? 'Erro ao atualizar quadra.';
       throw Exception(msg);
     }
   }
@@ -123,7 +158,7 @@ class ServicoQuadras {
   /// Remove uma quadra do sistema
   static Future<void> deletarQuadra(String id) async {
     final resposta = await _fazerRequisicao('DELETE', '/api/Quadra/$id', null);
-    
+
     if (resposta.statusCode != 200) {
       final dadosResposta = jsonDecode(resposta.body);
       final String msg = dadosResposta['mensagem'] ?? 'Erro ao deletar quadra.';

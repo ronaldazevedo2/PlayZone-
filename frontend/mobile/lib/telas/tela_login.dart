@@ -17,8 +17,12 @@ class _TelaLoginUsuarioEstado extends State<TelaLoginUsuario> {
   final GlobalKey<FormState> _chaveFormulario = GlobalKey<FormState>();
   bool _estaCarregando = false;
 
-  final TextEditingController _controladorEmail = TextEditingController(text: 'jogador@email.com');
-  final TextEditingController _controladorSenha = TextEditingController(text: 'PlayZone123!');
+  final TextEditingController _controladorEmail = TextEditingController(
+    text: 'midian@gmail.com',
+  );
+  final TextEditingController _controladorSenha = TextEditingController(
+    text: '29092007*Mk',
+  );
 
   final FocusNode _focoEmail = FocusNode();
   final FocusNode _focoSenha = FocusNode();
@@ -89,20 +93,15 @@ class _TelaLoginUsuarioEstado extends State<TelaLoginUsuario> {
     } catch (erro) {
       if (!mounted) return;
 
-      final stringErro = erro.toString();
+      final stringErro = erro.toString().replaceAll('Exception: ', '');
 
-      if (stringErro.contains('Sem conexão com o servidor') ||
-          stringErro.contains('Exception: Sem conexão')) {
-        _mostrarDialogoFallbackOffline(email);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(stringErro.replaceAll('Exception: ', '')),
-            backgroundColor: Colors.redAccent,
-            duration: const Duration(seconds: 4),
-          ),
-        );
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(stringErro),
+          backgroundColor: Colors.redAccent,
+          duration: const Duration(seconds: 4),
+        ),
+      );
     } finally {
       if (mounted) {
         setState(() {
@@ -110,70 +109,6 @@ class _TelaLoginUsuarioEstado extends State<TelaLoginUsuario> {
         });
       }
     }
-  }
-
-  void _mostrarDialogoFallbackOffline(String email) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.wifi_off, color: Colors.orange),
-            SizedBox(width: 10),
-            Text('Conexão Offline'),
-          ],
-        ),
-        content: const Text(
-          'Não foi possível se conectar ao servidor local da PlayZone.\n\nDeseja realizar um login de demonstração offline para testar o aplicativo?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: const Text(
-              'Cancelar',
-              style: TextStyle(color: Color(0xFF64748B)),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              Navigator.pop(context);
-
-              final sessaoMock = SessaoUsuario(
-                tokenAcesso: 'jwt_mock_token_playzone_offline',
-                nomeCompleto: 'Jogador de Demonstração',
-                email: email,
-                perfil: 'jogador',
-              );
-              await ServicoAutenticacao.salvarSessao(sessaoMock);
-
-              if (!mounted) return;
-
-              ScaffoldMessenger.of(this.context).showSnackBar(
-                const SnackBar(
-                  content: Text('Sessão simulada offline criada com sucesso!'),
-                  backgroundColor: Color(0xFF22C55E),
-                ),
-              );
-
-              Navigator.pushReplacement(
-                this.context,
-                MaterialPageRoute(
-                  builder: (context) => TelaInicial(sessao: sessaoMock),
-                ),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF254EDB),
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Sim, Entrar'),
-          ),
-        ],
-      ),
-    );
   }
 
   void _irParaEsqueciSenha() {
