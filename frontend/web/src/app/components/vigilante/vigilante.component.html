@@ -1,4 +1,4 @@
-<div class="tab-panel animate-fade">
+<div class="tab-panel animate-fade" (click)="fecharMenus()">
   <div class="vigilante-header-bar">
     <div class="vigilante-title">
       <h3>Gestão e Escala de Vigilantes</h3>
@@ -108,6 +108,7 @@
             <th>Matrícula</th>
             <th>Arena</th>
             <th>Status</th>
+            <th>Ações</th>
           </tr>
         </thead>
         <tbody>
@@ -115,8 +116,8 @@
             <td>
               <div style="display: flex; align-items: center; gap: 10px;">
                 <div class="guard-avatar">
-                  <img *ngIf="guard.fotoPerfil" [src]="guard.fotoPerfil" alt="Foto de perfil" class="avatar-image">
-                  <span *ngIf="!guard.fotoPerfil">{{ guard.nomeCompleto.substring(0, 2).toUpperCase() }}</span>
+                  <img *ngIf="getFoto(guard)" [src]="getFoto(guard)" alt="Foto de perfil" class="avatar-image">
+                  <span *ngIf="!getFoto(guard)">{{ guard.nomeCompleto.substring(0, 2).toUpperCase() }}</span>
                 </div>
                 <strong>{{ guard.nomeCompleto }}</strong>
               </div>
@@ -132,6 +133,42 @@
                 {{ guard.ativo ? 'Ativo' : 'Inativo' }}
               </span>
             </td>
+            <td>
+              <div class="actions-buttons">
+                <button class="action-btn edit-btn" (click)="editarVigilante(guard)" title="Editar">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                  </svg>
+                </button>
+                <div class="options-wrapper">
+                  <button class="action-btn options-btn" (click)="abrirOpcoes(guard, $event)" title="Mais opções">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="1"></circle>
+                      <circle cx="12" cy="5" r="1"></circle>
+                      <circle cx="12" cy="19" r="1"></circle>
+                    </svg>
+                  </button>
+                  <div class="options-dropdown" *ngIf="menuAbertoId === guard.id" (click)="$event.stopPropagation()">
+                    <button class="dropdown-item" (click)="editarVigilante(guard); fecharMenus()">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                      </svg>
+                      Editar vigilante
+                    </button>
+                    <div class="dropdown-divider"></div>
+                    <button class="dropdown-item dropdown-item-danger" (click)="excluirVigilante(guard); fecharMenus()">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                      </svg>
+                      Excluir vigilante
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -143,7 +180,7 @@
 <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
   <div class="modal-card animate-zoom" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h3>Novo Vigilante</h3>
+      <h3>{{ vigilanteEditandoId ? 'Editar Vigilante' : 'Novo Vigilante' }}</h3>
       <button class="close-btn" (click)="closeModal()">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -219,16 +256,22 @@
         <div class="form-row">
           <div class="form-group half-width">
             <label for="matricula">Matrícula <span class="required">*</span></label>
-            <input type="text" id="matricula" [(ngModel)]="matricula" name="matricula" placeholder="Digite a matrícula" required>
+            <input type="text" id="matricula" [(ngModel)]="matricula" name="matricula" placeholder="Digite a matrícula"
+              required>
           </div>
 
           <div class="form-group half-width">
             <label for="arena">Arena <span class="required">*</span></label>
-            <input type="text" id="arena" [(ngModel)]="arena" name="arena" placeholder="Digite a arena" required>
+
+            <select id="arena" name="arena" class="form-select" [(ngModel)]="arena" required>
+              <option *ngFor="let quadra of quadras" [value]="quadra.nome">
+                {{ quadra.nome }}
+              </option>
+            </select>
           </div>
         </div>
 
-        <div class="form-group status-info-group">
+        <div class="form-group status-info-group" *ngIf="!vigilanteEditandoId">
           <label>Status Inicial</label>
           <div class="status-badge-initial">
             <span class="status-indicator active-status">Ativo</span>
@@ -236,11 +279,19 @@
           </div>
         </div>
 
+        <div class="form-group" *ngIf="vigilanteEditandoId">
+          <label for="status">Status do Vigilante <span class="required">*</span></label>
+          <select id="status" name="ativo" class="form-select" [(ngModel)]="ativo" required>
+            <option [ngValue]="true">Ativo</option>
+            <option [ngValue]="false">Inativo</option>
+          </select>
+        </div>
+
         <div class="modal-footer-actions">
           <button type="button" class="btn btn-cancel" (click)="closeModal()" [disabled]="isLoading">Cancelar</button>
           <button type="submit" class="btn btn-save" [disabled]="isLoading">
             <span class="btn-spinner" *ngIf="isLoading"></span>
-            Salvar Vigilante
+            {{ vigilanteEditandoId ? 'Salvar Alterações' : 'Salvar Vigilante' }}
           </button>
         </div>
       </form>

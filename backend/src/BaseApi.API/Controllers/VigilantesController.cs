@@ -61,7 +61,8 @@ public class VigilantesController(IMediator mediator) : ControllerBase
             request.Cpf,
             request.Matricula,
             request.Arena,
-            request.Ativo
+            request.Ativo,
+            request.FotoPerfil
         );
 
         await mediator.Send(command, ct);
@@ -83,5 +84,6 @@ public record AtualizarVigilanteRequest(
     string Cpf,
     string Matricula,
     string Arena,
-    bool Ativo
+    bool Ativo,
+    string? FotoPerfil
 );

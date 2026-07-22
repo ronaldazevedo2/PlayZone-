@@ -40,6 +40,7 @@ interface PaginatedResult<T> {
   styleUrl: './usuarios.component.css'
 })
 export class UsuariosComponent implements OnInit {
+  Math = Math; // Expose Math to template
   usuarios: Usuario[] = [];
   usuariosFiltrados: Usuario[] = [];
   termoBusca = '';
@@ -139,6 +140,26 @@ export class UsuariosComponent implements OnInit {
         cpfSemMascara.includes(termoSemMascara)
       );
     });
+  }
+
+  // Stats Card Helpers
+  getUsuariosAtivos(): number {
+    return this.usuarios.filter(u => u.ativo).length;
+  }
+
+  getPercentualAtivos(): number {
+    if (this.usuarios.length === 0) return 0;
+    return (this.getUsuariosAtivos() / this.usuarios.length) * 100;
+  }
+
+  getMediaAvaliacaoNum(): number {
+    if (this.usuarios.length === 0) return 0;
+    const soma = this.usuarios.reduce((acc, u) => acc + (u.avaliacao || 0), 0);
+    return soma / this.usuarios.length;
+  }
+
+  getMediaAvaliacao(): string {
+    return this.getMediaAvaliacaoNum().toFixed(1);
   }
 
   openUserDetails(usuario: Usuario): void {

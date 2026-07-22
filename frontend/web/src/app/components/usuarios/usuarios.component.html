@@ -35,6 +35,63 @@
     {{ errorMessage }}
   </div>
 
+  <!-- Data Stats Cards -->
+  <section class="stats-grid" *ngIf="!isLoading">
+    <div class="stat-card">
+      <div class="stat-icon users-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+      </div>
+      <div class="stat-details">
+        <p class="stat-label">Usuários no Sistema</p>
+        <h3>{{ usuarios.length }} Usuários</h3>
+        <p class="stat-sub text-green">Cadastrados no banco de dados</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon active-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+      </div>
+      <div class="stat-details">
+        <p class="stat-label">Usuários Ativos</p>
+        <h3>{{ getUsuariosAtivos() }} Ativos</h3>
+        <div class="progress-container">
+          <div class="progress-bar" [style.width.%]="getPercentualAtivos()"></div>
+        </div>
+        <p class="stat-sub">{{ getPercentualAtivos().toFixed(0) }}% do total ativo</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon rating-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+        </svg>
+      </div>
+      <div class="stat-details">
+        <p class="stat-label">Média de Avaliação Geral</p>
+        <h3>{{ getMediaAvaliacao() }}</h3>
+        <div class="stars-preview">
+          <svg *ngFor="let star of [1,2,3,4,5]; let i = index"
+               xmlns="http://www.w3.org/2000/svg"
+               viewBox="0 0 24 24"
+               [ngClass]="{'star-filled': i < Math.round(getMediaAvaliacaoNum()), 'star-empty': i >= Math.round(getMediaAvaliacaoNum())}"
+               stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Data Table -->
   <div class="table-container" *ngIf="!isLoading">
     <div class="table-filters">

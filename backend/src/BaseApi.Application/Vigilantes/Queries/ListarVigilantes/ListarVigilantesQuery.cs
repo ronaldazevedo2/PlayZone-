@@ -19,6 +19,10 @@ public record VigilanteListaDto(
     Guid Id,
     string NomeCompleto,
     string Cpf,
+    string Email,
+    string Telefone,
+    DateTime DataNascimento,
+    string FotoPerfil,
     string Matricula,
     string Arena,
     bool Ativo
