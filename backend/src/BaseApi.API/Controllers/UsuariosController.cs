@@ -114,9 +114,9 @@ public class UsuariosController(IMediator mediator) : ControllerBase
         var command = new AtualizarUsuarioCommand(
             id,
             request.NomeCompleto,
+            request.Email,
             request.Cpf,
             request.Telefone,
-            request.Email,
             request.PerfilId,
             request.Ativo);
 

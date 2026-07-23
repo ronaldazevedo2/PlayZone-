@@ -76,7 +76,9 @@ namespace BaseApi.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Modalidade = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    ImagemUrl = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: false)
+                    ImagemUrl = table.Column<string>(type: "longtext", maxLength: 1000000, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Status = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
@@ -99,7 +101,7 @@ namespace BaseApi.Infrastructure.Migrations
                     Telefone = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     DataNascimento = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    FotoPerfil = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: false)
+                    FotoPerfil = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Ativo = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     CriadoEm = table.Column<DateTime>(type: "datetime(6)", nullable: false),
@@ -123,6 +125,10 @@ namespace BaseApi.Infrastructure.Migrations
                     NomeCompleto = table.Column<string>(type: "varchar(150)", maxLength: 150, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Email = table.Column<string>(type: "varchar(200)", maxLength: 200, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Cpf = table.Column<string>(type: "varchar(11)", maxLength: 11, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Telefone = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     SenhaHash = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -188,13 +194,13 @@ namespace BaseApi.Infrastructure.Migrations
 
             migrationBuilder.InsertData(
                 table: "quadras",
-                columns: new[] { "Id", "Capacidade", "Descricao", "ImagemUrl", "Localizacao", "Modalidade", "Nome" },
+                columns: new[] { "Id", "Capacidade", "Descricao", "ImagemUrl", "Localizacao", "Modalidade", "Nome", "Status" },
                 values: new object[,]
                 {
-                    { new Guid("33333333-3333-3333-3333-333333333333"), 20, "Ginásio Poliesportivo localizado no bairro São José.", "https://www.aecweb.com.br/revista/materias/projetando-areas-esportivas-conheca-os-materiais-mais-indicados/6698", "São José", "Futebol", "GINÁSIO POLIESPORTIVO \"EURICO GUILHERME SCHULZ\"" },
-                    { new Guid("44444444-4444-4444-4444-444444444444"), 20, "Ginásio Poliesportivo localizado no bairro Aviso.", "https://www.newquadras.com.br/images/Projetos/Fotos/ESCOLA%20IPSG%20(2).jpg", "Aviso", "Futebol", "GINÁSIO POLIESPORTIVO BAIRRO AVISO" },
-                    { new Guid("55555555-5555-5555-5555-555555555555"), 20, "Ginásio Poliesportivo localizado no bairro Interlagos.", "https://exemplo.com/imagens/interlagos.jpg", "Interlagos", "Futebol", "GINÁSIO POLIESPORTIVO \"LEANDRO SILVA DOS REIS\"" },
-                    { new Guid("66666666-6666-6666-6666-666666666666"), 20, "Ginásio Poliesportivo localizado no bairro Araçá.", "https://exemplo.com/imagens/araca.jpg", "Araçá", "Futebol", "GINÁSIO POLIESPORTIVO BAIRRO ARAÇÁ" }
+                    { new Guid("33333333-3333-3333-3333-333333333333"), 20, "Ginásio Poliesportivo localizado no bairro São José.", "https://www.aecweb.com.br/revista/materias/projetando-areas-esportivas-conheca-os-materiais-mais-indicados/6698", "São José", "Futebol", "GINÁSIO POLIESPORTIVO \"EURICO GUILHERME SCHULZ\"", "Ativa" },
+                    { new Guid("44444444-4444-4444-4444-444444444444"), 20, "Ginásio Poliesportivo localizado no bairro Aviso.", "https://www.newquadras.com.br/images/Projetos/Fotos/ESCOLA%20IPSG%20(2).jpg", "Aviso", "Futebol", "GINÁSIO POLIESPORTIVO BAIRRO AVISO", "Ativa" },
+                    { new Guid("55555555-5555-5555-5555-555555555555"), 20, "Ginásio Poliesportivo localizado no bairro Interlagos.", "https://exemplo.com/imagens/interlagos.jpg", "Interlagos", "Futebol", "GINÁSIO POLIESPORTIVO \"LEANDRO SILVA DOS REIS\"", "Ativa" },
+                    { new Guid("66666666-6666-6666-6666-666666666666"), 20, "Ginásio Poliesportivo localizado no bairro Araçá.", "https://exemplo.com/imagens/araca.jpg", "Araçá", "Futebol", "GINÁSIO POLIESPORTIVO BAIRRO ARAÇÁ", "Ativa" }
                 });
 
             migrationBuilder.InsertData(
@@ -222,13 +228,13 @@ namespace BaseApi.Infrastructure.Migrations
 
             migrationBuilder.InsertData(
                 table: "usuarios",
-                columns: new[] { "Id", "Ativo", "AtualizadoEm", "CriadoEm", "Email", "NomeCompleto", "PerfilId", "SenhaHash", "TokenExpiracao", "TokenRedefinicaoSenha" },
+                columns: new[] { "Id", "Ativo", "AtualizadoEm", "Cpf", "CriadoEm", "Email", "NomeCompleto", "PerfilId", "SenhaHash", "Telefone", "TokenExpiracao", "TokenRedefinicaoSenha" },
                 values: new object[,]
                 {
-                    { new Guid("00000000-0000-0000-0000-000000000001"), true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "admin@baseapi.com", "Administrador do Sistema", 1, "$2a$11$wfecw7J8NUgBI8r/aHTVcuwPdMKrDcjNcQixHNl97DJYMztOuDVUi", null, null },
-                    { new Guid("77777777-7777-7777-7777-777777777777"), true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin@playzone.com", "Administrador", 1, "$2a$11$PV12jhl97mf5r/yi46FQ7eBoQml2mrOlKZDoCo2tx8ejgWrYxhBYG", null, null },
-                    { new Guid("88888888-8888-8888-8888-888888888888"), true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "joao@playzone.com", "João Silva", 2, "$2a$11$wKuK.WDBn0/DaTvqEy3Ww.qgd4tDQIN8PKQzsN0rPv4W3kNqaVbjK", null, null },
-                    { new Guid("99999999-9999-9999-9999-999999999999"), true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "maria@playzone.com", "Maria Souza", 3, "$2a$11$4Ht8XgkTRmlfvDc1eq1OV.4rv36NVStzCT1.ds4GzCXrnj0inyEyO", null, null }
+                    { new Guid("00000000-0000-0000-0000-000000000001"), true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "admin@baseapi.com", "Administrador do Sistema", 1, "$2a$11$/hgAEt/yMPj1m7Uj18KZy.AFFecvKxaduRnbAPJshXhdShEN4KjKK", "", null, null },
+                    { new Guid("77777777-7777-7777-7777-777777777777"), true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "11111111111", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin@playzone.com", "Administrador", 1, "$2a$11$xTLtFnCfyZxpWzu2zM2dnO3uh7IN6AhEat5VMTs69mbz5g/re0r3q", "27999990001", null, null },
+                    { new Guid("88888888-8888-8888-8888-888888888888"), true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "22222222222", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "joao@playzone.com", "João Silva", 2, "$2a$11$a2AWxwk5HzuSdkXXx6CPQucPrL87VXkDLo5ZtGwEQMwBIIcOBEEGu", "27999990002", null, null },
+                    { new Guid("99999999-9999-9999-9999-999999999999"), true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "33333333333", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "maria@playzone.com", "Maria Souza", 3, "$2a$11$d966b3Vl4/3EtJ2CAbD2JuS21U69qCbTNb0sOxOSUDup7od4CnBu6", "27999990003", null, null }
                 });
 
             migrationBuilder.CreateIndex(
@@ -241,6 +247,12 @@ namespace BaseApi.Infrastructure.Migrations
                 name: "IX_reservas_QuadraId_DataAgendada_HorarioAgendado",
                 table: "reservas",
                 columns: new[] { "QuadraId", "DataAgendada", "HorarioAgendado" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_usuarios_Cpf",
+                table: "usuarios",
+                column: "Cpf",
                 unique: true);
 
             migrationBuilder.CreateIndex(

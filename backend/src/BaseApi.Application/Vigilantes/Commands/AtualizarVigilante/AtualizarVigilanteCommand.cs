@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 
 namespace BaseApi.Application.Vigilantes.Commands.AtualizarVigilante;
 
@@ -8,5 +8,6 @@ public record AtualizarVigilanteCommand(
     string Cpf,
     string Matricula,
     string Arena,
-    bool Ativo
+    bool Ativo,
+    string? FotoPerfil
 ) : IRequest<Unit>;

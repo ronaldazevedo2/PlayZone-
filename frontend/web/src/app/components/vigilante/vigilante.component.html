@@ -1,37 +1,44 @@
-<div class="tab-panel animate-fade">
-  <div class="vigilante-header-bar">
-    <div class="vigilante-title">
-      <h3>Gestão e Escala de Vigilantes</h3>
-      <p>Controle as rondas, turnos e check-ins de segurança na arena.</p>
+<div class="vigilantes-container" (click)="showMaisFiltros = false">
+  <div class="header-actions">
+    <div class="page-title">
+      <h2>Vigilantes</h2>
+      <p>Gerencie seus vigilantes, escalas e rondas de segurança.</p>
     </div>
-    <div class="vigilante-actions">
-      <button class="btn btn-danger btn-sm" (click)="registerGuardIncident()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2" style="margin-right: 5px; vertical-align: middle;">
-          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-          <line x1="12" y1="9" x2="12" y2="13"></line>
-          <line x1="12" y1="17" x2="12.01" y2="17"></line>
-        </svg>
-        Registrar Ocorrência
-      </button>
-      <button class="btn btn-success btn-sm" (click)="openAddModal()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2" style="margin-right: 5px; vertical-align: middle;">
+
+    <div class="actions-group">
+      <button class="btn-primary" (click)="openAddModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="12" y1="5" x2="12" y2="19"></line>
           <line x1="5" y1="12" x2="19" y2="12"></line>
         </svg>
-        Adicionar Vigilante
+        Novo Vigilante
       </button>
     </div>
   </div>
 
-  <!-- Guards Specific Stats -->
-  <section class="stats-grid">
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading && guards.length === 0">
+    <div class="spinner"></div>
+    <p>Carregando vigilantes...</p>
+  </div>
+
+  <!-- Error Message -->
+  <div class="alert alert-error" *ngIf="errorMessages.length > 0 && !showModal && !showDetailsModal">
+    <ul *ngIf="errorMessages.length > 1" style="margin: 0; padding-left: 18px;">
+      <li *ngFor="let msg of errorMessages">{{ msg }}</li>
+    </ul>
+    <span *ngIf="errorMessages.length === 1">{{ errorMessages[0] }}</span>
+  </div>
+
+  <!-- Data Stats Cards -->
+  <section class="stats-grid" *ngIf="!isLoading || guards.length > 0">
     <div class="stat-card">
-      <div class="stat-icon res-icon" style="background-color: rgba(40, 167, 69, 0.1); color: #28a745;">
+      <div class="stat-icon users-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
           <circle cx="9" cy="7" r="4"></circle>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
         </svg>
       </div>
       <div class="stat-details">
@@ -42,23 +49,24 @@
     </div>
 
     <div class="stat-card">
-      <div class="stat-icon msg-icon" style="background-color: rgba(26, 115, 232, 0.1); color: var(--secondary-color);">
+      <div class="stat-icon active-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
         </svg>
       </div>
       <div class="stat-details">
-        <p class="stat-label">Ronda da Semana</p>
-        <h3>100% Concluída</h3>
+        <p class="stat-label">Vigilantes Ativos</p>
+        <h3>{{ getVigilantesAtivos() }} Ativos</h3>
         <div class="progress-container">
-          <div class="progress-bar" style="width: 100%; background-color: #28a745;"></div>
+          <div class="progress-bar" [style.width.%]="getPercentualAtivos()"></div>
         </div>
-        <p class="stat-sub">Sem atrasos reportados</p>
+        <p class="stat-sub">{{ getPercentualAtivos().toFixed(0) }}% do total ativo</p>
       </div>
     </div>
 
     <div class="stat-card">
-      <div class="stat-icon star-icon" style="background-color: rgba(255, 193, 7, 0.1); color: #ffc107;">
+      <div class="stat-icon rating-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="10"></circle>
           <polyline points="12 6 12 12 16 14"></polyline>
@@ -66,184 +74,316 @@
       </div>
       <div class="stat-details">
         <p class="stat-label">Monitoramento Geral</p>
-        <h3>Ativo</h3>
-        <p class="stat-sub">Arena sob proteção contínua</p>
+        <h3>100% Ativo</h3>
+        <p class="stat-sub text-green">Proteção contínua na arena</p>
       </div>
     </div>
   </section>
 
-  <!-- Guards List Table -->
-  <div class="font-card"
-    style="margin-top: 30px; padding: 25px; background: var(--white); border-radius: 12px; box-shadow: var(--shadow-sm);">
-    <div class="card-title-bar">
-      <h4>Equipe de Vigilância Cadastrada</h4>
+  <!-- Data Table Container -->
+  <div class="table-container" *ngIf="!isLoading || guards.length > 0">
+    <div class="table-filters">
+      <div class="search-box">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" placeholder="Buscar por nome, e-mail, telefone, CPF, matrícula ou arena..."
+          [(ngModel)]="termoBusca" (input)="filtrarVigilantes()">
+      </div>
+
+      <div class="filter-dropdowns">
+        <select class="status-filter" [(ngModel)]="filtroStatus" (change)="filtrarVigilantes()">
+          <option value="Todos">Todos</option>
+          <option value="Ativos">Ativos</option>
+          <option value="Inativos">Inativos</option>
+        </select>
+
+        <div class="popover-filters-wrapper">
+
+          <!-- Dropdown / Popover Mais Filtros -->
+          <div class="popover-filters" *ngIf="showMaisFiltros" (click)="$event.stopPropagation()">
+            <div class="popover-filters-header">
+              <h5>Filtros Avançados</h5>
+              <button type="button" class="btn-close-sm" (click)="showMaisFiltros = false">✕</button>
+            </div>
+
+            <div class="popover-group">
+              <label>Arena Alocada</label>
+              <select class="form-control-sm" [(ngModel)]="filtroArena" (change)="filtrarVigilantes()">
+                <option value="">Todas as arenas</option>
+                <option *ngFor="let q of quadras" [value]="q.nome">{{ q.nome }}</option>
+              </select>
+            </div>
+
+            <div class="popover-group">
+              <label>Matrícula</label>
+              <input type="text" class="form-control-sm" placeholder="Ex: VIG-2026-001" [(ngModel)]="filtroMatricula"
+                (input)="filtrarVigilantes()">
+            </div>
+
+            <div class="popover-group">
+              <label>Data de Nascimento</label>
+              <input type="date" class="form-control-sm" [(ngModel)]="filtroDataNascimento"
+                (change)="filtrarVigilantes()">
+            </div>
+
+            <div class="popover-filters-footer">
+              <button type="button" class="btn-sm-clear" (click)="limparFiltros()">Limpar Filtros</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div *ngIf="isLoading && guards.length === 0" class="loading-spinner-wrapper">
-      <div class="spinner"></div>
-      <p>Carregando dados dos vigilantes...</p>
-    </div>
-
-    <div *ngIf="!isLoading && guards.length === 0" class="no-records-message">
-      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
-        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-        class="feather feather-users">
-        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-        <circle cx="9" cy="7" r="4"></circle>
-        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-      </svg>
-      <p>Nenhum vigilante cadastrado no banco de dados.</p>
-    </div>
-
-    <div class="table-container" *ngIf="guards.length > 0">
-      <table class="bookings-table">
-        <thead>
-          <tr>
-            <th>Vigilante</th>
-            <th>CPF</th>
-            <th>E-mail</th>
-            <th>Telefone</th>
-            <th>Data de Nascimento</th>
-            <th>Matrícula</th>
-            <th>Arena</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let guard of guards">
-            <td>
-              <div style="display: flex; align-items: center; gap: 10px;">
-                <div class="guard-avatar">
-                  <img *ngIf="guard.fotoPerfil" [src]="guard.fotoPerfil" alt="Foto de perfil" class="avatar-image">
-                  <span *ngIf="!guard.fotoPerfil">{{ guard.nomeCompleto.substring(0, 2).toUpperCase() }}</span>
-                </div>
-                <strong>{{ guard.nomeCompleto }}</strong>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>VIGILANTE</th>
+          <th>CPF</th>
+          <th>E-MAIL</th>
+          <th>TELEFONE</th>
+          <th>MATRÍCULA</th>
+          <th>ARENA</th>
+          <th>STATUS</th>
+          <th>AÇÕES</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let guard of guardsFiltrados" (click)="openVigilanteDetails(guard)" class="clickable-row">
+          <td>
+            <div class="user-cell">
+              <div class="user-avatar" *ngIf="!getFoto(guard)">{{ guard.nomeCompleto.charAt(0) | uppercase }}</div>
+              <img [src]="getFoto(guard)" alt="Avatar" class="user-avatar-img" *ngIf="getFoto(guard)">
+              <div class="user-info">
+                <span class="user-name">{{ guard.nomeCompleto }}</span>
+                <span class="user-date" *ngIf="guard.dataNascimento">Nasc: {{ guard.dataNascimento |
+                  date:'dd/MM/yyyy':'UTC' }}</span>
               </div>
-            </td>
-            <td>{{ guard.cpf }}</td>
-            <td>{{ guard.email }}</td>
-            <td>{{ guard.telefone }}</td>
-            <td>{{ guard.dataNascimento | date:'dd/MM/yyyy':'UTC' }}</td>
-            <td>{{ guard.matricula }}</td>
-            <td>{{ guard.arena }}</td>
-            <td>
-              <span class="status-indicator" [class.active-status]="guard.ativo" [class.inactive-status]="!guard.ativo">
+            </div>
+          </td>
+          <td>
+            <div class="contact-cell">
+              <span>{{ formatCpf(guard.cpf) }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="email-cell">
+              <span class="contact-email">{{ guard.email }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="contact-cell">
+              <span class="contact-phone">{{ formatTelefone(guard.telefone) }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="contact-cell">
+              <strong style="color: #334155;">{{ guard.matricula }}</strong>
+            </div>
+          </td>
+          <td>
+            <div class="contact-cell">
+              <span>{{ guard.arena }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="status-cell">
+              <span class="status-badge" [ngClass]="guard.ativo ? 'status-active' : 'status-inactive'">
                 {{ guard.ativo ? 'Ativo' : 'Inativo' }}
               </span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+            </div>
+          </td>
+          <td>
+            <div class="actions-cell">
+              <button class="btn-icon" title="Editar" (click)="$event.stopPropagation(); editarVigilante(guard)">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+              </button>
+              <button class="btn-icon-danger" title="Excluir"
+                (click)="$event.stopPropagation(); excluirVigilante(guard)">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Empty state when search/filter has no results -->
+    <div class="empty-search-state" *ngIf="guardsFiltrados.length === 0 && guards.length > 0 && !isLoading">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+        width="48" height="48" style="opacity: 0.4; margin-bottom: 12px;">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <p style="color: #94a3b8; font-size: 0.95rem; margin: 0;">Nenhum vigilante encontrado para <strong>"{{ termoBusca
+          || 'filtros selecionados' }}"</strong></p>
+      <p style="color: #64748b; font-size: 0.85rem; margin-top: 4px;">Tente buscar por nome, e-mail, telefone, CPF,
+        matrícula ou arena.</p>
     </div>
   </div>
-</div>
 
-<!-- Centered Add Vigilante Modal Sub-Screen -->
-<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
-  <div class="modal-card animate-zoom" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h3>Novo Vigilante</h3>
-      <button class="close-btn" (click)="closeModal()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      </button>
+  <!-- Modal View Details -->
+  <div class="modal-overlay" *ngIf="showDetailsModal" (click)="closeDetailsModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Detalhes do Vigilante</h2>
+        <button class="btn-close" (click)="closeDetailsModal()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body" *ngIf="selectedVigilante">
+        <div class="user-profile-header">
+          <div class="user-avatar large" *ngIf="!getFoto(selectedVigilante)">{{ selectedVigilante.nomeCompleto.charAt(0)
+            | uppercase }}</div>
+          <img [src]="getFoto(selectedVigilante)" alt="Avatar" class="user-avatar-img large"
+            *ngIf="getFoto(selectedVigilante)">
+
+          <div class="user-profile-info">
+            <h3>{{ selectedVigilante.nomeCompleto }}</h3>
+            <span class="status-badge" [ngClass]="selectedVigilante.ativo ? 'status-active' : 'status-inactive'">
+              {{ selectedVigilante.ativo ? 'Ativo' : 'Inativo' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="info-section">
+          <h4>Dados Pessoais & Contato</h4>
+          <div class="info-row">
+            <span><strong>E-mail:</strong> {{ selectedVigilante.email }}</span>
+          </div>
+          <div class="info-row" *ngIf="selectedVigilante.telefone">
+            <span><strong>Telefone:</strong> {{ formatTelefone(selectedVigilante.telefone) }}</span>
+          </div>
+          <div class="info-row" *ngIf="selectedVigilante.cpf">
+            <span><strong>CPF:</strong> {{ formatCpf(selectedVigilante.cpf) }}</span>
+          </div>
+          <div class="info-row" *ngIf="selectedVigilante.dataNascimento">
+            <span><strong>Nascimento:</strong> {{ selectedVigilante.dataNascimento | date:'dd/MM/yyyy':'UTC' }}</span>
+          </div>
+        </div>
+
+        <div class="info-section">
+          <h4>Credenciamento & Arena</h4>
+          <div class="info-row">
+            <span><strong>Matrícula:</strong> {{ selectedVigilante.matricula }}</span>
+          </div>
+          <div class="info-row">
+            <span><strong>Arena Alocada:</strong> {{ selectedVigilante.arena }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-outline" (click)="closeDetailsModal()">Fechar</button>
+      </div>
     </div>
+  </div>
 
-    <div class="modal-body">
-      <!-- Alerts -->
-      <div class="alert alert-danger" *ngIf="errorMessage">
-        {{ errorMessage }}
+  <!-- Modal Add / Edit Vigilante -->
+  <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ vigilanteEditandoId ? 'Editar Vigilante' : 'Adicionar Novo Vigilante' }}</h2>
+        <button class="btn-close" (click)="closeModal()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
       </div>
-      <div class="alert alert-success" *ngIf="successMessage">
-        {{ successMessage }}
+
+      <div class="modal-body">
+        <div class="alert alert-error" *ngIf="errorMessages.length > 0">
+          <ul *ngIf="errorMessages.length > 1" style="margin: 0; padding-left: 18px;">
+            <li *ngFor="let msg of errorMessages">{{ msg }}</li>
+          </ul>
+          <span *ngIf="errorMessages.length === 1">{{ errorMessages[0] }}</span>
+        </div>
+        <div class="alert alert-success" *ngIf="successMessage">{{ successMessage }}</div>
+
+        <form (ngSubmit)="salvarVigilante()" #vigilanteForm="ngForm" class="form-container">
+          <div class="form-group">
+            <label for="nomeCompleto">Nome Completo *</label>
+            <input type="text" id="nomeCompleto" name="nomeCompleto" [(ngModel)]="nomeCompleto" required
+              placeholder="Ex: Carlos Silva" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label for="email">E-mail *</label>
+            <input type="email" id="email" name="email" [(ngModel)]="email" required placeholder="Ex: carlos@email.com"
+              class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label for="cpf">CPF *</label>
+            <input type="text" id="cpf" name="cpf" [(ngModel)]="cpf" (input)="applyCpfMask($event)" required
+              placeholder="000.000.000-00" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label for="telefone">Telefone *</label>
+            <input type="text" id="telefone" name="telefone" [(ngModel)]="telefone" (input)="applyPhoneMask($event)"
+              required placeholder="(00) 00000-0000" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label for="dataNascimento">Data de Nascimento *</label>
+            <input type="date" id="dataNascimento" name="dataNascimento" [(ngModel)]="dataNascimento" required
+              class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label for="matricula">Matrícula *</label>
+            <input type="text" id="matricula" name="matricula" [(ngModel)]="matricula" required
+              placeholder="Ex: VIG-2026-001" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label for="arena">Arena Alocada *</label>
+            <select id="arena" name="arena" [(ngModel)]="arena" required class="form-control">
+              <option value="" disabled>Selecione uma arena</option>
+              <option *ngFor="let q of quadras" [value]="q.nome">{{ q.nome }}</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="fotoPerfil">Foto de Perfil</label>
+            <input type="file" id="fotoPerfil" (change)="onFileSelected($event)" accept="image/*" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label>Status</label>
+            <select class="form-control" name="ativo" [(ngModel)]="ativo">
+              <option [ngValue]="true">Ativo</option>
+              <option [ngValue]="false">Inativo</option>
+            </select>
+          </div>
+        </form>
       </div>
 
-      <form (submit)="$event.preventDefault(); salvarVigilante();" class="modal-form">
-        <!-- Profile Pic Area -->
-        <div class="photo-upload-container">
-          <div class="avatar-preview">
-            <img *ngIf="fotoPerfil" [src]="fotoPerfil" alt="Preview da Foto">
-            <svg *ngIf="!fotoPerfil" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"
-              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-              class="placeholder-icon">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-          </div>
-          <div class="upload-actions">
-            <label for="foto-input" class="btn btn-secondary btn-sm">
-              Selecionar Foto
-            </label>
-            <input type="file" id="foto-input" (change)="onFileSelected($event)" accept="image/*"
-              style="display: none;">
-            <p class="upload-hint">Formatos: JPG, PNG. Max: 2MB.</p>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="nome">Nome Completo <span class="required">*</span></label>
-          <input type="text" id="nome" [(ngModel)]="nomeCompleto" name="nomeCompleto"
-            placeholder="Digite o nome completo" required>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group half-width">
-            <label for="cpf">CPF <span class="required">*</span></label>
-            <input type="text" id="cpf" [(ngModel)]="cpf" name="cpf" (input)="applyCpfMask($event)"
-              placeholder="000.000.000-00" required>
-          </div>
-
-          <div class="form-group half-width">
-            <label for="dataNascimento">Data de Nascimento <span class="required">*</span></label>
-            <input type="date" id="dataNascimento" [(ngModel)]="dataNascimento" name="dataNascimento" required>
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group half-width">
-            <label for="email">E-mail <span class="required">*</span></label>
-            <input type="email" id="email" [(ngModel)]="email" name="email" placeholder="email@exemplo.com" required>
-          </div>
-
-          <div class="form-group half-width">
-            <label for="telefone">Telefone <span class="required">*</span></label>
-            <input type="text" id="telefone" [(ngModel)]="telefone" name="telefone" (input)="applyPhoneMask($event)"
-              placeholder="(00) 00000-0000" required>
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group half-width">
-            <label for="matricula">Matrícula <span class="required">*</span></label>
-            <input type="text" id="matricula" [(ngModel)]="matricula" name="matricula" placeholder="Digite a matrícula" required>
-          </div>
-
-          <div class="form-group half-width">
-            <label for="arena">Arena <span class="required">*</span></label>
-            <input type="text" id="arena" [(ngModel)]="arena" name="arena" placeholder="Digite a arena" required>
-          </div>
-        </div>
-
-        <div class="form-group status-info-group">
-          <label>Status Inicial</label>
-          <div class="status-badge-initial">
-            <span class="status-indicator active-status">Ativo</span>
-            <span class="status-hint">Novos vigilantes iniciam como ativos no sistema.</span>
-          </div>
-        </div>
-
-        <div class="modal-footer-actions">
-          <button type="button" class="btn btn-cancel" (click)="closeModal()" [disabled]="isLoading">Cancelar</button>
-          <button type="submit" class="btn btn-save" [disabled]="isLoading">
-            <span class="btn-spinner" *ngIf="isLoading"></span>
-            Salvar Vigilante
-          </button>
-        </div>
-      </form>
+      <div class="modal-footer">
+        <button class="btn-outline" (click)="closeModal()" [disabled]="isLoading">Cancelar</button>
+        <button class="btn-primary" (click)="salvarVigilante()"
+          [disabled]="isLoading || !nomeCompleto || !email || !cpf || !telefone || !dataNascimento">
+          <span *ngIf="isLoading" class="spinner-small"></span>
+          Salvar
+        </button>
+      </div>
     </div>
   </div>
 </div>
