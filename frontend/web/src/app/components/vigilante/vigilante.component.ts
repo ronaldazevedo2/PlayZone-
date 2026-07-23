@@ -41,15 +41,25 @@ interface PaginatedResult<T> {
 })
 export class VigilanteComponent implements OnInit {
   guards: Vigilante[] = [];
+  guardsFiltrados: Vigilante[] = [];
   isLoading = false;
-  errorMessage = '';
+  errorMessages: string[] = [];
   successMessage = '';
   quadras: ReservaQuadraDto[] = [];
+
+  // Search & Filter state
+  termoBusca = '';
+  filtroStatus = 'Todos';
+  showMaisFiltros = false;
+  filtroArena = '';
+  filtroMatricula = '';
+  filtroDataNascimento = '';
 
   // Modal State
   showModal = false;
   vigilanteEditandoId: string | null = null;
-  menuAbertoId: string | null = null;
+  selectedVigilante: Vigilante | null = null;
+  showDetailsModal = false;
 
   // Form Fields
   nomeCompleto = '';
@@ -70,27 +80,25 @@ export class VigilanteComponent implements OnInit {
     private quadraService: QuadraService
   ) { }
 
-  private formatDate(dateStr: string): string {
-    if (!dateStr) return '';
-    const d = new Date(dateStr);
-    return d.toISOString();
-  }
-
   ngOnInit(): void {
     this.carregarVigilantes();
     this.carregarQuadras();
   }
 
-  carregarQuadras(): void {
-    console.log('Entrou em carregarQuadras');
+  getVigilantesAtivos(): number {
+    return this.guards.filter(g => g.ativo).length;
+  }
 
+  getPercentualAtivos(): number {
+    if (this.guards.length === 0) return 0;
+    return (this.getVigilantesAtivos() / this.guards.length) * 100;
+  }
+
+  carregarQuadras(): void {
     this.quadraService.listar(1, 100).subscribe({
       next: (res) => {
-        console.log('Resposta da API:', res);
-
         if (res.ok && res.dados) {
           this.quadras = res.dados.itens ?? [];
-          console.log('Quadras:', this.quadras);
           if (!this.arena && this.quadras.length > 0) {
             this.arena = this.quadras[0].nome;
           }
@@ -106,7 +114,7 @@ export class VigilanteComponent implements OnInit {
     this.isLoading = true;
     const token = this.authService.getToken();
     if (!token) {
-      this.errorMessage = 'Usuário não autenticado.';
+      this.errorMessages = ['Usuário não autenticado.'];
       this.isLoading = false;
       return;
     }
@@ -120,27 +128,112 @@ export class VigilanteComponent implements OnInit {
       next: (res) => {
         this.isLoading = false;
         if (res.ok && res.dados) {
-          this.guards = res.dados.itens;
+          this.guards = res.dados.itens || [];
+          this.filtrarVigilantes();
         } else if (res.erros && res.erros.length > 0) {
-          this.errorMessage = res.erros.join(', ');
+          this.errorMessages = res.erros;
         }
       },
       error: (err) => {
         this.isLoading = false;
         console.error('Erro ao buscar vigilantes:', err);
-        this.errorMessage = 'Erro ao carregar a lista de vigilantes.';
+        this.errorMessages = ['Erro ao carregar a lista de vigilantes.'];
       }
     });
   }
 
+  filtrarVigilantes(): void {
+    let resultado = [...this.guards];
+
+    // Filtro de Status
+    if (this.filtroStatus === 'Ativos') {
+      resultado = resultado.filter(g => g.ativo);
+    } else if (this.filtroStatus === 'Inativos') {
+      resultado = resultado.filter(g => !g.ativo);
+    }
+
+    // Filtro de Arena (Mais Filtros)
+    if (this.filtroArena && this.filtroArena.trim() !== '') {
+      const arenaTerm = this.filtroArena.toLowerCase().trim();
+      resultado = resultado.filter(g => (g.arena || '').toLowerCase().includes(arenaTerm));
+    }
+
+    // Filtro de Matrícula (Mais Filtros)
+    if (this.filtroMatricula && this.filtroMatricula.trim() !== '') {
+      const matTerm = this.filtroMatricula.toLowerCase().trim();
+      resultado = resultado.filter(g => (g.matricula || '').toLowerCase().includes(matTerm));
+    }
+
+    // Filtro de Data de Nascimento (Mais Filtros)
+    if (this.filtroDataNascimento && this.filtroDataNascimento.trim() !== '') {
+      resultado = resultado.filter(g => {
+        const dataStr = this.formatDateForInput(g.dataNascimento);
+        return dataStr === this.filtroDataNascimento;
+      });
+    }
+
+    // Campo de busca geral (termoBusca)
+    if (this.termoBusca && this.termoBusca.trim() !== '') {
+      const termo = this.termoBusca.toLowerCase().trim();
+      const termoSemMascara = termo.replace(/[.\-()\s/]/g, '');
+
+      resultado = resultado.filter(g => {
+        const nome = (g.nomeCompleto || '').toLowerCase();
+        const email = (g.email || '').toLowerCase();
+        const telefone = (g.telefone || '').toLowerCase();
+        const telefoneSemMascara = telefone.replace(/[.\-()\s/]/g, '');
+        const cpf = (g.cpf || '').toLowerCase();
+        const cpfSemMascara = cpf.replace(/[.\-()\s/]/g, '');
+        const matricula = (g.matricula || '').toLowerCase();
+        const arena = (g.arena || '').toLowerCase();
+
+        return (
+          nome.includes(termo) ||
+          email.includes(termo) ||
+          telefone.includes(termo) ||
+          telefoneSemMascara.includes(termoSemMascara) ||
+          cpf.includes(termo) ||
+          cpfSemMascara.includes(termoSemMascara) ||
+          matricula.includes(termo) ||
+          arena.includes(termo)
+        );
+      });
+    }
+
+    this.guardsFiltrados = resultado;
+  }
+
+  toggleMaisFiltros(event?: MouseEvent): void {
+    if (event) event.stopPropagation();
+    this.showMaisFiltros = !this.showMaisFiltros;
+  }
+
+  limparFiltros(): void {
+    this.termoBusca = '';
+    this.filtroStatus = 'Todos';
+    this.filtroArena = '';
+    this.filtroMatricula = '';
+    this.filtroDataNascimento = '';
+    this.filtrarVigilantes();
+  }
+
   openAddModal(): void {
     this.resetForm();
-    this.carregarQuadras(); // Garante que a lista de quadras esteja sempre atualizada ao abrir o modal
+    this.carregarQuadras();
     this.showModal = true;
   }
 
+  openVigilanteDetails(guard: Vigilante): void {
+    this.selectedVigilante = guard;
+    this.showDetailsModal = true;
+  }
+
+  closeDetailsModal(): void {
+    this.showDetailsModal = false;
+    this.selectedVigilante = null;
+  }
+
   editarVigilante(guard: any): void {
-    console.log('Objeto vigilante recebido para edição:', guard);
     this.resetForm();
     this.carregarQuadras();
 
@@ -149,7 +242,7 @@ export class VigilanteComponent implements OnInit {
 
     const token = this.authService.getToken();
     if (!token) {
-      this.errorMessage = 'Usuário não autenticado.';
+      this.errorMessages = ['Usuário não autenticado.'];
       return;
     }
 
@@ -176,13 +269,13 @@ export class VigilanteComponent implements OnInit {
           
           this.showModal = true;
         } else {
-          this.errorMessage = 'Erro ao carregar os detalhes do vigilante.';
+          this.errorMessages = ['Erro ao carregar os detalhes do vigilante.'];
         }
       },
       error: (err) => {
         this.isLoading = false;
         console.error('Erro ao buscar detalhes do vigilante:', err);
-        this.errorMessage = 'Erro ao carregar detalhes do vigilante.';
+        this.errorMessages = ['Erro ao carregar detalhes do vigilante.'];
       }
     });
   }
@@ -190,42 +283,35 @@ export class VigilanteComponent implements OnInit {
   excluirVigilante(guard: Vigilante): void {
     if (!guard.id) return;
 
-    if (!confirm(`Tem certeza que deseja excluir o vigilante ${guard.nomeCompleto}?`)) {
-      return;
+    if (confirm(`Tem certeza que deseja excluir permanentemente o vigilante ${guard.nomeCompleto}?`)) {
+      const token = this.authService.getToken();
+      if (!token) return;
+
+      const headers = new HttpHeaders({
+        'accept': 'application/json',
+        'Authorization': `Bearer ${token}`
+      });
+
+      this.http.delete<any>(`${this.API_URL}/${guard.id}`, { headers }).subscribe({
+        next: (res) => {
+          if (res && res.ok) {
+            this.carregarVigilantes();
+          } else if (res && res.erros && res.erros.length > 0) {
+            alert('Erro ao excluir: ' + res.erros.join(', '));
+          } else {
+            this.carregarVigilantes();
+          }
+        },
+        error: (err) => {
+          console.error('Erro ao excluir vigilante:', err);
+          if (err.error && err.error.erros && err.error.erros.length > 0) {
+            alert('Erro ao excluir: ' + err.error.erros.join(', '));
+          } else {
+            alert('Erro ao excluir vigilante. Verifique as dependências.');
+          }
+        }
+      });
     }
-
-    const token = this.authService.getToken();
-    if (!token) {
-      this.errorMessage = 'Sua sessão expirou. Por favor, faça login novamente.';
-      return;
-    }
-
-    const headers = new HttpHeaders({
-      'accept': 'application/json',
-      'Authorization': `Bearer ${token}`
-    });
-
-    this.isLoading = true;
-    this.http.delete<any>(`${this.API_URL}/${guard.id}`, { headers }).subscribe({
-      next: (res) => {
-        this.isLoading = false;
-        this.carregarVigilantes();
-      },
-      error: (err) => {
-        this.isLoading = false;
-        console.error('Erro ao excluir vigilante:', err);
-        this.errorMessage = 'Erro ao excluir vigilante.';
-      }
-    });
-  }
-
-  abrirOpcoes(guard: Vigilante, event: MouseEvent): void {
-    event.stopPropagation();
-    this.menuAbertoId = this.menuAbertoId === guard.id ? null : (guard.id || null);
-  }
-
-  fecharMenus(): void {
-    this.menuAbertoId = null;
   }
 
   closeModal(): void {
@@ -243,11 +329,11 @@ export class VigilanteComponent implements OnInit {
     this.matricula = '';
     this.arena = '';
     this.ativo = true;
-    this.errorMessage = '';
+    this.errorMessages = [];
     this.successMessage = '';
   }
 
-  private formatCpf(cpf: string): string {
+  formatCpf(cpf: string): string {
     if (!cpf) return '';
     const digits = cpf.replace(/\D/g, '');
     if (digits.length === 11) {
@@ -256,7 +342,7 @@ export class VigilanteComponent implements OnInit {
     return cpf;
   }
 
-  private formatTelefone(tel: string): string {
+  formatTelefone(tel: string): string {
     if (!tel) return '';
     const digits = String(tel).replace(/\D/g, '');
     if (digits.length === 11) {
@@ -272,7 +358,7 @@ export class VigilanteComponent implements OnInit {
     return guard.fotoPerfil || guard.FotoPerfil || guard.fotoperfil || guard.foto || '';
   }
 
-  private formatDateForInput(dateVal: any): string {
+  formatDateForInput(dateVal: any): string {
     if (!dateVal) return '';
     const str = String(dateVal).trim();
     if (str.includes('/')) {
@@ -310,7 +396,6 @@ export class VigilanteComponent implements OnInit {
     }
   }
 
-  // Simple masks helper functions
   applyCpfMask(event: Event): void {
     const input = event.target as HTMLInputElement;
     let value = input.value.replace(/\D/g, '');
@@ -345,13 +430,13 @@ export class VigilanteComponent implements OnInit {
 
   salvarVigilante(): void {
     if (!this.nomeCompleto || !this.cpf || !this.email || !this.telefone || !this.dataNascimento) {
-      this.errorMessage = 'Por favor, preencha todos os campos obrigatórios.';
+      this.errorMessages = ['Por favor, preencha todos os campos obrigatórios.'];
       return;
     }
 
     const token = this.authService.getToken();
     if (!token) {
-      this.errorMessage = 'Sua sessão expirou. Por favor, faça login novamente.';
+      this.errorMessages = ['Sua sessão expirou. Por favor, faça login novamente.'];
       return;
     }
 
@@ -361,10 +446,8 @@ export class VigilanteComponent implements OnInit {
       'Authorization': `Bearer ${token}`
     });
 
-    // Sanitize CPF and telefone (remove non-digit characters)
     const sanitizedCpf = this.cpf.replace(/\D/g, '');
     const sanitizedTelefone = this.telefone.replace(/\D/g, '');
-    // Ensure ISO date format (yyyy-MM-dd -> ISO)
     const isoDate = new Date(this.dataNascimento).toISOString();
 
     const body: any = {
@@ -384,7 +467,7 @@ export class VigilanteComponent implements OnInit {
     }
 
     this.isLoading = true;
-    this.errorMessage = '';
+    this.errorMessages = [];
 
     const isEdit = !!this.vigilanteEditandoId;
     const request$ = isEdit
@@ -403,18 +486,18 @@ export class VigilanteComponent implements OnInit {
             this.carregarVigilantes();
           }, 1200);
         } else if (res && res.erros && res.erros.length > 0) {
-          this.errorMessage = res.erros.join(', ');
+          this.errorMessages = res.erros;
         } else {
-          this.errorMessage = `Erro ao ${isEdit ? 'atualizar' : 'cadastrar'} vigilante.`;
+          this.errorMessages = [`Erro ao ${isEdit ? 'atualizar' : 'cadastrar'} vigilante.`];
         }
       },
       error: (err) => {
         this.isLoading = false;
         console.error(`Erro ao ${isEdit ? 'atualizar' : 'cadastrar'} vigilante:`, err);
         if (err.error && err.error.erros && err.error.erros.length > 0) {
-          this.errorMessage = err.error.erros.join(', ');
+          this.errorMessages = err.error.erros;
         } else {
-          this.errorMessage = `Erro ao ${isEdit ? 'atualizar' : 'cadastrar'} vigilante. Verifique os dados informados.`;
+          this.errorMessages = [`Erro ao ${isEdit ? 'atualizar' : 'cadastrar'} vigilante. Verifique os dados informados.`];
         }
       }
     });
@@ -426,6 +509,4 @@ export class VigilanteComponent implements OnInit {
       alert('Ocorrência de vigilância registrada com sucesso!');
     }
   }
-
-
 }

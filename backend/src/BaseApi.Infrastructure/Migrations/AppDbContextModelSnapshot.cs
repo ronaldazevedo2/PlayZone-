@@ -373,7 +373,7 @@ namespace BaseApi.Infrastructure.Migrations
                             Email = "admin@baseapi.com",
                             NomeCompleto = "Administrador do Sistema",
                             PerfilId = 1,
-                            SenhaHash = "$2a$11$Rs2w12K9Jsz1DZQ2s4FQ4udFsP1F7FkJhN1DHzxwN16ZrFCPf25hy",
+                            SenhaHash = "$2a$11$/hgAEt/yMPj1m7Uj18KZy.AFFecvKxaduRnbAPJshXhdShEN4KjKK",
                             Telefone = ""
                         },
                         new
@@ -381,39 +381,39 @@ namespace BaseApi.Infrastructure.Migrations
                             Id = new Guid("77777777-7777-7777-7777-777777777777"),
                             Ativo = true,
                             AtualizadoEm = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Cpf = "",
+                            Cpf = "11111111111",
                             CriadoEm = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin@playzone.com",
                             NomeCompleto = "Administrador",
                             PerfilId = 1,
-                            SenhaHash = "$2a$11$jTLsirZPhHNnIAXwrcPx2eYKPt7bT8dZd3W122S2iJBpsSKEJnTmG",
-                            Telefone = ""
+                            SenhaHash = "$2a$11$xTLtFnCfyZxpWzu2zM2dnO3uh7IN6AhEat5VMTs69mbz5g/re0r3q",
+                            Telefone = "27999990001"
                         },
                         new
                         {
                             Id = new Guid("88888888-8888-8888-8888-888888888888"),
                             Ativo = true,
                             AtualizadoEm = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Cpf = "",
+                            Cpf = "22222222222",
                             CriadoEm = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "joao@playzone.com",
                             NomeCompleto = "João Silva",
                             PerfilId = 2,
-                            SenhaHash = "$2a$11$nG.5aav0E.X12cJuvKVmVuOMmVM.pPcnPHoiZgvmKEvEjfTdq5MdC",
-                            Telefone = ""
+                            SenhaHash = "$2a$11$a2AWxwk5HzuSdkXXx6CPQucPrL87VXkDLo5ZtGwEQMwBIIcOBEEGu",
+                            Telefone = "27999990002"
                         },
                         new
                         {
                             Id = new Guid("99999999-9999-9999-9999-999999999999"),
                             Ativo = true,
                             AtualizadoEm = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Cpf = "",
+                            Cpf = "33333333333",
                             CriadoEm = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "maria@playzone.com",
                             NomeCompleto = "Maria Souza",
                             PerfilId = 3,
-                            SenhaHash = "$2a$11$Z2reOjYx6S.CQUhU0WCbkeUaqDiL30StHpDmLgkbF0r5u3bNsX5qi",
-                            Telefone = ""
+                            SenhaHash = "$2a$11$d966b3Vl4/3EtJ2CAbD2JuS21U69qCbTNb0sOxOSUDup7od4CnBu6",
+                            Telefone = "27999990003"
                         });
                 });
 

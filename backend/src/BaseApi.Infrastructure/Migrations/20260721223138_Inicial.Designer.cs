@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BaseApi.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260717002704_UpdateFotoPerfilMaxLength")]
-    partial class UpdateFotoPerfilMaxLength
+    [Migration("20260721223138_Inicial")]
+    partial class Inicial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -164,8 +164,8 @@ namespace BaseApi.Infrastructure.Migrations
 
                     b.Property<string>("ImagemUrl")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)");
+                        .HasMaxLength(1000000)
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Localizacao")
                         .IsRequired()
@@ -182,6 +182,10 @@ namespace BaseApi.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.HasKey("Id");
 
                     b.ToTable("quadras", (string)null);
@@ -195,7 +199,8 @@ namespace BaseApi.Infrastructure.Migrations
                             ImagemUrl = "https://www.aecweb.com.br/revista/materias/projetando-areas-esportivas-conheca-os-materiais-mais-indicados/6698",
                             Localizacao = "São José",
                             Modalidade = "Futebol",
-                            Nome = "GINÁSIO POLIESPORTIVO \"EURICO GUILHERME SCHULZ\""
+                            Nome = "GINÁSIO POLIESPORTIVO \"EURICO GUILHERME SCHULZ\"",
+                            Status = "Ativa"
                         },
                         new
                         {
@@ -205,7 +210,8 @@ namespace BaseApi.Infrastructure.Migrations
                             ImagemUrl = "https://www.newquadras.com.br/images/Projetos/Fotos/ESCOLA%20IPSG%20(2).jpg",
                             Localizacao = "Aviso",
                             Modalidade = "Futebol",
-                            Nome = "GINÁSIO POLIESPORTIVO BAIRRO AVISO"
+                            Nome = "GINÁSIO POLIESPORTIVO BAIRRO AVISO",
+                            Status = "Ativa"
                         },
                         new
                         {
@@ -215,7 +221,8 @@ namespace BaseApi.Infrastructure.Migrations
                             ImagemUrl = "https://exemplo.com/imagens/interlagos.jpg",
                             Localizacao = "Interlagos",
                             Modalidade = "Futebol",
-                            Nome = "GINÁSIO POLIESPORTIVO \"LEANDRO SILVA DOS REIS\""
+                            Nome = "GINÁSIO POLIESPORTIVO \"LEANDRO SILVA DOS REIS\"",
+                            Status = "Ativa"
                         },
                         new
                         {
@@ -225,7 +232,8 @@ namespace BaseApi.Infrastructure.Migrations
                             ImagemUrl = "https://exemplo.com/imagens/araca.jpg",
                             Localizacao = "Araçá",
                             Modalidade = "Futebol",
-                            Nome = "GINÁSIO POLIESPORTIVO BAIRRO ARAÇÁ"
+                            Nome = "GINÁSIO POLIESPORTIVO BAIRRO ARAÇÁ",
+                            Status = "Ativa"
                         });
                 });
 
@@ -308,6 +316,11 @@ namespace BaseApi.Infrastructure.Migrations
                     b.Property<DateTime>("AtualizadoEm")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<string>("Cpf")
+                        .IsRequired()
+                        .HasMaxLength(11)
+                        .HasColumnType("varchar(11)");
+
                     b.Property<DateTime>("CriadoEm")
                         .HasColumnType("datetime(6)");
 
@@ -328,6 +341,11 @@ namespace BaseApi.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<string>("Telefone")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
                     b.Property<DateTime?>("TokenExpiracao")
                         .HasColumnType("datetime(6)");
 
@@ -336,6 +354,9 @@ namespace BaseApi.Infrastructure.Migrations
                         .HasColumnType("varchar(100)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Cpf")
+                        .IsUnique();
 
                     b.HasIndex("Email")
                         .IsUnique();
@@ -350,44 +371,52 @@ namespace BaseApi.Infrastructure.Migrations
                             Id = new Guid("00000000-0000-0000-0000-000000000001"),
                             Ativo = true,
                             AtualizadoEm = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Cpf = "",
                             CriadoEm = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "admin@baseapi.com",
                             NomeCompleto = "Administrador do Sistema",
                             PerfilId = 1,
-                            SenhaHash = "$2a$11$ybSNeQz4s1RkLfJqJliDkOw/RlLDIw1H3h86sj4KFzTGiZ8Lf6kNa"
+                            SenhaHash = "$2a$11$/hgAEt/yMPj1m7Uj18KZy.AFFecvKxaduRnbAPJshXhdShEN4KjKK",
+                            Telefone = ""
                         },
                         new
                         {
                             Id = new Guid("77777777-7777-7777-7777-777777777777"),
                             Ativo = true,
                             AtualizadoEm = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Cpf = "11111111111",
                             CriadoEm = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin@playzone.com",
                             NomeCompleto = "Administrador",
                             PerfilId = 1,
-                            SenhaHash = "$2a$11$phsEXOTXhrwpOB23DvRW/O1mL47MBSyoW4Kcmkxo6TvsdxVWE3SB6"
+                            SenhaHash = "$2a$11$xTLtFnCfyZxpWzu2zM2dnO3uh7IN6AhEat5VMTs69mbz5g/re0r3q",
+                            Telefone = "27999990001"
                         },
                         new
                         {
                             Id = new Guid("88888888-8888-8888-8888-888888888888"),
                             Ativo = true,
                             AtualizadoEm = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Cpf = "22222222222",
                             CriadoEm = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "joao@playzone.com",
                             NomeCompleto = "João Silva",
                             PerfilId = 2,
-                            SenhaHash = "$2a$11$i65Vh2qEwys3JCiUzDiaZeaVq8chWmVkTOjTar0LZBLO4DDY9ex/W"
+                            SenhaHash = "$2a$11$a2AWxwk5HzuSdkXXx6CPQucPrL87VXkDLo5ZtGwEQMwBIIcOBEEGu",
+                            Telefone = "27999990002"
                         },
                         new
                         {
                             Id = new Guid("99999999-9999-9999-9999-999999999999"),
                             Ativo = true,
                             AtualizadoEm = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Cpf = "33333333333",
                             CriadoEm = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "maria@playzone.com",
                             NomeCompleto = "Maria Souza",
                             PerfilId = 3,
-                            SenhaHash = "$2a$11$/H6UR9mex2GV/AxQtyGel.X.3DksbMQjxpiZh88hbqFMp3ndayv46"
+                            SenhaHash = "$2a$11$d966b3Vl4/3EtJ2CAbD2JuS21U69qCbTNb0sOxOSUDup7od4CnBu6",
+                            Telefone = "27999990003"
                         });
                 });
 
