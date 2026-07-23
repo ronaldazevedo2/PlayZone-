@@ -1,7 +1,11 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'servicos/servico_autenticacao.dart';
 import 'telas/tela_login.dart';
 
 void main() {
+  HttpOverrides.global = OverridesHttpPlayZone();
   runApp(const MeuAplicativo());
 }
 
@@ -13,6 +17,16 @@ class MeuAplicativo extends StatelessWidget {
     return MaterialApp(
       title: 'PlayZone',
       debugShowCheckedModeBanner: false,
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('pt', 'BR'),
+        Locale('en', 'US'),
+      ],
+      locale: const Locale('pt', 'BR'),
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
@@ -22,7 +36,7 @@ class MeuAplicativo extends StatelessWidget {
         ),
         scaffoldBackgroundColor: Colors.white,
       ),
-      home: const TelaLogin(),
+      home: const TelaLoginUsuario(),
     );
   }
 }

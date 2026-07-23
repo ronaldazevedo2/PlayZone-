@@ -1,20 +1,29 @@
 import 'package:flutter/material.dart';
 import '../componentes/cabecalho_autenticacao.dart';
 import '../componentes/campo_texto.dart';
+import '../servicos/servico_autenticacao.dart';
+import 'tela_cadastro_usuario.dart';
+import 'tela_esqueceu_senha.dart';
+import 'tela_inicial.dart';
 
-class TelaLogin extends StatefulWidget {
-  const TelaLogin({super.key});
+class TelaLoginUsuario extends StatefulWidget {
+  const TelaLoginUsuario({super.key});
 
   @override
-  State<TelaLogin> createState() => _TelaLoginEstado();
+  State<TelaLoginUsuario> createState() => _TelaLoginUsuarioEstado();
 }
 
-class _TelaLoginEstado extends State<TelaLogin> {
+class _TelaLoginUsuarioEstado extends State<TelaLoginUsuario> {
   final GlobalKey<FormState> _chaveFormulario = GlobalKey<FormState>();
-  
-  final TextEditingController _controladorEmail = TextEditingController();
-  final TextEditingController _controladorSenha = TextEditingController();
-  
+  bool _estaCarregando = false;
+
+  final TextEditingController _controladorEmail = TextEditingController(
+    text: 'midian@gmail.com',
+  );
+  final TextEditingController _controladorSenha = TextEditingController(
+    text: '29092007*Mk',
+  );
+
   final FocusNode _focoEmail = FocusNode();
   final FocusNode _focoSenha = FocusNode();
 
@@ -49,37 +58,70 @@ class _TelaLoginEstado extends State<TelaLogin> {
     return null;
   }
 
-  void _realizarLogin() {
-    if (_chaveFormulario.currentState!.validate()) {
-      // O formulário é válido, realiza a lógica de autenticação
-      final email = _controladorEmail.text.trim();
+  Future<void> _realizarLogin() async {
+    if (!_chaveFormulario.currentState!.validate()) {
+      return;
+    }
 
-      // Exibe um feedback visual de carregamento/sucesso temporário
+    setState(() {
+      _estaCarregando = true;
+    });
+
+    final email = _controladorEmail.text.trim();
+    final senha = _controladorSenha.text;
+
+    try {
+      final sessao = await ServicoAutenticacao.realizarLogin(
+        email: email,
+        senha: senha,
+      );
+
+      if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Entrando com o e-mail: $email...'),
-          backgroundColor: const Color(0xFF22C55E), // Verde de sucesso
-          duration: const Duration(seconds: 2),
+        const SnackBar(
+          content: Text('Login realizado com sucesso!'),
+          backgroundColor: Color(0xFF22C55E),
+          duration: Duration(seconds: 2),
         ),
       );
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => TelaInicial(sessao: sessao)),
+      );
+    } catch (erro) {
+      if (!mounted) return;
+
+      final stringErro = erro.toString().replaceAll('Exception: ', '');
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(stringErro),
+          backgroundColor: Colors.redAccent,
+          duration: const Duration(seconds: 4),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _estaCarregando = false;
+        });
+      }
     }
   }
 
   void _irParaEsqueciSenha() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Funcionalidade "Esqueci minha senha" em desenvolvimento.'),
-        duration: Duration(seconds: 2),
-      ),
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const TelaEsqueceuSenha()),
     );
   }
 
   void _irParaCadastro() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Funcionalidade "Cadastro" em desenvolvimento.'),
-        duration: Duration(seconds: 2),
-      ),
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const TelaCadastroUsuario()),
     );
   }
 
@@ -91,7 +133,10 @@ class _TelaLoginEstado extends State<TelaLogin> {
         child: Center(
           child: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 24.0,
+              vertical: 16.0,
+            ),
             child: Form(
               key: _chaveFormulario,
               child: Column(
@@ -100,10 +145,11 @@ class _TelaLoginEstado extends State<TelaLogin> {
                 children: [
                   // Cabeçalho com logo e boas-vindas
                   const CabecalhoAutenticacao(
-                    titulo: 'Bem-vindo de volta!',
-                    subtitulo: 'Entre com seus dados para acessar sua conta na PlayZone.',
+                    titulo: 'Bem-vindo de volta! v1',
+                    subtitulo:
+                        'Entre com seus dados para acessar sua conta na PlayZone.',
                   ),
-                  
+
                   // Campo de Entrada para E-mail
                   CampoTexto(
                     rotulo: 'E-mail',
@@ -115,9 +161,9 @@ class _TelaLoginEstado extends State<TelaLogin> {
                     tipoTeclado: TextInputType.emailAddress,
                     validador: _validarEmail,
                   ),
-                  
+
                   const SizedBox(height: 20),
-                  
+
                   // Campo de Entrada para Senha
                   CampoTexto(
                     rotulo: 'Senha',
@@ -129,9 +175,9 @@ class _TelaLoginEstado extends State<TelaLogin> {
                     validador: _validarSenha,
                     aoSubmeter: (_) => _realizarLogin(),
                   ),
-                  
+
                   const SizedBox(height: 12),
-                  
+
                   // Link para recuperar a senha
                   Align(
                     alignment: Alignment.centerRight,
@@ -152,32 +198,46 @@ class _TelaLoginEstado extends State<TelaLogin> {
                       ),
                     ),
                   ),
-                  
+
                   const SizedBox(height: 32),
-                  
+
                   // Botão de Entrar
                   ElevatedButton(
-                    onPressed: _realizarLogin,
+                    onPressed: _estaCarregando ? null : _realizarLogin,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF22C55E), // Verde clássico do app
+                      backgroundColor: const Color(
+                        0xFF22C55E,
+                      ), // Verde clássico do app
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 16.0),
                       elevation: 0,
+                      disabledBackgroundColor: const Color(
+                        0xFF22C55E,
+                      ).withOpacity(0.6),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                     ),
-                    child: const Text(
-                      'Entrar',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    child: _estaCarregando
+                        ? const SizedBox(
+                            height: 22,
+                            width: 22,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2.5,
+                            ),
+                          )
+                        : const Text(
+                            'Entrar',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                   ),
-                  
+
                   const SizedBox(height: 24),
-                  
+
                   // Rodapé para criar conta
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
