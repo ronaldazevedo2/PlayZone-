@@ -20,7 +20,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<DadosSecretaria> DadosSecretaria => Set<DadosSecretaria>();
     public DbSet<Vigilantes> Vigilantes => Set<Vigilantes>();
 
+    public DbSet<Notificacao> Telefones => Set<Notificacao>();
 
+    public object Notificacoes { get; internal set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
