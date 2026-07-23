@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 namespace BaseApi.Application.Vigilantes.Commands.CriarVigilante;
 
@@ -16,11 +16,11 @@ public class CriarVigilanteValidator : AbstractValidator<CriarVigilanteCommand>
             .Length(11).WithMessage("CPF deve possuir 11 dígitos.");
 
         RuleFor(x => x.Email)
-            .NotEmpty().WithMessage("Email é obrigatória.")
-            .MaximumLength(20).WithMessage("Email deve ter no máximo 20 caracteres.");
+            .NotEmpty().WithMessage("Email é obrigatório.")
+            .MaximumLength(150).WithMessage("Email deve ter no máximo 150 caracteres.");
 
         RuleFor(x => x.Telefone)
-           .NotEmpty().WithMessage("Telefone é obrigatória.")
+           .NotEmpty().WithMessage("Telefone é obrigatório.")
            .MaximumLength(20).WithMessage("Telefone deve ter no máximo 20 caracteres.");
 
         RuleFor(x => x.DataNascimento)
@@ -28,8 +28,7 @@ public class CriarVigilanteValidator : AbstractValidator<CriarVigilanteCommand>
            .LessThan(DateTime.Today).WithMessage("Data de nascimento deve ser no passado.");
 
         RuleFor(x => x.FotoPerfil)
-            .NotEmpty().WithMessage("Foto de perfil é obrigatória.")
-            .MaximumLength(500).WithMessage("Foto de perfil deve ter no máximo 500 caracteres.");
+            .MaximumLength(2097152).WithMessage("Foto de perfil deve ter no máximo 2MB.");
 
         RuleFor(x => x.Matricula)
             .NotEmpty().WithMessage("Matrícula é obrigatória.")

@@ -91,7 +91,8 @@ public class QuadraController(IMediator mediator) : ControllerBase
             request.Localizacao,
             request.Capacidade,
             request.Modalidade,
-            request.ImagemUrl);
+            request.ImagemUrl,
+            request.Status);
 
         await mediator.Send(command, ct);
 
@@ -125,5 +126,6 @@ public record AtualizarQuadraRequest(
     string Localizacao,
     int Capacidade,
     string Modalidade,
-    string ImagemUrl
+    string ImagemUrl,
+    string Status
 );

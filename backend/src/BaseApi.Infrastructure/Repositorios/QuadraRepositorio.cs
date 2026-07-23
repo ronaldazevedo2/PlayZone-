@@ -90,5 +90,11 @@ namespace BaseApi.Infrastructure.Repositorios
 
             return (itens, total);
         }
+
+        public async Task<bool> PossuiReservasAsync(Guid quadraId, CancellationToken ct = default)
+        {
+            return await contexto.Reserva
+                .AnyAsync(r => r.QuadraId == quadraId, ct);
+        }
     }
 }

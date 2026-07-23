@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 
 namespace BaseApi.Application.Vigilantes.Queries.ObterVigilantePorId;
 
@@ -11,7 +11,7 @@ public record ObterVigilantePorIdQuery(Guid Id) : IRequest<VigilanteDetalheDto>;
 /// DTO com todos os dados do vigilante para exibição.
 /// </summary>
 public record VigilanteDetalheDto(
-    int Id,
+    Guid Id,
     string NomeCompleto,
     string Cpf,
     string Email,

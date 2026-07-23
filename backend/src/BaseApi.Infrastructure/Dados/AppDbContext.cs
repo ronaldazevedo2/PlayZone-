@@ -20,7 +20,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<DadosSecretaria> DadosSecretaria => Set<DadosSecretaria>();
     public DbSet<Vigilantes> Vigilantes => Set<Vigilantes>();
 
+    public DbSet<Notificacao> Telefones => Set<Notificacao>();
 
+    public object Notificacoes { get; internal set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -75,6 +77,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 Id = Guid.Parse("77777777-7777-7777-7777-777777777777"),
                 NomeCompleto = "Administrador",
                 Email = "admin@playzone.com",
+                Cpf = "11111111111",
+                Telefone = "27999990001",
                 SenhaHash = BCrypt.Net.BCrypt.HashPassword("Admin@123"),
                 PerfilId = 1,
                 Ativo = true,
@@ -86,6 +90,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 Id = Guid.Parse("88888888-8888-8888-8888-888888888888"),
                 NomeCompleto = "João Silva",
                 Email = "joao@playzone.com",
+                Cpf = "22222222222",
+                Telefone = "27999990002",
                 SenhaHash = BCrypt.Net.BCrypt.HashPassword("123456"),
                 PerfilId = 2,
                 Ativo = true,
@@ -97,6 +103,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 Id = Guid.Parse("99999999-9999-9999-9999-999999999999"),
                 NomeCompleto = "Maria Souza",
                 Email = "maria@playzone.com",
+                Cpf = "33333333333",
+                Telefone = "27999990003",
                 SenhaHash = BCrypt.Net.BCrypt.HashPassword("123456"),
                 PerfilId = 3,
                 Ativo = true,

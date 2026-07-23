@@ -21,26 +21,37 @@ public class UsuarioRepositorio(AppDbContext contexto) : IUsuarioRepositorio
             .Include(u => u.Perfil)
             .FirstOrDefaultAsync(u => u.Email == email, ct);
 
+    public async Task<Usuario?> ObterPorCpfAsync(string cpf, CancellationToken ct = default)
+        => await contexto.Usuarios
+            .Include(u => u.Perfil)
+            .FirstOrDefaultAsync(u => u.Cpf == cpf, ct);
+
     public async Task<Usuario?> ObterPorTokenRedefinicaoAsync(string token, CancellationToken ct = default)
         => await contexto.Usuarios
             .FirstOrDefaultAsync(u => u.TokenRedefinicaoSenha == token, ct);
 
     public async Task<(IEnumerable<Usuario> Itens, int Total)> ListarAsync(
-        int pagina, int tamanhoPagina, string? busca, CancellationToken ct = default)
+        int pagina,
+        int tamanhoPagina,
+        string? busca,
+        CancellationToken ct = default)
     {
         var query = contexto.Usuarios
             .Include(u => u.Perfil)
-            .AsNoTracking(); // Não rastreia para leitura (performance)
+            .AsNoTracking();
 
         if (!string.IsNullOrWhiteSpace(busca))
         {
             busca = busca.ToLower();
+
             query = query.Where(u =>
                 u.NomeCompleto.ToLower().Contains(busca) ||
-                u.Email.ToLower().Contains(busca));
+                u.Email.ToLower().Contains(busca) ||
+                u.Cpf.Contains(busca));
         }
 
         var total = await query.CountAsync(ct);
+
         var itens = await query
             .OrderBy(u => u.NomeCompleto)
             .Skip((pagina - 1) * tamanhoPagina)
@@ -50,9 +61,23 @@ public class UsuarioRepositorio(AppDbContext contexto) : IUsuarioRepositorio
         return (itens, total);
     }
 
-    public async Task<bool> EmailExisteAsync(string email, Guid? ignorarId = null, CancellationToken ct = default)
-        => await contexto.Usuarios.AnyAsync(u =>
-            u.Email == email && (ignorarId == null || u.Id != ignorarId), ct);
+    public async Task<bool> EmailExisteAsync(
+        string email,
+        Guid? ignorarId = null,
+        CancellationToken ct = default)
+        => await contexto.Usuarios.AnyAsync(
+            u => u.Email == email &&
+            (ignorarId == null || u.Id != ignorarId),
+            ct);
+
+    public async Task<bool> CpfExisteAsync(
+        string cpf,
+        Guid? ignorarId = null,
+        CancellationToken ct = default)
+        => await contexto.Usuarios.AnyAsync(
+            u => u.Cpf == cpf &&
+            (ignorarId == null || u.Id != ignorarId),
+            ct);
 
     public async Task AdicionarAsync(Usuario usuario, CancellationToken ct = default)
         => await contexto.Usuarios.AddAsync(usuario, ct);

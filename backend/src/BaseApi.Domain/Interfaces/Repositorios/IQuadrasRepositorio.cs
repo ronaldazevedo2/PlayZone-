@@ -19,4 +19,5 @@ public interface IQuadraRepositorio
     void Atualizar(Quadra quadra);
     void Remover(Quadra quadra);
     Task SalvarAsync(CancellationToken ct = default);
+    Task<bool> PossuiReservasAsync(Guid id, CancellationToken ct);
 }

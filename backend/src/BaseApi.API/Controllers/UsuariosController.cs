@@ -34,17 +34,13 @@ namespace BaseApi.API.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-[Authorize] // Exige JWT em todos os endpoints desta controller
+[Authorize]
 [Produces("application/json")]
 public class UsuariosController(IMediator mediator) : ControllerBase
 {
     // =========================================================
-    // GET /api/usuarios?pagina=1&tamanhoPagina=10&busca=joao
+    // GET /api/usuarios
     // =========================================================
-    /// <summary>
-    /// Lista usuários com paginação e busca por nome ou e-mail.
-    /// Restrito a Admin e Gerente.
-    /// </summary>
     [HttpGet]
     [Authorize(Roles = $"{NomePerfil.Admin},{NomePerfil.Gerente}")]
     [ProducesResponseType(typeof(RespostaApi<ResultadoPaginado<UsuarioListaDto>>), StatusCodes.Status200OK)]
@@ -54,7 +50,6 @@ public class UsuariosController(IMediator mediator) : ControllerBase
         [FromQuery] string? busca = null,
         CancellationToken ct = default)
     {
-        // Envia a Query para o MediatR → ListarUsuariosHandler
         var resultado = await mediator.Send(new ListarUsuariosQuery(pagina, tamanhoPagina, busca), ct);
         return Ok(RespostaApi<ResultadoPaginado<UsuarioListaDto>>.Sucesso(resultado));
     }
@@ -62,9 +57,6 @@ public class UsuariosController(IMediator mediator) : ControllerBase
     // =========================================================
     // GET /api/usuarios/{id}
     // =========================================================
-    /// <summary>
-    /// Obtém os detalhes de um usuário pelo Id.
-    /// </summary>
     [HttpGet("{id:guid}")]
     [Authorize(Roles = $"{NomePerfil.Admin},{NomePerfil.Gerente}")]
     [ProducesResponseType(typeof(RespostaApi<UsuarioDetalheDto>), StatusCodes.Status200OK)]
@@ -78,21 +70,22 @@ public class UsuariosController(IMediator mediator) : ControllerBase
     // =========================================================
     // POST /api/usuarios
     // =========================================================
-    /// <summary>
-    /// Cria um novo usuário no sistema.
-    /// Apenas Admin pode criar usuários.
-    /// </summary>
     /// <remarks>
     /// Exemplo de body:
     ///
-    ///     {
-    ///       "nomeCompleto": "João da Silva",
-    ///       "email": "joao@exemplo.com",
-    ///       "senha": "Senha@123",
-    ///       "perfilId": 3
-    ///     }
+    /// {
+    ///   "nomeCompleto": "João da Silva",
+    ///   "cpf": "12345678901",
+    ///   "telefone": "(27) 99999-9999",
+    ///   "email": "joao@exemplo.com",
+    ///   "senha": "Senha@123",
+    ///   "perfilId": 3
+    /// }
     ///
-    /// PerfilId: 1=Admin, 2=Gerente, 3=Usuário
+    /// PerfilId:
+    /// 1 = Admin
+    /// 2 = Gerente
+    /// 3 = Usuário
     /// </remarks>
     [HttpPost]
     [Authorize(Roles = NomePerfil.Admin)]
@@ -100,10 +93,8 @@ public class UsuariosController(IMediator mediator) : ControllerBase
     [ProducesResponseType(typeof(RespostaApi), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Criar([FromBody] CriarUsuarioCommand command, CancellationToken ct)
     {
-        // Envia o Command para o MediatR → CriarUsuarioHandler
         var resultado = await mediator.Send(command, ct);
 
-        // Retorna 201 Created com o header Location apontando para o novo recurso
         return CreatedAtAction(
             nameof(ObterPorId),
             new { id = resultado.Id },
@@ -113,10 +104,6 @@ public class UsuariosController(IMediator mediator) : ControllerBase
     // =========================================================
     // PUT /api/usuarios/{id}
     // =========================================================
-    /// <summary>
-    /// Atualiza os dados de um usuário existente.
-    /// Apenas Admin pode atualizar.
-    /// </summary>
     [HttpPut("{id:guid}")]
     [Authorize(Roles = NomePerfil.Admin)]
     [ProducesResponseType(typeof(RespostaApi), StatusCodes.Status200OK)]
@@ -124,19 +111,23 @@ public class UsuariosController(IMediator mediator) : ControllerBase
     [ProducesResponseType(typeof(RespostaApi), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Atualizar(Guid id, [FromBody] AtualizarUsuarioRequest request, CancellationToken ct)
     {
-        // Combina o Id da rota com os dados do body no Command
-        var command = new AtualizarUsuarioCommand(id, request.NomeCompleto, request.Email, request.PerfilId, request.Ativo);
+        var command = new AtualizarUsuarioCommand(
+            id,
+            request.NomeCompleto,
+            request.Email,
+            request.Cpf,
+            request.Telefone,
+            request.PerfilId,
+            request.Ativo);
+
         await mediator.Send(command, ct);
+
         return Ok(RespostaApi.Sucesso("Usuário atualizado com sucesso!"));
     }
 
     // =========================================================
     // DELETE /api/usuarios/{id}
     // =========================================================
-    /// <summary>
-    /// Remove um usuário permanentemente.
-    /// Apenas Admin pode excluir.
-    /// </summary>
     [HttpDelete("{id:guid}")]
     [Authorize(Roles = NomePerfil.Admin)]
     [ProducesResponseType(typeof(RespostaApi), StatusCodes.Status200OK)]
@@ -148,9 +139,11 @@ public class UsuariosController(IMediator mediator) : ControllerBase
     }
 }
 
-// DTO local para o request de atualização (separa os dados do body do Id da rota)
+// DTO utilizado no PUT
 public record AtualizarUsuarioRequest(
     string NomeCompleto,
+    string Cpf,
+    string Telefone,
     string Email,
     int PerfilId,
     bool Ativo);

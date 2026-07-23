@@ -1,0 +1,555 @@
+<div class="quadras-view-container" *ngIf="!exibirFormularioCadastro" (click)="fecharMenus()">
+
+  <!-- Toast Notification -->
+  <div class="toast-notification" *ngIf="toastMensagem" [ngClass]="'toast-' + toastTipo">
+    <div class="toast-icon">
+      <svg *ngIf="toastTipo === 'erro'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <svg *ngIf="toastTipo === 'aviso'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+        <line x1="12" y1="9" x2="12" y2="13"></line>
+        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+      </svg>
+      <svg *ngIf="toastTipo === 'sucesso'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+      </svg>
+    </div>
+    <div class="toast-content">
+      <span class="toast-title">{{ toastTitulo }}</span>
+      <p class="toast-body">{{ toastMensagem }}</p>
+    </div>
+    <button class="toast-close" (click)="fecharToast()">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Top Header Area -->
+  <div class="quadras-header">
+    <div class="title-section">
+      <h1>Quadras</h1>
+      <p>Gerencie todas as quadras cadastradas, horários e dias disponíveis.</p>
+    </div>
+
+    <div class="actions-section">
+
+
+      <button class="btn-primary" (click)="adicionarQuadra()">
+        <span class="plus-symbol">+</span> Adicionar Quadra
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats Grid -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon-wrapper blue-bg">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          class="stat-icon">
+          <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+          <line x1="9" y1="3" x2="9" y2="21"></line>
+          <line x1="15" y1="3" x2="15" y2="21"></line>
+        </svg>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Total de Quadras</span>
+        <h2 class="stat-value">{{ totalQuadrasCount }}</h2>
+        <span class="stat-sub">quadras cadastradas</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon-wrapper green-bg">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          class="stat-icon">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Ativas</span>
+        <h2 class="stat-value">{{ ativasCount }}</h2>
+        <span class="stat-sub">quadras ativas</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon-wrapper yellow-bg">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          class="stat-icon">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Manutenção</span>
+        <h2 class="stat-value">{{ manutencaoCount }}</h2>
+        <span class="stat-sub">em manutenção</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon-wrapper purple-bg">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          class="stat-icon">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Horários Cadastrados</span>
+        <h2 class="stat-value">{{ horariosCount }}</h2>
+        <span class="stat-sub">horários disponíveis</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content Block -->
+  <div class="content-block">
+    <div class="table-toolbar">
+      <div class="tabs-group">
+        <button class="tab-btn" [class.active]="abaAtiva === 'Todas'" (click)="selecionarAba('Todas')">Todas as
+          Quadras</button>
+        <button class="tab-btn" [class.active]="abaAtiva === 'Ativas'" (click)="selecionarAba('Ativas')">Ativas</button>
+        <button class="tab-btn" [class.active]="abaAtiva === 'Manutenção'"
+          (click)="selecionarAba('Manutenção')">Manutenção</button>
+        <button class="tab-btn" [class.active]="abaAtiva === 'Inativas'"
+          (click)="selecionarAba('Inativas')">Inativas</button>
+      </div>
+
+      <div class="sorting-group">
+        <label for="sort-select">Ordenar por:</label>
+        <select id="sort-select" (change)="mudarOrdenacao($event)">
+          <option value="nome-asc">Nome (A-Z)</option>
+          <option value="nome-desc">Nome (Z-A)</option>
+          <option value="capacidade-asc">Menor Capacidade</option>
+          <option value="capacidade-desc">Maior Capacidade</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Loading and Error Indicators -->
+    <div class="loading-state" *ngIf="carregando">
+      <div class="spinner"></div>
+      <p>Carregando quadras...</p>
+    </div>
+
+    <div class="error-state" *ngIf="erro && !carregando">
+      <p>{{ erro }}</p>
+      <button class="btn-secondary btn-sm" (click)="carregarQuadras()">Tentar Novamente</button>
+    </div>
+
+    <div class="empty-state" *ngIf="!carregando && !erro && quadrasFiltradas.length === 0">
+      <p>Não existem quadras cadastradas.</p>
+    </div>
+
+    <!-- Table List -->
+    <div class="table-responsive" *ngIf="!carregando && !erro && quadrasFiltradas.length > 0">
+      <table class="quadras-table">
+        <thead>
+          <tr>
+            <th>Quadra</th>
+            <th>Tipo</th>
+            <th>Capacidade</th>
+            <th>Dias Disponíveis</th>
+            <th>Horários Disponíveis</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let quadra of quadrasFiltradas">
+            <!-- Quadra Col (Image + Info) -->
+            <td>
+              <div class="quadra-info-col">
+                <img [src]="quadra.imagemUrl || 'placeholder-court.jpg'" alt="{{ quadra.nome }}" class="quadra-thumb"
+                  onerror="this.src='https://images.unsplash.com/photo-1545807191-178a3752c51e?q=80&w=300'">
+                <div class="quadra-text-details">
+                  <span class="quadra-name">{{ quadra.nome }}</span>
+                  <span class="quadra-address">{{ quadra.localizacao }}</span>
+                  <a class="location-link" href="https://maps.google.com" target="_blank">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2" class="link-icon">
+                      <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path>
+                      <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                    Ver localização
+                  </a>
+                </div>
+              </div>
+            </td>
+
+            <!-- Tipo (Modalidade) -->
+            <td>
+              <span class="badge-modalidade" [class]="'badge-' + quadra.modalidade.toLowerCase().replace(' ', '-')">
+                {{ quadra.modalidade }}
+              </span>
+            </td>
+
+            <!-- Capacidade -->
+            <td>
+              <div class="capacity-info">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2" class="capacity-icon">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                <div class="capacity-text">
+                  <span class="capacity-num">{{ quadra.capacidade }}</span>
+                  <span class="capacity-label">jogadores</span>
+                </div>
+              </div>
+            </td>
+
+            <!-- Dias Disponíveis -->
+            <td>
+              <div class="days-indicator">
+                <span *ngFor="let dia of ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom']" class="day-badge"
+                  [class.available]="quadra.diasDisponiveis.includes(dia)">
+                  {{ dia }}
+                </span>
+              </div>
+            </td>
+
+            <!-- Horários Disponíveis -->
+            <td>
+              <div class="hours-info">
+                <span class="hours-range">{{ quadra.horariosDisponiveis }}</span>
+                <span class="hours-count">{{ quadra.totalHorarios }} horários disponíveis</span>
+              </div>
+            </td>
+
+            <!-- Status -->
+            <td>
+              <span class="badge-status" [class]="'status-' + quadra.status.toLowerCase()">
+                {{ quadra.status }}
+              </span>
+            </td>
+
+            <!-- Ações -->
+            <td>
+              <div class="actions-buttons">
+                <button class="action-btn edit-btn" (click)="editarQuadra(quadra)" title="Editar">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                  </svg>
+                </button>
+                <div class="options-wrapper">
+                  <button class="action-btn options-btn" (click)="abrirOpcoes(quadra, $event)" title="Mais opções">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2">
+                      <circle cx="12" cy="12" r="1"></circle>
+                      <circle cx="12" cy="5" r="1"></circle>
+                      <circle cx="12" cy="19" r="1"></circle>
+                    </svg>
+                  </button>
+                  <div class="options-dropdown" *ngIf="menuAbertoId === quadra.id" (click)="$event.stopPropagation()">
+                    <button class="dropdown-item" (click)="editarQuadra(quadra); fecharMenus()">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                      </svg>
+                      Editar quadra
+                    </button>
+                    <div class="dropdown-divider"></div>
+                    <button class="dropdown-item dropdown-item-danger" (click)="excluirQuadra(quadra)">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                      </svg>
+                      Excluir quadra
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-footer" *ngIf="!carregando && !erro && totalItens > 0">
+      <div class="pagination-info">
+        Mostrando <strong>{{ (paginaAtual - 1) * tamanhoPagina + 1 }}</strong> a <strong>{{ paginaAtual * tamanhoPagina
+          > totalItens ? totalItens : paginaAtual * tamanhoPagina }}</strong> de <strong>{{ totalItens }}</strong>
+        quadras
+      </div>
+      <div class="pagination-controls">
+        <button class="page-arrow" [disabled]="paginaAtual === 1" (click)="mudarPagina(paginaAtual - 1)">
+          &lt;
+        </button>
+        <button *ngFor="let pag of getObjetoPaginas()" class="page-number" [class.active]="pag === paginaAtual"
+          (click)="mudarPagina(pag)">
+          {{ pag }}
+        </button>
+        <button class="page-arrow" [disabled]="paginaAtual === totalPaginas" (click)="mudarPagina(paginaAtual + 1)">
+          &gt;
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================
+     CADASTRO FORM SUB-SCREEN
+     ========================================================= -->
+<div class="cadastro-view-container" *ngIf="exibirFormularioCadastro">
+  <!-- Top Nav Header -->
+  <div class="form-header-bar">
+    <div class="breadcrumb-container">
+      <h1>{{ quadraEditandoId ? 'Editar Quadra' : 'Cadastrar Quadra' }}</h1>
+      <div class="breadcrumb-links">
+        <span class="home-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+        </span>
+        <span class="bc-link" (click)="cancelarCadastro()">Quadras</span>
+        <span class="bc-separator">&gt;</span>
+        <span class="bc-current">{{ quadraEditandoId ? 'Editar quadra' : 'Cadastrar quadra' }}</span>
+      </div>
+    </div>
+
+    <div class="header-form-buttons">
+      <button class="btn-secondary" (click)="cancelarCadastro()">Cancelar</button>
+      <button class="btn-primary" (click)="salvarQuadra()" [disabled]="salvando">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          class="save-icon" *ngIf="!salvando">
+          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+          <polyline points="17 21 17 13 7 13 7 21"></polyline>
+          <polyline points="7 3 7 8 15 8"></polyline>
+        </svg>
+        <span class="spinner-sm" *ngIf="salvando"></span>
+        {{ salvando ? 'Salvando...' : (quadraEditandoId ? 'Salvar alterações' : 'Salvar quadra') }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Error Alerts -->
+  <div class="error-banner" *ngIf="erro">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+      class="error-alert-icon">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="12" y1="8" x2="12" y2="12"></line>
+      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+    </svg>
+    <span>{{ erro }}</span>
+  </div>
+
+  <!-- Form Grid -->
+  <div class="form-content-grid">
+    <!-- 1. Informações Gerais Card -->
+    <div class="form-card">
+      <div class="form-card-header">
+        <h3>Informações gerais</h3>
+        <p>Preencha as informações básicas da quadra.</p>
+      </div>
+
+      <div class="form-fields-row">
+        <div class="form-field-group">
+          <label>Nome da quadra <span class="required">*</span></label>
+          <input type="text" placeholder="Ex.: QUADRA SOCIETY 01" [(ngModel)]="novaQuadra.nome"
+            (ngModelChange)="novaQuadra.nome = $event.toUpperCase()" style="text-transform: uppercase;">
+        </div>
+
+        <div class="form-field-group">
+          <label>Capacidade máxima de pessoas <span class="required">*</span></label>
+          <div class="input-with-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" class="field-icon">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+            </svg>
+            <input type="number" placeholder="Ex.: 22" [(ngModel)]="novaQuadra.capacidade">
+          </div>
+          <span class="field-helper">Número máximo de pessoas permitidas na quadra.</span>
+        </div>
+      </div>
+
+      <div class="form-fields-row">
+        <div class="form-field-group">
+          <label>Localização da quadra <span class="required">*</span></label>
+          <input type="text" placeholder="Ex.: Rua das Palmeiras, 123 - Vila Olímpia"
+            [(ngModel)]="novaQuadra.localizacao">
+          <span class="field-helper">Informe o endereço ou ponto de referência da quadra.</span>
+        </div>
+
+        <div class="form-field-group">
+          <label>Modalidade (Tipo) <span class="required">*</span></label>
+          <select [(ngModel)]="novaQuadra.modalidade" class="form-select">
+            <option *ngFor="let modalidade of opcoesModalidades" [value]="modalidade">
+              {{ modalidade }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-fields-row">
+        <div class="form-field-group">
+          <label>Status <span class="required">*</span></label>
+          <select [(ngModel)]="novaQuadra.status" class="form-select">
+            <option value="Ativa">Ativa</option>
+            <option value="Inativa">Inativa</option>
+            <option value="Manutenção">Manutenção</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Descrição Adicional para compatibilidade com o JSON do Backend -->
+      <div class="form-field-group">
+        <label>Descrição da quadra</label>
+        <textarea
+          placeholder="Ex.: Quadra de grama sintética premium de alta performance, ideal para jogos de futebol 7."
+          [(ngModel)]="novaQuadra.descricao" rows="3"></textarea>
+      </div>
+    </div>
+
+    <!-- 2. NOVO - Horários Disponíveis Card Interativo (Organizado por Dia) -->
+    <div class="form-card">
+      <div class="form-card-header">
+        <h3>Horários disponíveis por dia</h3>
+        <p>Selecione o dia da semana abaixo e marque os horários disponíveis para reserva de forma rápida.</p>
+      </div>
+
+      <!-- Abas dos Dias da Semana -->
+      <div class="dias-abas-container">
+        <button *ngFor="let dia of diasSemana" class="dia-aba-btn" [class.active]="dia === diaFormAtivo"
+          [class.has-hours]="(horariosPorDia[dia]?.length ?? 0) > 0" (click)="mudarDiaForm(dia)">
+          <span class="dia-dot" *ngIf="(horariosPorDia[dia]?.length ?? 0) > 0"></span>
+          {{ dia }}
+          <span class="dia-count" *ngIf="(horariosPorDia[dia]?.length ?? 0) > 0">
+            ({{ horariosPorDia[dia].length }})
+          </span>
+        </button>
+      </div>
+
+      <!-- Ações rápidas para o dia selecionado -->
+      <div class="horarios-quick-actions">
+        <span class="dia-status-label">Configurando: <strong>{{ diaFormAtivo }}</strong></span>
+        <div class="actions-buttons-group">
+          <button class="btn-secondary btn-sm" (click)="selecionarTodosHorarios(diaFormAtivo)">
+            Selecionar Todos
+          </button>
+          <button class="btn-secondary btn-sm text-danger" (click)="limparTodosHorarios(diaFormAtivo)">
+            Limpar Horários
+          </button>
+          <button class="btn-primary btn-sm" (click)="copiarParaTodosDias(diaFormAtivo)">
+            Copiar para todos os dias
+          </button>
+        </div>
+      </div>
+
+      <!-- Grade interativa de Slots de Horários -->
+      <div class="slots-grid-container">
+        <button *ngFor="let slot of slotsHorariosDisponiveis" class="slot-pula-btn"
+          [class.selected]="horariosPorDia[diaFormAtivo]?.includes(slot)" (click)="alternarHorario(diaFormAtivo, slot)">
+          <span class="checkbox-indicator"></span>
+          {{ slot }}
+        </button>
+      </div>
+
+      <!-- Info Alert Box -->
+      <div class="info-alert-box">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          class="info-icon">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        <span>Os horários selecionados ficarão disponíveis para agendamentos online nos respectivos dias da
+          semana.</span>
+      </div>
+    </div>
+
+    <!-- 3. Fotos da Quadra Card -->
+    <div class="form-card">
+      <div class="form-card-header">
+        <h3>Fotos da quadra</h3>
+        <p>Envie fotos para apresentar a quadra aos usuários.</p>
+      </div>
+
+      <div class="upload-section-row">
+        <label class="upload-dropzone" for="fileUpload" style="cursor: pointer;">
+          <input type="file" id="fileUpload" style="display: none;" accept="image/png, image/jpeg, image/jpg"
+            (change)="onFileSelected($event)">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            class="upload-cloud-icon">
+            <path
+              d="M21.2 15c.7-1.2 1-2.5.7-3.9-.5-2-2.4-3.5-4.5-3.5h-1.3C15.5 4.7 12.8 3 10 3 6.7 3 4 5.7 4 9c0 .4 0 .8.1 1.2C2.1 11.2 1 13 1 15c0 2.8 2.2 5 5 5h14c2.2 0 4-1.8 4-4 0-.4-.1-.8-.2-1.2z">
+            </path>
+            <polyline points="16 16 12 12 8 16"></polyline>
+            <line x1="12" y1="12" x2="12" y2="21"></line>
+          </svg>
+          <div class="upload-text">
+            <span>Clique para enviar ou arraste as imagens</span>
+            <p>PNG, JPG ou JPEG. Máx. 5MB por imagem.</p>
+          </div>
+        </label>
+
+        <div class="upload-tips-card">
+          <h4>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" class="tips-icon">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            Dicas
+          </h4>
+          <ul>
+            <li>Envie fotos nítidas e bem iluminadas.</li>
+            <li>Mostre diferentes ângulos da quadra.</li>
+            <li>A primeira imagem será a capa.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Adicional: Input de link para testes rápidos -->
+      <div class="form-field-group margin-top-15">
+        <label>Ou insira uma URL de imagem direta para testes rápidos</label>
+        <input type="text" placeholder="https://exemplo.com/foto-da-quadra.jpg" [(ngModel)]="novaQuadra.imagemUrl">
+      </div>
+    </div>
+
+
+
+    <!-- Bottom Important Disclaimer Bar -->
+    <div class="disclaimer-bottom-bar">
+      <div class="info-group">
+        <div class="info-circle-bg">i</div>
+        <div>
+          <strong>Importante</strong>
+          <p>Todos os campos marcados com <span class="required">*</span> são obrigatórios.</p>
+        </div>
+      </div>
+
+      <div class="bottom-action-buttons">
+        <button class="btn-secondary" (click)="cancelarCadastro()">Cancelar</button>
+        <button class="btn-primary" (click)="salvarQuadra()" [disabled]="salvando">
+          <span class="spinner-sm" *ngIf="salvando"></span>
+          {{ salvando ? 'Salvando...' : (quadraEditandoId ? 'Salvar alterações' : 'Salvar quadra') }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

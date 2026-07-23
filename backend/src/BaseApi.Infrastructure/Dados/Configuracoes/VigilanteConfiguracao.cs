@@ -1,4 +1,4 @@
-﻿using BaseApi.Domain.Entidades;
+using BaseApi.Domain.Entidades;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -32,7 +32,7 @@ namespace BaseApi.Infrastructure.Dados.Configuracoes
                 .HasMaxLength(20);
 
             builder.Property(v => v.FotoPerfil)
-                .HasMaxLength(500);
+                .HasColumnType("longtext");
 
             builder.Property(v => v.Ativo)
                 .IsRequired();

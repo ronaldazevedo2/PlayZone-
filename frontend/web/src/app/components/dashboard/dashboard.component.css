@@ -5,8 +5,13 @@
   margin-top: 30px;
 }
 
-.flex-2 { flex: 2; }
-.flex-1 { flex: 1; }
+.flex-2 {
+  flex: 2;
+}
+
+.flex-1 {
+  flex: 1;
+}
 
 .col-main {
   display: flex;
@@ -19,7 +24,7 @@
   border-radius: 12px;
   padding: 25px;
   box-shadow: var(--shadow-sm);
-  border: 1px solid rgba(0,0,0,0.03);
+  border: 1px solid rgba(0, 0, 0, 0.03);
 }
 
 .card-title-bar {
@@ -86,10 +91,25 @@
   border-radius: 12px;
 }
 
-.badge-society { background-color: rgba(40, 167, 69, 0.12); color: #1e7e34; }
-.badge-tennis { background-color: rgba(26, 115, 232, 0.12); color: #1a73e8; }
-.badge-futsal { background-color: rgba(255, 140, 0, 0.12); color: #ff8c00; }
-.badge-volei { background-color: rgba(108, 117, 125, 0.12); color: #6c757d; }
+.badge-society {
+  background-color: rgba(40, 167, 69, 0.12);
+  color: #1e7e34;
+}
+
+.badge-tennis {
+  background-color: rgba(26, 115, 232, 0.12);
+  color: #1a73e8;
+}
+
+.badge-futsal {
+  background-color: rgba(255, 140, 0, 0.12);
+  color: #ff8c00;
+}
+
+.badge-volei {
+  background-color: rgba(108, 117, 125, 0.12);
+  color: #6c757d;
+}
 
 /* Messages List */
 .side-cards {
@@ -187,7 +207,7 @@
   border-radius: 12px;
   padding: 25px;
   box-shadow: var(--shadow-sm);
-  border: 1px solid rgba(0,0,0,0.03);
+  border: 1px solid rgba(0, 0, 0, 0.03);
 }
 
 .chart-header {
@@ -219,9 +239,11 @@
 }
 
 .svg-chart {
-  width: 100%;
+  width: 70%;
   height: auto;
   overflow: visible;
+  display: block;
+  margin: 0 auto;
 }
 
 .chart-lbl {
@@ -286,10 +308,21 @@
   height: 18px;
 }
 
-.bg-green { background-color: #28a745; }
-.bg-green-light { background-color: #48c774; }
-.bg-orange { background-color: #ff8c00; }
-.bg-red { background-color: #dc3545; }
+.bg-green {
+  background-color: #28a745;
+}
+
+.bg-green-light {
+  background-color: #48c774;
+}
+
+.bg-orange {
+  background-color: #ff8c00;
+}
+
+.bg-red {
+  background-color: #dc3545;
+}
 
 .action-btn span {
   font-size: 0.75rem;
@@ -336,10 +369,25 @@
   height: 22px;
 }
 
-.res-icon { background-color: rgba(26, 115, 232, 0.1); color: var(--secondary-color); }
-.quadras-icon { background-color: rgba(40, 167, 69, 0.1); color: #28a745; }
-.msg-icon { background-color: rgba(255, 193, 7, 0.1); color: #e0a800; }
-.star-icon { background-color: rgba(255, 193, 7, 0.15); color: #ffc107; }
+.res-icon {
+  background-color: rgba(26, 115, 232, 0.1);
+  color: var(--secondary-color);
+}
+
+.quadras-icon {
+  background-color: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+}
+
+.msg-icon {
+  background-color: rgba(255, 193, 7, 0.1);
+  color: #e0a800;
+}
+
+.star-icon {
+  background-color: rgba(255, 193, 7, 0.15);
+  color: #ffc107;
+}
 
 .stat-details {
   flex: 1;
@@ -365,9 +413,20 @@
   color: var(--text-muted);
 }
 
-.text-green { color: #28a745; font-weight: 600; }
-.text-orange { color: #ff8c00; font-weight: 600; }
-.arrow-up { font-size: 0.65rem; margin-right: 2px; }
+.text-green {
+  color: #28a745;
+  font-weight: 600;
+}
+
+.text-orange {
+  color: #ff8c00;
+  font-weight: 600;
+}
+
+.arrow-up {
+  font-size: 0.65rem;
+  margin-right: 2px;
+}
 
 .progress-container {
   width: 100%;

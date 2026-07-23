@@ -13,6 +13,8 @@ public record UsuarioDetalheDto(
     Guid Id,
     string NomeCompleto,
     string Email,
+    string Cpf,
+    string Telefone,
     string NomePerfil,
     bool Ativo,
     DateTime CriadoEm,

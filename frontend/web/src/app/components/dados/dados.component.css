@@ -23,29 +23,17 @@
 }
 
 .btn-salvar-dados {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 11px 22px;
-  background: #28a745;
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-  box-shadow: 0 4px 14px rgba(40, 167, 69, 0.35);
+  background-color: var(--primary-color, #28a745);
+  color: white;
 }
 
 .btn-salvar-dados:hover {
-  background: #218838;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(40, 167, 69, 0.45);
+  background-color: var(--primary-hover, #218838);
 }
 
-.btn-salvar-dados:active {
-  transform: translateY(0);
+.btn-salvar-dados svg {
+  width: 18px;
+  height: 18px;
 }
 
 .dados-card {
@@ -160,10 +148,12 @@
   .dados-fields-grid {
     grid-template-columns: 1fr;
   }
+
   .dados-field-group.full-width,
   .dados-field-group.flex-3 {
     grid-column: 1;
   }
+
   .dados-header {
     flex-direction: column;
     align-items: flex-start;

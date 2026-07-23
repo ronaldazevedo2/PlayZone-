@@ -1,4 +1,4 @@
-﻿using BaseApi.Application.Quadra.Commands.AdicionarQuadra;
+using BaseApi.Application.Quadra.Commands.AdicionarQuadra;
 using BaseApi.Application.Usuarios.Commands.CriarUsuario;
 using BaseApi.Domain.Entidades;
 using BaseApi.Domain.Excecoes;
@@ -30,7 +30,7 @@ namespace BaseApi.Application.Quadra.Commands.CriarQuadra
                 Localizacao = command.Localizacao,
                 Modalidade = command.Modalidade,
                 ImagemUrl = command.ImagemUrl,
-               
+                Status = string.IsNullOrWhiteSpace(command.Status) ? "Ativa" : command.Status
             };
 
             await repositorio.AdicionarAsync(quadra, ct);
@@ -43,8 +43,8 @@ namespace BaseApi.Application.Quadra.Commands.CriarQuadra
                 quadra.Capacidade,
                 quadra.Localizacao,
                 quadra.Modalidade,
-                quadra.ImagemUrl
-            
+                quadra.ImagemUrl,
+                quadra.Status
             );
         }
     }

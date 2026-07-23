@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +17,8 @@ namespace BaseApi.Application.Quadra.Queries
         string Localizacao,
         int Capacidade,
         string Modalidade,
-        string ImagemUrl
+        string ImagemUrl,
+        string Status
     );
 
 }

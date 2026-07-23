@@ -17,6 +17,8 @@ public record UsuarioListaDto(
     Guid Id,
     string NomeCompleto,
     string Email,
+    string Cpf,
+    string Telefone,
     string NomePerfil,
     bool Ativo
 );
