@@ -5,6 +5,24 @@
   gap: 20px;
 }
 
+/* Bloco único: busca + tabela colados, sem o gap do container pai */
+.vigilante-list-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.vigilante-list-block .table-filters {
+  margin-bottom: 0;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.vigilante-list-block .table-container {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-top: 1px solid var(--border-color, #e2e8f0);
+}
+
 /* Larguras das colunas — 8 colunas (Vigilantes) */
 .data-table th:nth-child(1) {
   width: 22%;
@@ -67,7 +85,6 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  animation: fadeIn 0.15s ease-out;
 }
 
 @keyframes fadeIn {

@@ -5,6 +5,24 @@
   gap: 20px;
 }
 
+/* Bloco único: busca + tabela colados, sem o gap do container pai */
+.user-list-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-list-block .table-filters {
+  margin-bottom: 0;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.user-list-block .table-container {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-top: 1px solid var(--border-color, #e2e8f0);
+}
+
 .stars-preview {
   display: flex;
   gap: 2px;

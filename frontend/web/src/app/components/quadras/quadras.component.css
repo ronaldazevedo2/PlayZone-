@@ -1,10 +1,27 @@
 .quadras-view-container,
 .cadastro-view-container {
-  animation: fadeIn 0.4s ease-out;
   display: flex;
   flex-direction: column;
   gap: 20px;
   padding: 0;
+}
+
+/* Bloco único: busca + tabela colados, sem o gap do container pai */
+.quadra-list-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.quadra-list-block .table-filters {
+  margin-bottom: 0;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.quadra-list-block .table-container {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-top: none;
 }
 
 /* Search box com largura própria (lista) */
@@ -49,6 +66,7 @@
 }
 
 /* Ações */
+
 
 .data-table td:nth-child(7) {
   text-align: right;
