@@ -20,13 +20,15 @@ interface QuadraExibicao extends ReservaQuadraDto {
 export class QuadrasComponent implements OnInit {
   quadras: QuadraExibicao[] = [];
   quadrasFiltradas: QuadraExibicao[] = [];
-  
+
   // Controle de Visualização
   exibirFormularioCadastro = false;
   quadraEditandoId: string | null = null;
 
   // Filtros e busca da listagem
   buscaTexto = '';
+  termoBusca = '';
+  filtroStatus: 'Todas' | 'Ativas' | 'Manutenção' | 'Inativas' = 'Todas';
   abaAtiva: 'Todas' | 'Ativas' | 'Manutenção' | 'Inativas' = 'Todas';
   ordenacao: 'nome-asc' | 'nome-desc' | 'capacidade-asc' | 'capacidade-desc' = 'nome-asc';
 
@@ -88,7 +90,7 @@ export class QuadrasComponent implements OnInit {
   // Estrutura que guarda os horários selecionados para cada dia
   horariosPorDia: { [dia: string]: string[] } = {};
 
-  constructor(private quadraService: QuadraService) {}
+  constructor(private quadraService: QuadraService) { }
 
   ngOnInit(): void {
     this.carregarQuadras();
@@ -117,13 +119,13 @@ export class QuadrasComponent implements OnInit {
         const itens = res.dados?.itens ?? [];
         this.totalItens = res.dados?.total ?? 0;
         this.totalPaginas = res.dados?.totalPaginas ?? 0;
-        
+
         this.quadras = itens.map(q => {
           const status = (q as any).status || 'Ativa';
           const nomeStr = q.nome?.toLowerCase() || '';
 
           const diasDisponiveis = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
-          
+
           let horariosDisponiveis = '06:00 - 23:00';
           let totalHorarios = 17;
           if (nomeStr.includes('beach') || nomeStr.includes('vôlei')) {
@@ -175,11 +177,36 @@ export class QuadrasComponent implements OnInit {
     this.quadrasFiltradas = resultado;
   }
 
+  aplicarFiltrosBusca(): void {
+    let resultado = [...this.quadras];
+
+    // Filtro por status (dropdown)
+    if (this.filtroStatus === 'Ativas') {
+      resultado = resultado.filter(q => q.status === 'Ativa');
+    } else if (this.filtroStatus === 'Manutenção') {
+      resultado = resultado.filter(q => q.status === 'Manutenção');
+    } else if (this.filtroStatus === 'Inativas') {
+      resultado = resultado.filter(q => q.status === 'Inativa');
+    }
+
+    // Filtro por texto
+    if (this.termoBusca.trim()) {
+      const termo = this.termoBusca.toLowerCase();
+      resultado = resultado.filter(q =>
+        q.nome?.toLowerCase().includes(termo) ||
+        q.localizacao?.toLowerCase().includes(termo) ||
+        q.modalidade?.toLowerCase().includes(termo)
+      );
+    }
+
+    this.quadrasFiltradas = resultado;
+  }
+
   atualizarEstatisticas(): void {
     this.totalQuadrasCount = this.totalItens;
     this.ativasCount = Math.max(0, this.quadras.filter(q => q.status === 'Ativa').length);
     this.manutencaoCount = Math.max(0, this.quadras.filter(q => q.status === 'Manutenção').length);
-    
+
     if (this.totalItens > this.quadras.length) {
       const proporcao = this.totalItens / this.quadras.length;
       this.ativasCount = Math.round(this.ativasCount * proporcao);
@@ -241,7 +268,7 @@ export class QuadrasComponent implements OnInit {
       imagemUrl: '',
       status: 'Ativa'
     };
-    
+
     // Inicializa os horários padrão por dia conforme a planilha
     this.diaFormAtivo = 'Seg';
     this.horariosPorDia = {
@@ -327,7 +354,7 @@ export class QuadrasComponent implements OnInit {
 
     this.salvando = true;
     this.erro = '';
-    
+
     // Garantir tipos corretos
     const commandToSave = {
       ...this.novaQuadra,
@@ -366,14 +393,14 @@ export class QuadrasComponent implements OnInit {
     let mensagemErro = 'Ocorreu um erro ao salvar a quadra na API.';
     if (err.error) {
       if (err.error.erros && err.error.erros.length > 0) {
-         mensagemErro = err.error.erros.join(', ');
+        mensagemErro = err.error.erros.join(', ');
       } else if (err.error.mensagem) {
-         mensagemErro = err.error.mensagem;
+        mensagemErro = err.error.mensagem;
       } else if (err.error.errors) {
-         const msgs = Object.values(err.error.errors).flat();
-         mensagemErro = msgs.join(', ');
+        const msgs = Object.values(err.error.errors).flat();
+        mensagemErro = msgs.join(', ');
       } else if (typeof err.error === 'string') {
-         mensagemErro = err.error;
+        mensagemErro = err.error;
       }
     }
     this.erro = mensagemErro;
@@ -385,7 +412,7 @@ export class QuadrasComponent implements OnInit {
     this.quadraEditandoId = quadra.id;
     this.erro = '';
     this.sucessoMsg = '';
-    
+
     this.novaQuadra = {
       nome: quadra.nome || '',
       descricao: quadra.descricao || '',
@@ -395,7 +422,7 @@ export class QuadrasComponent implements OnInit {
       imagemUrl: quadra.imagemUrl || '',
       status: quadra.status || 'Ativa'
     };
-    
+
     this.diaFormAtivo = 'Seg';
     this.horariosPorDia = {
       'Seg': ['18:00', '19:00', '20:00', '21:00'],

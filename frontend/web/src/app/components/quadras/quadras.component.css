@@ -3,8 +3,75 @@
   animation: fadeIn 0.4s ease-out;
   display: flex;
   flex-direction: column;
-  gap: 25px;
-  padding: 5px 10px;
+  gap: 20px;
+  padding: 0;
+}
+
+/* Search box com largura própria (lista) */
+.search-box {
+  width: 420px;
+}
+
+/* Larguras das colunas — 7 colunas (Quadras) */
+.data-table th:nth-child(1) {
+  width: 26%;
+}
+
+/* Quadra (foto + nome) */
+.data-table th:nth-child(2) {
+  width: 12%;
+}
+
+/* Tipo */
+.data-table th:nth-child(3) {
+  width: 10%;
+}
+
+/* Capacidade */
+.data-table th:nth-child(4) {
+  width: 18%;
+}
+
+/* Dias Disponíveis */
+.data-table th:nth-child(5) {
+  width: 12%;
+}
+
+/* Horários */
+.data-table th:nth-child(6) {
+  width: 10%;
+}
+
+/* Status */
+.data-table th:nth-child(7) {
+  width: 12%;
+  text-align: right;
+}
+
+/* Ações */
+
+.data-table td:nth-child(7) {
+  text-align: right;
+}
+
+.quadra-thumb {
+  width: 72px;
+  min-width: 72px;
+  height: 52px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  object-fit: cover;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  background-color: #e9ecef;
+}
+
+/* ATENÇÃO: .active-icon aqui é VERDE, mas no global.css (baseado em
+   Vigilante/Usuários) .active-icon é AZUL. Nomes de classe colidem —
+   se este CSS carregar depois do global, o verde vence; se carregar
+   antes, o azul vence. Recomendo renomear para evitar ambiguidade. */
+.active-icon {
+  background-color: rgba(40, 167, 69, 0.1);
+  color: #28a745;
 }
 
 /* =========================================================
@@ -122,7 +189,7 @@
 }
 
 /* =========================================================
-   HEADER SECTION & BREADCRUMBS
+   HEADER SECTION & BREADCRUMBS (tela de cadastro/edição)
    ========================================================= */
 .quadras-header {
   display: flex;
@@ -214,40 +281,7 @@
   height: 16px;
 }
 
-/* Search Box */
-.search-box {
-  position: relative;
-  width: 260px;
-}
-
-.search-icon {
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 18px;
-  height: 18px;
-  color: var(--text-muted);
-}
-
-.search-box input {
-  width: 100%;
-  padding: 12px 16px 12px 42px;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  background-color: var(--white);
-  font-size: 0.9rem;
-  color: var(--text-dark);
-  transition: all 0.2s ease;
-}
-
-.search-box input:focus {
-  outline: none;
-  border-color: var(--secondary-color);
-  box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.15);
-}
-
-/* Buttons */
+/* Buttons (variante local — sobrescreve .btn-primary/.btn-icon globais) */
 .btn-primary {
   background-color: var(--primary-color, #28a745);
   color: white;
@@ -293,7 +327,7 @@
   background-color: var(--bg-light);
 }
 
-.btn-icon {
+.btn-header-icon {
   width: 16px;
   height: 16px;
   color: var(--text-muted);
@@ -304,7 +338,7 @@
 }
 
 /* =========================================================
-   STATS GRID
+   STATS GRID (variante da tela de cadastro — 4 cards, cores próprias)
    ========================================================= */
 .stats-grid {
   display: grid;
@@ -471,7 +505,7 @@
 }
 
 /* =========================================================
-   FORM CONTENT GRID
+   FORM CONTENT GRID (cadastro/edição de quadra)
    ========================================================= */
 .form-content-grid {
   display: flex;
@@ -783,7 +817,7 @@
   margin-top: 15px;
 }
 
-/* Swithes / Toggles */
+/* Switches / Toggles */
 .settings-toggles {
   display: flex;
   flex-direction: column;
@@ -940,7 +974,7 @@ input:checked+.switch-slider:before {
 }
 
 /* =========================================================
-   TABLE STYLES
+   TABLE STYLES (tabela interna do cadastro/detalhe)
    ========================================================= */
 .table-responsive {
   width: 100%;
@@ -975,6 +1009,8 @@ input:checked+.switch-slider:before {
   gap: 16px;
 }
 
+/* Segunda versão de .quadra-thumb (80x60) — sobrescreve a de 72x52
+   de cima quando este bloco vem depois no arquivo compilado */
 .quadra-thumb {
   width: 80px;
   min-width: 80px;
@@ -1320,7 +1356,7 @@ input:checked+.switch-slider:before {
 }
 
 /* =========================================================
-   LOADING, ERROR & EMPTY STATES
+   LOADING, ERROR & EMPTY STATES (variante local com --vars)
    ========================================================= */
 .loading-state,
 .error-state,
