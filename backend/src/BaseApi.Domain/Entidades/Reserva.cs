@@ -8,9 +8,10 @@ namespace BaseApi.Domain.Entidades
 {
    public class Reserva
     {
-        public Guid Id { get; set; }
+        public Guid ReservasId { get; set; }
 
         public Guid QuadraId { get; set; }
+        public Guid UsuarioId { get; set; }
 
         public DateTime DataAgendada { get; set; }
 

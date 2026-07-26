@@ -10,7 +10,7 @@ public class UsuarioConfiguracao : IEntityTypeConfiguration<Usuario>
     {
         builder.ToTable("usuarios");
 
-        builder.HasKey(u => u.Id);
+        builder.HasKey(u => u.UsuariosId);
 
         builder.Property(u => u.NomeCompleto)
             .IsRequired()

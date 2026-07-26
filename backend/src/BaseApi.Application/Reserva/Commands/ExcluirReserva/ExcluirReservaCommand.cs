@@ -2,4 +2,4 @@
 
 namespace BaseApi.Application.Telefones.Commands.ExcluirTelefone;
 
-public record ExcluirReservaCommand(Guid Id) : IRequest<Unit>;
+public record ExcluirReservaCommand(Guid ReservasId) : IRequest<Unit>;

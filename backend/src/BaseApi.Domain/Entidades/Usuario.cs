@@ -6,7 +6,7 @@ namespace BaseApi.Domain.Entidades;
 /// </summary>
 public class Usuario
 {
-    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid UsuariosId { get; set; } = Guid.NewGuid();
 
     public string NomeCompleto { get; set; } = string.Empty;
 
