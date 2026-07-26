@@ -294,250 +294,249 @@
       </div>
     </div>
   </div>
-
-  <!-- =========================================================
+</div>
+<!-- =========================================================
      CADASTRO FORM SUB-SCREEN
      ========================================================= -->
-  <div class="cadastro-view-container" *ngIf="exibirFormularioCadastro">
-    <!-- Top Nav Header -->
-    <div class="form-header-bar">
-      <div class="breadcrumb-container">
-        <h1>{{ quadraEditandoId ? 'Editar Quadra' : 'Cadastrar Quadra' }}</h1>
-        <div class="breadcrumb-links">
-          <span class="home-icon">
+<div class="cadastro-view-container" *ngIf="exibirFormularioCadastro">
+  <!-- Top Nav Header -->
+  <div class="form-header-bar">
+    <div class="breadcrumb-container">
+      <h1>{{ quadraEditandoId ? 'Editar Quadra' : 'Cadastrar Quadra' }}</h1>
+      <div class="breadcrumb-links">
+        <span class="home-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+        </span>
+        <span class="bc-link" (click)="cancelarCadastro()">Quadras</span>
+        <span class="bc-separator">&gt;</span>
+        <span class="bc-current">{{ quadraEditandoId ? 'Editar quadra' : 'Cadastrar quadra' }}</span>
+      </div>
+    </div>
+
+    <div class="header-form-buttons">
+      <button class="btn-secondary" (click)="cancelarCadastro()">Cancelar</button>
+      <button class="btn-primary" (click)="salvarQuadra()" [disabled]="salvando">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          class="save-icon" *ngIf="!salvando">
+          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+          <polyline points="17 21 17 13 7 13 7 21"></polyline>
+          <polyline points="7 3 7 8 15 8"></polyline>
+        </svg>
+        <span class="spinner-sm" *ngIf="salvando"></span>
+        {{ salvando ? 'Salvando...' : (quadraEditandoId ? 'Salvar alterações' : 'Salvar quadra') }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Error Alerts -->
+  <div class="error-banner" *ngIf="erro">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+      class="error-alert-icon">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="12" y1="8" x2="12" y2="12"></line>
+      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+    </svg>
+    <span>{{ erro }}</span>
+  </div>
+
+  <!-- Form Grid -->
+  <div class="form-content-grid">
+    <!-- 1. Informações Gerais Card -->
+    <div class="form-card">
+      <div class="form-card-header">
+        <h3>Informações gerais</h3>
+        <p>Preencha as informações básicas da quadra.</p>
+      </div>
+
+      <div class="form-fields-row">
+        <div class="form-field-group">
+          <label>Nome da quadra <span class="required">*</span></label>
+          <input type="text" placeholder="Ex.: QUADRA SOCIETY 01" [(ngModel)]="novaQuadra.nome"
+            (ngModelChange)="novaQuadra.nome = $event.toUpperCase()" style="text-transform: uppercase;">
+        </div>
+
+        <div class="form-field-group">
+          <label>Capacidade máxima de pessoas <span class="required">*</span></label>
+          <div class="input-with-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2">
-              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-              <polyline points="9 22 9 12 15 12 15 22"></polyline>
+              stroke-width="2" class="field-icon">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
             </svg>
-          </span>
-          <span class="bc-link" (click)="cancelarCadastro()">Quadras</span>
-          <span class="bc-separator">&gt;</span>
-          <span class="bc-current">{{ quadraEditandoId ? 'Editar quadra' : 'Cadastrar quadra' }}</span>
+            <input type="number" placeholder="Ex.: 22" [(ngModel)]="novaQuadra.capacidade">
+          </div>
+          <span class="field-helper">Número máximo de pessoas permitidas na quadra.</span>
         </div>
       </div>
 
-      <div class="header-form-buttons">
+      <div class="form-fields-row">
+        <div class="form-field-group">
+          <label>Localização da quadra <span class="required">*</span></label>
+          <input type="text" placeholder="Ex.: Rua das Palmeiras, 123 - Vila Olímpia"
+            [(ngModel)]="novaQuadra.localizacao">
+          <span class="field-helper">Informe o endereço ou ponto de referência da quadra.</span>
+        </div>
+
+        <div class="form-field-group">
+          <label>Modalidade (Tipo) <span class="required">*</span></label>
+          <select [(ngModel)]="novaQuadra.modalidade" class="form-select">
+            <option *ngFor="let modalidade of opcoesModalidades" [value]="modalidade">
+              {{ modalidade }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-fields-row">
+        <div class="form-field-group">
+          <label>Status <span class="required">*</span></label>
+          <select [(ngModel)]="novaQuadra.status" class="form-select">
+            <option value="Ativa">Ativa</option>
+            <option value="Inativa">Inativa</option>
+            <option value="Manutenção">Manutenção</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Descrição Adicional para compatibilidade com o JSON do Backend -->
+      <div class="form-field-group">
+        <label>Descrição da quadra</label>
+        <textarea
+          placeholder="Ex.: Quadra de grama sintética premium de alta performance, ideal para jogos de futebol 7."
+          [(ngModel)]="novaQuadra.descricao" rows="3"></textarea>
+      </div>
+    </div>
+
+    <!-- 2. NOVO - Horários Disponíveis Card Interativo (Organizado por Dia) -->
+    <div class="form-card">
+      <div class="form-card-header">
+        <h3>Horários disponíveis por dia</h3>
+        <p>Selecione o dia da semana abaixo e marque os horários disponíveis para reserva de forma rápida.</p>
+      </div>
+
+      <!-- Abas dos Dias da Semana -->
+      <div class="dias-abas-container">
+        <button *ngFor="let dia of diasSemana" class="dia-aba-btn" [class.active]="dia === diaFormAtivo"
+          [class.has-hours]="(horariosPorDia[dia]?.length ?? 0) > 0" (click)="mudarDiaForm(dia)">
+          <span class="dia-dot" *ngIf="(horariosPorDia[dia]?.length ?? 0) > 0"></span>
+          {{ dia }}
+          <span class="dia-count" *ngIf="(horariosPorDia[dia]?.length ?? 0) > 0">
+            ({{ horariosPorDia[dia].length }})
+          </span>
+        </button>
+      </div>
+
+      <!-- Ações rápidas para o dia selecionado -->
+      <div class="horarios-quick-actions">
+        <span class="dia-status-label">Configurando: <strong>{{ diaFormAtivo }}</strong></span>
+        <div class="actions-buttons-group">
+          <button class="btn-secondary btn-sm" (click)="selecionarTodosHorarios(diaFormAtivo)">
+            Selecionar Todos
+          </button>
+          <button class="btn-secondary btn-sm text-danger" (click)="limparTodosHorarios(diaFormAtivo)">
+            Limpar Horários
+          </button>
+          <button class="btn-primary btn-sm" (click)="copiarParaTodosDias(diaFormAtivo)">
+            Copiar para todos os dias
+          </button>
+        </div>
+      </div>
+
+      <!-- Grade interativa de Slots de Horários -->
+      <div class="slots-grid-container">
+        <button *ngFor="let slot of slotsHorariosDisponiveis" class="slot-pula-btn"
+          [class.selected]="horariosPorDia[diaFormAtivo]?.includes(slot)" (click)="alternarHorario(diaFormAtivo, slot)">
+          <span class="checkbox-indicator"></span>
+          {{ slot }}
+        </button>
+      </div>
+
+      <!-- Info Alert Box -->
+      <div class="info-alert-box">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          class="info-icon">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        <span>Os horários selecionados ficarão disponíveis para agendamentos online nos respectivos dias da
+          semana.</span>
+      </div>
+    </div>
+
+    <!-- 3. Fotos da Quadra Card -->
+    <div class="form-card">
+      <div class="form-card-header">
+        <h3>Fotos da quadra</h3>
+        <p>Envie fotos para apresentar a quadra aos usuários.</p>
+      </div>
+
+      <div class="upload-section-row">
+        <label class="upload-dropzone" for="fileUpload" style="cursor: pointer;">
+          <input type="file" id="fileUpload" style="display: none;" accept="image/png, image/jpeg, image/jpg"
+            (change)="onFileSelected($event)">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            class="upload-cloud-icon">
+            <path
+              d="M21.2 15c.7-1.2 1-2.5.7-3.9-.5-2-2.4-3.5-4.5-3.5h-1.3C15.5 4.7 12.8 3 10 3 6.7 3 4 5.7 4 9c0 .4 0 .8.1 1.2C2.1 11.2 1 13 1 15c0 2.8 2.2 5 5 5h14c2.2 0 4-1.8 4-4 0-.4-.1-.8-.2-1.2z">
+            </path>
+            <polyline points="16 16 12 12 8 16"></polyline>
+            <line x1="12" y1="12" x2="12" y2="21"></line>
+          </svg>
+          <div class="upload-text">
+            <span>Clique para enviar ou arraste as imagens</span>
+            <p>PNG, JPG ou JPEG. Máx. 5MB por imagem.</p>
+          </div>
+        </label>
+
+        <div class="upload-tips-card">
+          <h4>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" class="tips-icon">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            Dicas
+          </h4>
+          <ul>
+            <li>Envie fotos nítidas e bem iluminadas.</li>
+            <li>Mostre diferentes ângulos da quadra.</li>
+            <li>A primeira imagem será a capa.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Adicional: Input de link para testes rápidos -->
+      <div class="form-field-group margin-top-15">
+        <label>Ou insira uma URL de imagem direta para testes rápidos</label>
+        <input type="text" placeholder="https://exemplo.com/foto-da-quadra.jpg" [(ngModel)]="novaQuadra.imagemUrl">
+      </div>
+    </div>
+
+
+
+    <!-- Bottom Important Disclaimer Bar -->
+    <div class="disclaimer-bottom-bar">
+      <div class="info-group">
+        <div class="info-circle-bg">i</div>
+        <div>
+          <strong>Importante</strong>
+          <p>Todos os campos marcados com <span class="required">*</span> são obrigatórios.</p>
+        </div>
+      </div>
+
+      <div class="bottom-action-buttons">
         <button class="btn-secondary" (click)="cancelarCadastro()">Cancelar</button>
         <button class="btn-primary" (click)="salvarQuadra()" [disabled]="salvando">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            class="save-icon" *ngIf="!salvando">
-            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-            <polyline points="17 21 17 13 7 13 7 21"></polyline>
-            <polyline points="7 3 7 8 15 8"></polyline>
-          </svg>
           <span class="spinner-sm" *ngIf="salvando"></span>
           {{ salvando ? 'Salvando...' : (quadraEditandoId ? 'Salvar alterações' : 'Salvar quadra') }}
         </button>
       </div>
     </div>
-
-    <!-- Error Alerts -->
-    <div class="error-banner" *ngIf="erro">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-        class="error-alert-icon">
-        <circle cx="12" cy="12" r="10"></circle>
-        <line x1="12" y1="8" x2="12" y2="12"></line>
-        <line x1="12" y1="16" x2="12.01" y2="16"></line>
-      </svg>
-      <span>{{ erro }}</span>
-    </div>
-
-    <!-- Form Grid -->
-    <div class="form-content-grid">
-      <!-- 1. Informações Gerais Card -->
-      <div class="form-card">
-        <div class="form-card-header">
-          <h3>Informações gerais</h3>
-          <p>Preencha as informações básicas da quadra.</p>
-        </div>
-
-        <div class="form-fields-row">
-          <div class="form-field-group">
-            <label>Nome da quadra <span class="required">*</span></label>
-            <input type="text" placeholder="Ex.: QUADRA SOCIETY 01" [(ngModel)]="novaQuadra.nome"
-              (ngModelChange)="novaQuadra.nome = $event.toUpperCase()" style="text-transform: uppercase;">
-          </div>
-
-          <div class="form-field-group">
-            <label>Capacidade máxima de pessoas <span class="required">*</span></label>
-            <div class="input-with-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2" class="field-icon">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                <circle cx="9" cy="7" r="4"></circle>
-              </svg>
-              <input type="number" placeholder="Ex.: 22" [(ngModel)]="novaQuadra.capacidade">
-            </div>
-            <span class="field-helper">Número máximo de pessoas permitidas na quadra.</span>
-          </div>
-        </div>
-
-        <div class="form-fields-row">
-          <div class="form-field-group">
-            <label>Localização da quadra <span class="required">*</span></label>
-            <input type="text" placeholder="Ex.: Rua das Palmeiras, 123 - Vila Olímpia"
-              [(ngModel)]="novaQuadra.localizacao">
-            <span class="field-helper">Informe o endereço ou ponto de referência da quadra.</span>
-          </div>
-
-          <div class="form-field-group">
-            <label>Modalidade (Tipo) <span class="required">*</span></label>
-            <select [(ngModel)]="novaQuadra.modalidade" class="form-select">
-              <option *ngFor="let modalidade of opcoesModalidades" [value]="modalidade">
-                {{ modalidade }}
-              </option>
-            </select>
-          </div>
-        </div>
-
-        <div class="form-fields-row">
-          <div class="form-field-group">
-            <label>Status <span class="required">*</span></label>
-            <select [(ngModel)]="novaQuadra.status" class="form-select">
-              <option value="Ativa">Ativa</option>
-              <option value="Inativa">Inativa</option>
-              <option value="Manutenção">Manutenção</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Descrição Adicional para compatibilidade com o JSON do Backend -->
-        <div class="form-field-group">
-          <label>Descrição da quadra</label>
-          <textarea
-            placeholder="Ex.: Quadra de grama sintética premium de alta performance, ideal para jogos de futebol 7."
-            [(ngModel)]="novaQuadra.descricao" rows="3"></textarea>
-        </div>
-      </div>
-
-      <!-- 2. NOVO - Horários Disponíveis Card Interativo (Organizado por Dia) -->
-      <div class="form-card">
-        <div class="form-card-header">
-          <h3>Horários disponíveis por dia</h3>
-          <p>Selecione o dia da semana abaixo e marque os horários disponíveis para reserva de forma rápida.</p>
-        </div>
-
-        <!-- Abas dos Dias da Semana -->
-        <div class="dias-abas-container">
-          <button *ngFor="let dia of diasSemana" class="dia-aba-btn" [class.active]="dia === diaFormAtivo"
-            [class.has-hours]="(horariosPorDia[dia]?.length ?? 0) > 0" (click)="mudarDiaForm(dia)">
-            <span class="dia-dot" *ngIf="(horariosPorDia[dia]?.length ?? 0) > 0"></span>
-            {{ dia }}
-            <span class="dia-count" *ngIf="(horariosPorDia[dia]?.length ?? 0) > 0">
-              ({{ horariosPorDia[dia].length }})
-            </span>
-          </button>
-        </div>
-
-        <!-- Ações rápidas para o dia selecionado -->
-        <div class="horarios-quick-actions">
-          <span class="dia-status-label">Configurando: <strong>{{ diaFormAtivo }}</strong></span>
-          <div class="actions-buttons-group">
-            <button class="btn-secondary btn-sm" (click)="selecionarTodosHorarios(diaFormAtivo)">
-              Selecionar Todos
-            </button>
-            <button class="btn-secondary btn-sm text-danger" (click)="limparTodosHorarios(diaFormAtivo)">
-              Limpar Horários
-            </button>
-            <button class="btn-primary btn-sm" (click)="copiarParaTodosDias(diaFormAtivo)">
-              Copiar para todos os dias
-            </button>
-          </div>
-        </div>
-
-        <!-- Grade interativa de Slots de Horários -->
-        <div class="slots-grid-container">
-          <button *ngFor="let slot of slotsHorariosDisponiveis" class="slot-pula-btn"
-            [class.selected]="horariosPorDia[diaFormAtivo]?.includes(slot)"
-            (click)="alternarHorario(diaFormAtivo, slot)">
-            <span class="checkbox-indicator"></span>
-            {{ slot }}
-          </button>
-        </div>
-
-        <!-- Info Alert Box -->
-        <div class="info-alert-box">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            class="info-icon">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" y1="16" x2="12" y2="12"></line>
-            <line x1="12" y1="8" x2="12.01" y2="8"></line>
-          </svg>
-          <span>Os horários selecionados ficarão disponíveis para agendamentos online nos respectivos dias da
-            semana.</span>
-        </div>
-      </div>
-
-      <!-- 3. Fotos da Quadra Card -->
-      <div class="form-card">
-        <div class="form-card-header">
-          <h3>Fotos da quadra</h3>
-          <p>Envie fotos para apresentar a quadra aos usuários.</p>
-        </div>
-
-        <div class="upload-section-row">
-          <label class="upload-dropzone" for="fileUpload" style="cursor: pointer;">
-            <input type="file" id="fileUpload" style="display: none;" accept="image/png, image/jpeg, image/jpg"
-              (change)="onFileSelected($event)">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2" class="upload-cloud-icon">
-              <path
-                d="M21.2 15c.7-1.2 1-2.5.7-3.9-.5-2-2.4-3.5-4.5-3.5h-1.3C15.5 4.7 12.8 3 10 3 6.7 3 4 5.7 4 9c0 .4 0 .8.1 1.2C2.1 11.2 1 13 1 15c0 2.8 2.2 5 5 5h14c2.2 0 4-1.8 4-4 0-.4-.1-.8-.2-1.2z">
-              </path>
-              <polyline points="16 16 12 12 8 16"></polyline>
-              <line x1="12" y1="12" x2="12" y2="21"></line>
-            </svg>
-            <div class="upload-text">
-              <span>Clique para enviar ou arraste as imagens</span>
-              <p>PNG, JPG ou JPEG. Máx. 5MB por imagem.</p>
-            </div>
-          </label>
-
-          <div class="upload-tips-card">
-            <h4>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2" class="tips-icon">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="16" x2="12" y2="12"></line>
-                <line x1="12" y1="8" x2="12.01" y2="8"></line>
-              </svg>
-              Dicas
-            </h4>
-            <ul>
-              <li>Envie fotos nítidas e bem iluminadas.</li>
-              <li>Mostre diferentes ângulos da quadra.</li>
-              <li>A primeira imagem será a capa.</li>
-            </ul>
-          </div>
-        </div>
-
-        <!-- Adicional: Input de link para testes rápidos -->
-        <div class="form-field-group margin-top-15">
-          <label>Ou insira uma URL de imagem direta para testes rápidos</label>
-          <input type="text" placeholder="https://exemplo.com/foto-da-quadra.jpg" [(ngModel)]="novaQuadra.imagemUrl">
-        </div>
-      </div>
-
-
-
-      <!-- Bottom Important Disclaimer Bar -->
-      <div class="disclaimer-bottom-bar">
-        <div class="info-group">
-          <div class="info-circle-bg">i</div>
-          <div>
-            <strong>Importante</strong>
-            <p>Todos os campos marcados com <span class="required">*</span> são obrigatórios.</p>
-          </div>
-        </div>
-
-        <div class="bottom-action-buttons">
-          <button class="btn-secondary" (click)="cancelarCadastro()">Cancelar</button>
-          <button class="btn-primary" (click)="salvarQuadra()" [disabled]="salvando">
-            <span class="spinner-sm" *ngIf="salvando"></span>
-            {{ salvando ? 'Salvando...' : (quadraEditandoId ? 'Salvar alterações' : 'Salvar quadra') }}
-          </button>
-        </div>
-      </div>
-    </div>
   </div>
+</div>

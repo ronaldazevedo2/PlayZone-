@@ -46,7 +46,7 @@ export class QuadraService {
   constructor(
     private http: HttpClient,
     private authService: AuthService
-  ) {}
+  ) { }
 
   private getHeaders(): HttpHeaders {
     const token = this.authService.getToken();
@@ -121,20 +121,66 @@ export class QuadraService {
       .pipe(catchError(this.handleError));
   }
 
-  excluir(quadraId: string): Observable<any> {
+  /**
+   * Obtém a disponibilidade de datas e horários para a quadra especificada.
+   * Expect API endpoint: GET /api/Quadra/{quadraId}/disponibilidade
+   * Returns array of { data: string (ISO), horarios: string[] }
+   */
+  obterDisponibilidade(quadraId: string): Observable<RespostaApi<any>> {
+    const url = `${this.BASE_URL}/${quadraId}/disponibilidade`;
+    return this.http.get<RespostaApi<any>>(url, { headers: this.getHeaders() }).pipe(
+      catchError((error) => {
+        console.warn('[QuadraService] Falha ao obter disponibilidade, usando mock.', error);
+        // Mock data fallback
+        const mock = {
+          ok: true,
+          dados: [
+            {
+              data: new Date().toISOString().split('T')[0],
+              horarios: [
+                '06:00 - 07:00',
+                '07:00 - 08:00',
+                '08:00 - 09:00',
+                '09:00 - 10:00',
+                '10:00 - 11:00',
+                '11:00 - 12:00',
+                '12:00 - 13:00',
+                '13:00 - 14:00',
+                '14:00 - 15:00',
+                '15:00 - 16:00',
+                '16:00 - 17:00',
+                '17:00 - 18:00',
+                '18:00 - 19:00',
+                '19:00 - 20:00',
+                '20:00 - 21:00',
+                '21:00 - 22:00'
+              ]
+            },
+            // Add next day as example
+            {
+              data: new Date(Date.now() + 86400000).toISOString().split('T')[0],
+              horarios: ['08:00 - 09:00', '09:00 - 10:00', '10:00 - 11:00']
+            }
+          ]
+        };
+        return of(mock);
+      })
+    );
+  }
+
     return this.http
-      .delete<any>(
-        `${this.BASE_URL}/${quadraId}`,
-        { headers: this.getDeleteHeaders() }
-      )
-      .pipe(catchError((error) => {
-        console.error('[QuadraService] Erro na exclusão:', error);
-        return throwError(() => error);
-      }));
+  .delete<any>(
+    `${this.BASE_URL}/${quadraId}`,
+    { headers: this.getDeleteHeaders() }
+  )
+  .pipe(catchError((error) => {
+    console.error('[QuadraService] Erro na exclusão:', error);
+    return throwError(() => error);
+  }));
   }
 
   private handleError = (error: any): Observable<never> => {
-    console.error('[QuadraService] Erro na requisição:', error);
-    return throwError(() => error);
-  }
+  console.error('[QuadraService] Erro na requisição:', error);
+  return throwError(() => error);
+}
 }

@@ -19,6 +19,7 @@ export const routes: Routes = [
       { path: 'usuarios', loadComponent: () => import('./components/usuarios/usuarios.component').then(m => m.UsuariosComponent) },
       { path: 'dados', component: DadosComponent },
       { path: 'quadras', component: QuadrasComponent },
+      { path: 'reservas', loadComponent: () => import('./components/reservas/reservas.component').then(m => m.ReservasComponent) },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },
