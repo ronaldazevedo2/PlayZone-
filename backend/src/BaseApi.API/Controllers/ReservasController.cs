@@ -47,7 +47,7 @@ public class ReservasController(IMediator mediator) : ControllerBase
 
         return CreatedAtAction(
             nameof(ObterPorId),
-            new { id = resultado.Id },
+            new { id = resultado.ReservasId },
             RespostaApi<CriarReservaResposta>.Sucesso(
                 resultado,
                 "Reserva cadastrada com sucesso!"
@@ -65,6 +65,7 @@ public class ReservasController(IMediator mediator) : ControllerBase
         var command = new AtualizarReservaCommand(
             id,
             request.QuadraId,
+            request.UsuarioId, 
             request.DataAgendada,
             request.HorarioAgendado
         );
@@ -86,6 +87,7 @@ public class ReservasController(IMediator mediator) : ControllerBase
 
 public record AtualizarReservaRequest(
     Guid QuadraId,
+    Guid UsuarioId,
     DateTime DataAgendada,
     TimeSpan HorarioAgendado
 );

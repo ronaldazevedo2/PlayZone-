@@ -1,10 +1,4 @@
-﻿using BaseApi.Application.Reserva.Commands.CriarReserva;
-using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FluentValidation;
 
 namespace BaseApi.Application.Reserva.Commands.AtualizarReserva
 {
@@ -14,6 +8,9 @@ namespace BaseApi.Application.Reserva.Commands.AtualizarReserva
         {
             RuleFor(x => x.QuadraId)
                 .NotEmpty().WithMessage("Marca é obrigatória.");
+
+            RuleFor(x => x.UsuarioId)
+                .NotEmpty().WithMessage("Usuario é obrigatório.");
 
 
             RuleFor(x => x.DataAgendada)

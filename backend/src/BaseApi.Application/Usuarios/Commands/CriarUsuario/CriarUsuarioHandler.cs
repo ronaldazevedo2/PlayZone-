@@ -43,7 +43,7 @@ public class CriarUsuarioHandler(
         await repositorio.SalvarAsync(ct);
 
         return new CriarUsuarioResposta(
-            usuario.Id,
+            usuario.UsuariosId,
             usuario.NomeCompleto,
             usuario.Email,
             usuario.Cpf,

@@ -27,4 +27,4 @@ public record CriarUsuarioCommand(
 ) : IRequest<CriarUsuarioResposta>;
 
 /// <summary>DTO retornado após criação bem-sucedida</summary>
-public record CriarUsuarioResposta(Guid Id, string NomeCompleto, string Email, string Cpf, string Telefone);
+public record CriarUsuarioResposta(Guid UsuariosId, string NomeCompleto, string Email, string Cpf, string Telefone);

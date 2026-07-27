@@ -11,44 +11,33 @@ namespace BaseApi.Infrastructure.Repositorios;
 /// </summary>
 public class NotificacaoRepositorio(AppDbContext contexto) : INotificacaoRepositorio
 {
-    public async Task<Notificacao?> ObterPorIdAsync(Guid id, CancellationToken ct = default)
-        => await contexto.Notificacoes
-            .FirstOrDefaultAsync(t => t.Id == id, ct);
-
-    public async Task<(IEnumerable<Notificacao> Itens, int Total)> ListarAsync(
-        int pagina, int tamanhoPagina, string? busca, CancellationToken ct = default)
+    public Task AdicionarAsync(Notificacao notificacao, CancellationToken ct = default)
     {
-        var query = contexto.Notificacoes
-            .AsNoTracking(); // AsNoTracking = mais performance para leitura
-
-        // Filtro de busca por marca ou modelo
-        if (!string.IsNullOrWhiteSpace(busca))
-        {
-            busca = busca.ToLower();
-            query = query.Where(t =>
-                t.Marca.ToLower().Contains(busca) ||
-                t.Modelo.ToLower().Contains(busca));
-        }
-
-        var total = await query.CountAsync(ct);
-        var itens = await query
-            .OrderBy(t => t.Marca).ThenBy(t => t.Modelo)
-            .Skip((pagina - 1) * tamanhoPagina)
-            .Take(tamanhoPagina)
-            .ToListAsync(ct);
-
-        return (itens, total);
+        throw new NotImplementedException();
     }
 
-    public async Task AdicionarAsync(Notificacao notificacao, CancellationToken ct = default)
-        => await contexto.Notificacoes.AddAsync(notificacao, ct);
-
     public void Atualizar(Notificacao notificacao)
-        => contexto.Notificacoes.Update(notificacao);
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<(IEnumerable<Notificacao> Itens, int Total)> ListarAsync(int pagina, int tamanhoPagina, string? busca, CancellationToken ct = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<Notificacao?> ObterPorIdAsync(Guid id, CancellationToken ct = default)
+    {
+        throw new NotImplementedException();
+    }
 
     public void Remover(Notificacao notificacao)
-        => contexto.Notificacoes.Remove(notificacao);
+    {
+        throw new NotImplementedException();
+    }
 
-    public async Task SalvarAsync(CancellationToken ct = default)
-        => await contexto.SaveChangesAsync(ct);
+    public Task SalvarAsync(CancellationToken ct = default)
+    {
+        throw new NotImplementedException();
+    }
 }

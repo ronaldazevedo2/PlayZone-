@@ -49,7 +49,7 @@ public class TratadorRegistrarUsuario(
         await repositorioUsuario.SalvarAsync(tokenCancelamento);
 
         return new RespostaRegistrarUsuario(
-            novoUsuario.Id,
+            novoUsuario.UsuariosId,
             novoUsuario.NomeCompleto,
             novoUsuario.Email,
             novoUsuario.Cpf,

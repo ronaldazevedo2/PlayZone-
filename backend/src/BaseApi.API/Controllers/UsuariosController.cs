@@ -97,7 +97,7 @@ public class UsuariosController(IMediator mediator) : ControllerBase
 
         return CreatedAtAction(
             nameof(ObterPorId),
-            new { id = resultado.Id },
+            new { id = resultado.UsuariosId },
             RespostaApi<CriarUsuarioResposta>.Sucesso(resultado, "Usuário criado com sucesso!"));
     }
 

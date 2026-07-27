@@ -12,10 +12,15 @@ public class ReservaConfiguracao : IEntityTypeConfiguration<Reserva>
         builder.ToTable("reservas");
 
         // Chave primária
-        builder.HasKey(r => r.Id);
+        builder.HasKey(r => r.ReservasId);
 
         builder.Property(r => r.QuadraId)
             .IsRequired();
+
+        builder.HasOne<Usuario>()
+            .WithMany()
+            .HasForeignKey(r => r.UsuarioId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.Property(r => r.DataAgendada)
             .IsRequired()

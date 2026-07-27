@@ -3,7 +3,7 @@ using MediatR;
 namespace BaseApi.Application.Usuarios.Commands.AtualizarUsuario;
 
 public record AtualizarUsuarioCommand(
-    Guid Id,
+    Guid UsuariosId,
     string NomeCompleto,
     string Email,
     string Cpf,

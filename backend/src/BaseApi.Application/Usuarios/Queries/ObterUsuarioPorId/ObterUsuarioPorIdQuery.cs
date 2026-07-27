@@ -6,11 +6,11 @@ namespace BaseApi.Application.Usuarios.Queries.ObterUsuarioPorId;
 /// Query para buscar um único usuário pelo Id.
 /// Queries NUNCA alteram o estado — apenas leem dados.
 /// </summary>
-public record ObterUsuarioPorIdQuery(Guid Id) : IRequest<UsuarioDetalheDto>;
+public record ObterUsuarioPorIdQuery(Guid UsuariosId) : IRequest<UsuarioDetalheDto>;
 
 /// <summary>DTO com todos os detalhes do usuário para exibição</summary>
 public record UsuarioDetalheDto(
-    Guid Id,
+    Guid UsuariosId,
     string NomeCompleto,
     string Email,
     string Cpf,
