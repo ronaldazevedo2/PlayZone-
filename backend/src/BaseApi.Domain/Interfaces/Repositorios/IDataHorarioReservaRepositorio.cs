@@ -15,4 +15,5 @@ public interface IDataHorarioReservaRepositorio
     Task AtualizarAsync(DataHorarioReserva entidade);
 
     Task RemoverAsync(Guid id);
+    Task<(IEnumerable<DataHorarioReserva> itens, int total)> ListarAsync(int pagina,int tamanhoPagina,CancellationToken ct);
 }

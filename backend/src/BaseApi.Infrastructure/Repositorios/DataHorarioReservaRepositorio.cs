@@ -61,4 +61,23 @@ public class DataHorarioReservaRepositorio : IDataHorarioReservaRepositorio
         _context.DataHorarioReservas.Remove(entidade);
         await _context.SaveChangesAsync();
     }
+
+    public async Task<(IEnumerable<DataHorarioReserva> itens, int total)> ListarAsync(
+    int pagina,
+    int tamanhoPagina,
+    CancellationToken ct)
+    {
+        var query = _context.DataHorarioReservas.AsNoTracking();
+
+        var total = await query.CountAsync(ct);
+
+        var itens = await query
+            .OrderBy(x => x.Data)
+            .ThenBy(x => x.Horario)
+            .Skip((pagina - 1) * tamanhoPagina)
+            .Take(tamanhoPagina)
+            .ToListAsync(ct);
+
+        return (itens, total);
+    }
 }

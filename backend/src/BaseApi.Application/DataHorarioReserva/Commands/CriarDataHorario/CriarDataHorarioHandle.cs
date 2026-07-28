@@ -1,5 +1,4 @@
-﻿using BaseApi.Domain.Entidades;
-using BaseApi.Domain.Interfaces.Repositorios;
+﻿using BaseApi.Domain.Interfaces.Repositorios;
 using MediatR;
 
 namespace BaseApi.Application.DataHorarioReserva.Commands.CriarDataHorarioReserva;
@@ -10,7 +9,7 @@ public class CriarDataHorarioReservaHandler(
 {
     public async Task<CriarDataHorarioReservaResposta> Handle(CriarDataHorarioReservaCommand command, CancellationToken ct)
     {
-        var dataHorarioReserva = new DataHorarioReserva
+        var dataHorarioReserva = new BaseApi.Domain.Entidades.DataHorarioReserva
         {
             DataHorarioReservaId = Guid.NewGuid(),
             QuadraId = command.QuadraId,
