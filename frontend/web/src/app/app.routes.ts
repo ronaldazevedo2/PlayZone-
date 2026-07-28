@@ -19,6 +19,8 @@ export const routes: Routes = [
       { path: 'usuarios', loadComponent: () => import('./components/usuarios/usuarios.component').then(m => m.UsuariosComponent) },
       { path: 'dados', component: DadosComponent },
       { path: 'quadras', component: QuadrasComponent },
+      { path: 'quadras/nova', loadComponent: () => import('./components/quadras/quadra-form/quadra-form.component').then(m => m.QuadraFormComponent) },
+      { path: 'quadras/editar/:id', loadComponent: () => import('./components/quadras/quadra-form/quadra-form.component').then(m => m.QuadraFormComponent) },
       { path: 'reservas', loadComponent: () => import('./components/reservas/reservas.component').then(m => m.ReservasComponent) },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]

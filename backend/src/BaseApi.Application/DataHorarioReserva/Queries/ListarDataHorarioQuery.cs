@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BaseApi.Infrastructure.Repositorios
+namespace BaseApi.Application.DataHorarioReserva.Queries
 {
-    class DadosSecretaria
+    class ListarDataHorarioQuery
     {
     }
 }

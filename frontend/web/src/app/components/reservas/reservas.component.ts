@@ -229,8 +229,8 @@ export class ReservasComponent implements OnInit {
       this.disponibilidadeMap.clear();
       return;
     }
-    this.quadraService.getDisponibilidade(this.formQuadraId).subscribe({
-      next: (res) => {
+    this.quadraService.obterDisponibilidade(this.formQuadraId).subscribe({
+      next: (res: any) => {
         if (res && res.ok && res.dados) {
           // Assume res.dados is an array of { data: string, horarios: string[] }
           this.availableDates = res.dados.map((d: any) => d.data);
