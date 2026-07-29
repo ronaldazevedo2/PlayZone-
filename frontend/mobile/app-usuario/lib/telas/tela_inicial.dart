@@ -436,7 +436,7 @@ class _TelaInicialEstado extends State<TelaInicial> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => TelaDetalhesQuadra(quadra: quadra),
+            builder: (context) => TelaDetalhesQuadra(quadraId: quadra.id),
           ),
         );
       },
