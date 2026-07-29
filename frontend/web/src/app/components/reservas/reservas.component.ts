@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { QuadraService, ReservaQuadraDto } from '../../services/quadra.service';
 import { ReservaService, ReservaDto, CriarReservaCommand } from '../../services/reserva.service';
@@ -20,7 +21,7 @@ interface UsuarioBusca {
 @Component({
   selector: 'app-reservas',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './reservas.component.html',
   styleUrl: './reservas.component.css'
 })
@@ -82,7 +83,8 @@ export class ReservasComponent implements OnInit {
     private quadraService: QuadraService,
     private reservaService: ReservaService,
     private authService: AuthService,
-    private http: HttpClient
+    private http: HttpClient,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -203,12 +205,11 @@ export class ReservasComponent implements OnInit {
     this.reservasQuadraSelecionada = [];
   }
 
-  // ────────────────────────────────────────
-  //   MODAL DETALHES RESERVA EXISTENTE
-  // ────────────────────────────────────────
   openDetailsModal(reserva: ReservaDto): void {
-    this.selectedReserva = reserva;
-    this.showDetailsModal = true;
+    const id = reserva.id || reserva.reservaId;
+    if (id) {
+      this.router.navigate(['/reservas/editar', id]);
+    }
   }
 
   closeDetailsModal(): void {
@@ -266,10 +267,9 @@ export class ReservasComponent implements OnInit {
     }
     this.formHorario = '';
   }
+
   abrirNovaReserva(): void {
-    this.showNovaReservaForm = true;
-    this.quadraSelecionada = null;
-    this.limparForm();
+    this.router.navigate(['/reservas/nova']);
   }
 
   cancelarNovaReserva(): void {

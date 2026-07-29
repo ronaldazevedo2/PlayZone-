@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';
 import { ExportService } from '../../services/export.service';
@@ -36,7 +37,7 @@ interface PaginatedResult<T> {
 @Component({
   selector: 'app-usuarios',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './usuarios.component.html',
   styleUrl: './usuarios.component.css'
 })
@@ -70,7 +71,8 @@ export class UsuariosComponent implements OnInit {
   constructor(
     private http: HttpClient,
     private authService: AuthService,
-    private exportService: ExportService
+    private exportService: ExportService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -192,25 +194,13 @@ export class UsuariosComponent implements OnInit {
   }
 
   openAddModal(): void {
-    this.isEditMode = false;
-    this.editingUserId = null;
-    this.resetForm();
-    this.showAddModal = true;
+    this.router.navigate(['/usuarios/novo']);
   }
 
   abrirModalEdicao(usuario: Usuario): void {
-    this.isEditMode = true;
-    this.editingUserId = usuario.id || null;
-    this.nomeCompleto = usuario.nomeCompleto;
-    this.email = usuario.email;
-    // Formatar CPF e telefone para exibição com máscara
-    this.cpf = this.formatarCpf(usuario.cpf || '');
-    this.telefone = this.formatarTelefone(usuario.telefone || '');
-    this.ativo = usuario.ativo;
-    this.senha = ''; // Senha não é enviada na edição
-    this.errorMessages = [];
-    this.successMessage = '';
-    this.showAddModal = true;
+    if (usuario.id) {
+      this.router.navigate(['/usuarios/editar', usuario.id]);
+    }
   }
 
   closeAddModal(): void {

@@ -58,7 +58,9 @@ export class QuadrasComponent implements OnInit {
 
   ngOnInit(): void {
     this.carregarQuadras();
+
   }
+
 
   mostrarToast(titulo: string, mensagem: string, tipo: 'erro' | 'aviso' | 'sucesso' = 'erro', duracaoMs = 6000): void {
     if (this.toastTimer) clearTimeout(this.toastTimer);
