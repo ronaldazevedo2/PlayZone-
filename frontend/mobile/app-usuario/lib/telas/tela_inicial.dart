@@ -4,6 +4,7 @@ import '../servicos/servico_autenticacao.dart';
 import '../servicos/servico_quadras.dart';
 import 'tela_detalhes_quadra.dart';
 import 'tela_login.dart';
+import 'tela_pesquisa_quadras.dart';
 
 class TelaInicial extends StatefulWidget {
   final SessaoUsuario sessao;
@@ -105,21 +106,13 @@ class _TelaInicialEstado extends State<TelaInicial> {
 
   void _selecionarBairro(String bairro) {
     setState(() {
-      _bairroFiltrado = bairro;
+      if (_bairroFiltrado == bairro) {
+        _bairroFiltrado = null;
+      } else {
+        _bairroFiltrado = bairro;
+      }
       _filtrarQuadras();
     });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Filtrando quadras em $bairro'),
-        action: SnackBarAction(
-          label: 'Limpar',
-          textColor: Colors.white,
-          onPressed: _limparFiltroBairro,
-        ),
-        duration: const Duration(seconds: 3),
-      ),
-    );
   }
 
   void _limparFiltroBairro() {
@@ -142,33 +135,30 @@ class _TelaInicialEstado extends State<TelaInicial> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFAFAFA),
-      body: SafeArea(
-        child: RefreshIndicator(
-          onRefresh: _buscarQuadrasDaApi,
-          color: const Color(0xFF22C55E),
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // 1. Cabeçalho Customizado
-                _construirCabecalho(),
+      body: IndexedStack(
+        index: _abaSelecionada,
+        children: [
+          // ABA 0: Home
+          SafeArea(
+            child: RefreshIndicator(
+              onRefresh: _buscarQuadrasDaApi,
+              color: const Color(0xFF22C55E),
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // 1. Cabeçalho Customizado
+                    _construirCabecalho(),
 
-                // Indicador de progresso se estiver carregando
-                if (_estaCarregando)
-                  const LinearProgressIndicator(
-                    color: Color(0xFF22C55E),
-                    backgroundColor: Color(0xFFEFF6FF),
-                  ),
+                    // Indicador de progresso se estiver carregando
+                    if (_estaCarregando)
+                      const LinearProgressIndicator(
+                        color: Color(0xFF22C55E),
+                        backgroundColor: Color(0xFFEFF6FF),
+                      ),
 
-                const SizedBox(height: 16),
-
-                // 2. Barra de Busca
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: _construirBarraBusca(),
-                ),
-                const SizedBox(height: 8),
+                    const SizedBox(height: 8),
 
                 // Indicador de filtro ativo (Bairro)
                 if (_bairroFiltrado != null)
@@ -206,16 +196,36 @@ class _TelaInicialEstado extends State<TelaInicial> {
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: _construirBannerPremium(),
                 ),
-                const SizedBox(height: 32),
               ],
             ),
           ),
         ),
       ),
-      // 6. Barra de Navegação Inferior Customizada
-      bottomNavigationBar: _construirBarraNavegacao(),
-    );
-  }
+
+      // ABA 1: Pesquisa de Quadras (Search)
+      const TelaPesquisaQuadras(),
+
+        // ABA 2: Agendamentos
+        const Center(
+          child: Text(
+            'Minhas Reservas',
+            style: TextStyle(fontSize: 16, color: Color(0xFF64748B)),
+          ),
+        ),
+
+        // ABA 3: Perfil
+        const Center(
+          child: Text(
+            'Perfil do Usuário',
+            style: TextStyle(fontSize: 16, color: Color(0xFF64748B)),
+          ),
+        ),
+      ],
+    ),
+    // 6. Barra de Navegação Inferior Customizada
+    bottomNavigationBar: _construirBarraNavegacao(),
+  );
+}
 
   // WIDGET: Cabeçalho
   Widget _construirCabecalho() {
@@ -224,23 +234,7 @@ class _TelaInicialEstado extends State<TelaInicial> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          GestureDetector(
-            onTap: _fazerLogout,
-            child: Tooltip(
-              message: 'Perfil de ${_sessaoAtual.nomeCompleto} - Sair da conta',
-              child: Container(
-                width: 44,
-                height: 44,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF1E3A8A), // Azul escuro
-                  shape: BoxShape.circle,
-                ),
-                child: const Center(
-                  child: Icon(Icons.person, color: Colors.white, size: 26),
-                ),
-              ),
-            ),
-          ),
+          const SizedBox(width: 44),
 
           // Logotipo: PLAYZONE
           RichText(
@@ -264,35 +258,19 @@ class _TelaInicialEstado extends State<TelaInicial> {
             ),
           ),
 
-          // Ícone do sino
-          Stack(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: const Color(0xFFF1F5F9)),
-                ),
-                child: const Icon(
-                  Icons.notifications_none_outlined,
-                  color: Color(0xFF0F172A),
-                  size: 24,
-                ),
-              ),
-              Positioned(
-                right: 6,
-                top: 6,
-                child: Container(
-                  width: 8,
-                  height: 8,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFEF4444), // Vermelho
-                    shape: BoxShape.circle,
-                  ),
-                ),
-              ),
-            ],
+          // Ícone do sino (apenas circulado)
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              border: Border.all(color: const Color(0xFFE2E8F0)),
+            ),
+            child: const Icon(
+              Icons.notifications_none_outlined,
+              color: Color(0xFF0F172A),
+              size: 24,
+            ),
           ),
         ],
       ),
@@ -570,27 +548,22 @@ class _TelaInicialEstado extends State<TelaInicial> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      RichText(
-                        text: TextSpan(
-                          style: const TextStyle(
-                            fontSize: 14,
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFDCFCE7),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Text(
+                          'Uso Gratuito',
+                          style: TextStyle(
+                            fontSize: 11,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF0F172A),
+                            color: Color(0xFF16A34A),
                           ),
-                          children: [
-                            TextSpan(
-                              text:
-                                  'R\$ ${quadra.precoPorHora.toStringAsFixed(0)}',
-                            ),
-                            const TextSpan(
-                              text: '/hr',
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.normal,
-                                color: Color(0xFF64748B),
-                              ),
-                            ),
-                          ],
                         ),
                       ),
                       Container(
@@ -700,19 +673,21 @@ class _TelaInicialEstado extends State<TelaInicial> {
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 6.0),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: estaSelecionado ? const Color(0xFFF0F6FF) : Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: estaSelecionado
-                ? const Color(0xFF254EDB)
+                ? const Color(0xFF1D4ED8)
                 : const Color(0xFFE2E8F0),
-            width: estaSelecionado ? 1.5 : 1.0,
+            width: estaSelecionado ? 2.5 : 1.0,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.02),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
+              color: estaSelecionado
+                  ? const Color(0xFF1D4ED8).withValues(alpha: 0.18)
+                  : Colors.black.withValues(alpha: 0.02),
+              blurRadius: estaSelecionado ? 10 : 8,
+              offset: const Offset(0, 3),
             ),
           ],
         ),
@@ -886,7 +861,7 @@ class _TelaInicialEstado extends State<TelaInicial> {
         setState(() {
           _abaSelecionada = index;
         });
-        if (index > 0) {
+        if (index > 1) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Aba "$rotulo" em desenvolvimento!'),

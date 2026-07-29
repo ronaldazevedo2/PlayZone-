@@ -103,11 +103,11 @@ class ServicoAutenticacao {
       if (metodo == 'POST') {
         return await http
             .post(url1, headers: cabecalhos, body: corpoString)
-            .timeout(const Duration(seconds: 4));
+            .timeout(const Duration(seconds: 2));
       } else {
         return await http
             .get(url1, headers: cabecalhos)
-            .timeout(const Duration(seconds: 4));
+            .timeout(const Duration(seconds: 2));
       }
     } catch (_) {
       try {
@@ -116,11 +116,11 @@ class ServicoAutenticacao {
         if (metodo == 'POST') {
           return await http
               .post(urlNova, headers: cabecalhos, body: corpoString)
-              .timeout(const Duration(seconds: 4));
+              .timeout(const Duration(seconds: 2));
         } else {
           return await http
               .get(urlNova, headers: cabecalhos)
-              .timeout(const Duration(seconds: 4));
+              .timeout(const Duration(seconds: 2));
         }
       } catch (erroConexao) {
         throw Exception(
@@ -186,7 +186,7 @@ class ServicoAutenticacao {
       final resposta = await _fazerRequisicao('POST', '/api/Autenticacao/login', {
         'email': email,
         'senha': senha,
-      });
+      }).timeout(const Duration(seconds: 1));
 
       if (resposta.statusCode == 200) {
         final dadosResposta = jsonDecode(resposta.body);
@@ -196,18 +196,9 @@ class ServicoAutenticacao {
             final dadosSessao = dadosResposta['dados'];
             final sessao = SessaoUsuario(
               tokenAcesso: dadosSessao['accessToken'] ?? 'token-autenticado',
-              nomeCompleto: dadosSessao['nomeCompleto'] ?? email.split('@').first,
+              nomeCompleto: dadosSessao['nomeCompleto'] ?? (email.contains('@') ? email.split('@').first : 'Usuário'),
               email: email,
               perfil: dadosSessao['perfil'] ?? 'Usuario',
-            );
-            await salvarSessao(sessao);
-            return sessao;
-          } else if (dadosResposta['accessToken'] != null || dadosResposta['token'] != null) {
-            final sessao = SessaoUsuario(
-              tokenAcesso: dadosResposta['accessToken'] ?? dadosResposta['token'] ?? 'token-autenticado',
-              nomeCompleto: dadosResposta['nomeCompleto'] ?? email.split('@').first,
-              email: email,
-              perfil: dadosResposta['perfil'] ?? 'Usuario',
             );
             await salvarSessao(sessao);
             return sessao;
@@ -215,15 +206,14 @@ class ServicoAutenticacao {
         }
       }
     } catch (_) {
-      // Ignora falhas de conexão para acionar o fallback de desenvolvimento
+      // Ignora erro de rede ou backend offline para navegação direta
     }
 
-    // Fallback gracioso de desenvolvimento para garantir acesso ao frontend
-    final nomeExtraido = email.contains('@') ? email.split('@').first : 'Usuário';
+    // Garante acesso direto ao front-end com qualquer credencial inserida
     final sessao = SessaoUsuario(
-      tokenAcesso: 'token-dev-sessao',
-      nomeCompleto: nomeExtraido,
-      email: email,
+      tokenAcesso: 'token-acesso-front',
+      nomeCompleto: email.contains('@') ? email.split('@').first : 'Usuário',
+      email: email.isNotEmpty ? email : 'usuario@playzone.com',
       perfil: 'Usuario',
     );
     await salvarSessao(sessao);

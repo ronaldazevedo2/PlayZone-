@@ -8,6 +8,8 @@ class QuadraEsportiva {
   final String descricao;
   final double precoPorHora;
   final bool estaDisponivel;
+  final String status;
+  final double avaliacao;
   final double distanciaEmKm;
   final String caminhoImagem;
 
@@ -21,29 +23,30 @@ class QuadraEsportiva {
     required this.descricao,
     required this.precoPorHora,
     required this.estaDisponivel,
+    this.status = 'Ativa',
+    this.avaliacao = 4.8,
     required this.distanciaEmKm,
     required this.caminhoImagem,
   });
 
   factory QuadraEsportiva.deJson(Map<String, dynamic> json) {
-    final id = json['id'] ?? '';
+    final id = json['id']?.toString() ?? '';
     final nome = json['nome'] ?? 'Sem Nome';
     final modalidade = json['modalidade'] ?? 'Poliesportiva';
     final localizacao = json['localizacao'] ?? json['localidade'] ?? 'Centro';
     final capacidade = json['capacidade'] ?? 10;
     final descricao = json['descricao'] ?? 'Quadra esportiva para jogos e treinos.';
     final imagemUrl = json['imagemUrl'];
+    final statusRaw = json['status'] ?? 'Ativa';
 
-    // Mapeamentos elegantes dos campos locais
     final bairro = _extrairBairro(localizacao);
     final endereco = localizacao;
     
-    // Preço padrão fixo ou baseado na capacidade da quadra
     final precoPorHora = capacidade > 0 ? (capacidade * 15.0) : 150.0;
 
-    // Distância determinística gerada com base no hashCode do ID
     final hash = id.hashCode.abs();
     final distanciaEmKm = 1.0 + (hash % 40) / 10.0;
+    final avaliacaoCalculada = 4.2 + (hash % 8) / 10.0;
 
     final caminhoImagem = _obterImagemEsporte(imagemUrl, modalidade);
 
@@ -56,7 +59,9 @@ class QuadraEsportiva {
       capacidade: capacidade,
       descricao: descricao,
       precoPorHora: precoPorHora,
-      estaDisponivel: true,
+      estaDisponivel: statusRaw.toString().toLowerCase() != 'indisponível' && statusRaw.toString().toLowerCase() != 'indisponivel',
+      status: statusRaw.toString(),
+      avaliacao: double.parse(avaliacaoCalculada.toStringAsFixed(1)),
       distanciaEmKm: distanciaEmKm,
       caminhoImagem: caminhoImagem,
     );
@@ -64,12 +69,14 @@ class QuadraEsportiva {
 
   Map<String, dynamic> paraJson() {
     return {
+      'id': id,
       'nome': nome,
       'descricao': descricao,
       'capacidade': capacidade,
       'localizacao': '$endereco - $bairro',
       'modalidade': modalidade,
       'imagemUrl': caminhoImagem,
+      'status': status,
     };
   }
 

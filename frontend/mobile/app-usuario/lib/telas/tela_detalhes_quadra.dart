@@ -731,7 +731,7 @@ class _TelaDetalhesQuadraEstado extends State<TelaDetalhesQuadra> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'VALOR DA RESERVA',
+                  'AGENDAMENTO',
                   style: TextStyle(
                     fontSize: 9,
                     fontWeight: FontWeight.bold,
@@ -741,13 +741,11 @@ class _TelaDetalhesQuadraEstado extends State<TelaDetalhesQuadra> {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  _horarioSelecionado != null
-                      ? 'R\$ ${quadra.precoPorHora.toStringAsFixed(0)}'
-                      : '-',
+                  _horarioSelecionado != null ? 'Gratuito' : '-',
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1E293B),
+                    color: Color(0xFF16A34A),
                   ),
                 ),
               ],
