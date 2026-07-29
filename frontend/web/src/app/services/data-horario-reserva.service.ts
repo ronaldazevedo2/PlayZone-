@@ -82,7 +82,12 @@ export class DataHorarioReservaService {
    * Useful for loading all existing schedules when editing.
    */
   listarPorQuadra(quadraId: string): Observable<RespostaApi<DataHorarioReservaDto[]>> {
-    return this.listar(quadraId);
+    return this.http
+      .get<RespostaApi<DataHorarioReservaDto[]>>(
+        `${this.BASE_URL}/quadra/${quadraId}`,
+        { headers: this.getHeaders() }
+      )
+      .pipe(catchError(this.handleError));
   }
 
   /**

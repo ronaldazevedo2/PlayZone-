@@ -1,4 +1,4 @@
-﻿using BaseApi.Application.Comum.Modelos;
+using BaseApi.Application.Comum.Modelos;
 using BaseApi.Application.DataHorarioReserva.Commands.AtualizarDataHorarioReserva;
 using BaseApi.Application.DataHorarioReserva.Commands.CriarDataHorarioReserva;
 using BaseApi.Application.DataHorarioReserva.Commands.ExcluirDataHorarioReserva;
@@ -37,6 +37,13 @@ public class DataHorarioReservaController(IMediator mediator) : ControllerBase
             new ObterDataHorarioReservaPorIdQuery(id), ct);
 
         return Ok(RespostaApi<DataHorarioReservaDetalheDto>.Sucesso(resultado));
+    }
+
+    [HttpGet("quadra/{quadraId:guid}")]
+    public async Task<IActionResult> ListarPorQuadra(Guid quadraId, CancellationToken ct)
+    {
+        var resultado = await mediator.Send(new ListarHorariosDaQuadraQuery(quadraId), ct);
+        return Ok(RespostaApi<IEnumerable<DataHorarioReservaListaDto>>.Sucesso(resultado));
     }
 
     [HttpGet("disponiveis")]

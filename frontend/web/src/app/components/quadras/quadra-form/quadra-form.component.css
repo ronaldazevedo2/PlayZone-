@@ -184,7 +184,7 @@
 }
 
 .input-with-icon input {
-  padding-left: 38px;
+  padding-left: 38px !important;
 }
 
 .field-helper {

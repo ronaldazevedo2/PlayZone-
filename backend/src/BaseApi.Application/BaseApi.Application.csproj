@@ -1,8 +1,6 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
-  <ItemGroup>
-    <Compile Remove="DataHorarioReserva\Queries\ListarDataHorarioDisponivel\ListarHorariosDaQuadraQuery.cs" />
-  </ItemGroup>
+
 
   <ItemGroup>
     <ProjectReference Include="..\BaseApi.Domain\BaseApi.Domain.csproj" />

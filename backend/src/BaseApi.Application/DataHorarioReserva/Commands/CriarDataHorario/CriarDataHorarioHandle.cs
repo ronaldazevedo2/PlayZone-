@@ -1,4 +1,4 @@
-﻿using BaseApi.Domain.Interfaces.Repositorios;
+using BaseApi.Domain.Interfaces.Repositorios;
 using MediatR;
 
 namespace BaseApi.Application.DataHorarioReserva.Commands.CriarDataHorarioReserva;
@@ -9,6 +9,12 @@ public class CriarDataHorarioReservaHandler(
 {
     public async Task<CriarDataHorarioReservaResposta> Handle(CriarDataHorarioReservaCommand command, CancellationToken ct)
     {
+        var existing = await repositorio.ObterPorDataAsync(command.QuadraId, command.Data);
+        if (existing.Any(x => x.Horario == command.Horario))
+        {
+            throw new BaseApi.Domain.Excecoes.ExcecaoDominio("Este horário já está cadastrado para esta quadra neste dia.");
+        }
+
         var dataHorarioReserva = new BaseApi.Domain.Entidades.DataHorarioReserva
         {
             DataHorarioReservaId = Guid.NewGuid(),

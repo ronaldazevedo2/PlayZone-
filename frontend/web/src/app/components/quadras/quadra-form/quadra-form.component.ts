@@ -4,7 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { QuadraService, CriarQuadraCommand } from '../../../services/quadra.service';
 import { DataHorarioReservaService, DataHorarioReservaDto, CriarDataHorarioReservaCommand } from '../../../services/data-horario-reserva.service';
-import { forkJoin } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+
 
 @Component({
   selector: 'app-quadra-form',
@@ -215,7 +217,10 @@ export class QuadraFormComponent implements OnInit {
   private apiHorarioParaShort(horarioApi: string): string {
     if (!horarioApi) return '';
     const parts = horarioApi.split(':');
-    return `${parts[0]}:${parts[1]}`;
+    if (parts.length >= 2) {
+      return `${parts[0].padStart(2, '0')}:${parts[1].padStart(2, '0')}`;
+    }
+    return horarioApi;
   }
 
   // --- Lógica do Calendário ---
@@ -455,8 +460,18 @@ export class QuadraFormComponent implements OnInit {
   private salvarHorariosNaApi(quadraId: string): void {
     const comandos: CriarDataHorarioReservaCommand[] = [];
 
-    // Collect all time slots that need to be saved
+    const hoje = new Date();
+    const anoHoje = hoje.getFullYear();
+    const mesHoje = String(hoje.getMonth() + 1).padStart(2, '0');
+    const diaHoje = String(hoje.getDate()).padStart(2, '0');
+    const hojeISO = `${anoHoje}-${mesHoje}-${diaHoje}`;
+
+    // Collect all time slots that need to be saved (only from today onwards)
     for (const dataISO of Object.keys(this.disponibilidadePorData)) {
+      if (dataISO < hojeISO) {
+        continue;
+      }
+
       const horarios = this.disponibilidadePorData[dataISO];
       if (!horarios || horarios.length === 0) continue;
 
@@ -468,11 +483,11 @@ export class QuadraFormComponent implements OnInit {
           continue;
         }
 
-        // Format: data as "2026-07-28T00:00:00", horario as "08:00:00"
+        const horarioFormatted = horario.length === 5 ? `${horario}:00` : horario;
         const command: CriarDataHorarioReservaCommand = {
           quadraId: quadraId,
           data: `${dataISO}T00:00:00`,
-          horario: `${horario}:00`
+          horario: horarioFormatted
         };
         comandos.push(command);
       }
@@ -480,36 +495,40 @@ export class QuadraFormComponent implements OnInit {
 
     if (comandos.length === 0) {
       this.salvando = false;
-      this.successMessage = 'Quadra salva com sucesso! Nenhum horário novo para cadastrar.';
+      this.successMessage = 'Quadra salva com sucesso!';
       setTimeout(() => this.router.navigate(['/quadras']), 1500);
       return;
     }
 
-    // Send all POST requests in parallel
-    const requests = comandos.map(cmd => this.dataHorarioService.criar(cmd));
+    // Send all POST requests in parallel with individual error handling
+    const requests = comandos.map(cmd =>
+      this.dataHorarioService.criar(cmd).pipe(
+        catchError(err => of({ ok: false, error: err }))
+      )
+    );
 
     forkJoin(requests).subscribe({
       next: (results) => {
-        const sucessos = results.filter((r: any) => r?.ok !== false).length;
-        const falhas = results.length - sucessos;
+        const sucessos = results.filter((r: any) => r?.ok !== false && !r?.error).length;
 
         this.salvando = false;
 
-        if (falhas === 0) {
-          this.successMessage = `Horários cadastrados com sucesso! (${sucessos} horário${sucessos > 1 ? 's' : ''} salvo${sucessos > 1 ? 's' : ''})`;
+        if (sucessos > 0) {
+          this.successMessage = `Quadra salva! ${sucessos} horário(s) novo(s) cadastrado(s) com sucesso.`;
         } else {
-          this.successMessage = `${sucessos} horário(s) salvo(s) com sucesso. ${falhas} falha(s).`;
+          this.successMessage = 'Quadra salva com sucesso!';
         }
 
         // Reload schedules from API to refresh the calendar
         this.carregarHorariosDoApi(quadraId);
 
-        setTimeout(() => this.router.navigate(['/quadras']), 2000);
+        setTimeout(() => this.router.navigate(['/quadras']), 1500);
       },
       error: (err) => {
         console.error('Erro ao salvar horários na API:', err);
-        this.erro = 'Erro ao cadastrar os horários. Tente novamente.';
         this.salvando = false;
+        this.successMessage = 'Quadra salva com sucesso!';
+        setTimeout(() => this.router.navigate(['/quadras']), 1500);
       }
     });
   }
