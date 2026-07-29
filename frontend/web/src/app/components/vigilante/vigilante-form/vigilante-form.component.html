@@ -1,0 +1,121 @@
+<div class="cadastro-view-container">
+  <!-- Top Nav Header -->
+  <div class="form-header-bar">
+    <div class="breadcrumb-container">
+      <h1>{{ vigilanteEditandoId ? 'Editar Vigilante' : 'Cadastrar Vigilante' }}</h1>
+      <div class="breadcrumb-links">
+        <span class="home-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+        </span>
+        <span class="bc-link" (click)="cancelar()">Vigilante</span>
+        <span class="bc-separator">&gt;</span>
+        <span class="bc-current">{{ vigilanteEditandoId ? 'Editar vigilante' : 'Cadastrar vigilante' }}</span>
+      </div>
+    </div>
+
+    <div class="header-form-buttons">
+      <button class="btn-secondary" (click)="cancelar()">Cancelar</button>
+      <button class="btn-primary" (click)="salvarVigilante()" [disabled]="salvando">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          class="save-icon" *ngIf="!salvando">
+          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+          <polyline points="17 21 17 13 7 13 7 21"></polyline>
+          <polyline points="7 3 7 8 15 8"></polyline>
+        </svg>
+        <span class="spinner-sm" *ngIf="salvando"></span>
+        {{ salvando ? 'Salvando...' : (vigilanteEditandoId ? 'Salvar alterações' : 'Salvar vigilante') }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Success Banner -->
+  <div class="success-banner" *ngIf="successMessage">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+      <polyline points="22 4 12 14.01 9 11.01"></polyline>
+    </svg>
+    <span>{{ successMessage }}</span>
+  </div>
+
+  <!-- Error Banner -->
+  <div class="error-banner" *ngIf="errorMessages.length > 0">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+      class="error-alert-icon">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="12" y1="8" x2="12" y2="12"></line>
+      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+    </svg>
+    <div>
+      <div *ngFor="let err of errorMessages">{{ err }}</div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="carregando">
+    <span class="spinner"></span>
+    <p>Carregando dados do vigilante...</p>
+  </div>
+
+  <!-- Form Content -->
+  <div class="form-content-grid" *ngIf="!carregando">
+    <div class="form-card">
+      <div class="form-card-header">
+        <h3>Informações Pessoais e Credenciais</h3>
+        <p>Preencha as informações do vigilante responsável pelas arenas.</p>
+      </div>
+
+      <div class="form-fields-row">
+        <div class="form-field-group">
+          <label>Nome Completo <span class="required">*</span></label>
+          <input type="text" placeholder="Ex.: Roberto Carlos Silva" [(ngModel)]="nomeCompleto">
+        </div>
+
+        <div class="form-field-group">
+          <label>Matrícula <span class="required">*</span></label>
+          <input type="text" placeholder="Ex.: VIG-2026-001" [(ngModel)]="matricula">
+        </div>
+      </div>
+
+      <div class="form-fields-row">
+        <div class="form-field-group">
+          <label>CPF <span class="required">*</span></label>
+          <input type="text" placeholder="000.000.000-00" [value]="cpf" (input)="applyCpfMask($event)">
+        </div>
+
+        <div class="form-field-group">
+          <label>Telefone <span class="required">*</span></label>
+          <input type="text" placeholder="(00) 00000-0000" [value]="telefone" (input)="applyPhoneMask($event)">
+        </div>
+      </div>
+
+      <div class="form-fields-row">
+        <div class="form-field-group">
+          <label>E-mail <span class="required">*</span></label>
+          <input type="email" placeholder="vigilante@playzone.com" [(ngModel)]="email">
+        </div>
+
+        <div class="form-field-group">
+          <label>Data de Nascimento <span class="required">*</span></label>
+          <input type="date" [(ngModel)]="dataNascimento">
+        </div>
+      </div>
+
+      <div class="form-fields-row">
+        <div class="form-field-group">
+          <label>Arena / Quadra Alocada</label>
+          <input type="text" placeholder="Ex.: Arena Principal" [(ngModel)]="arena">
+        </div>
+
+        <div class="form-field-group">
+          <label>Status <span class="required">*</span></label>
+          <select [(ngModel)]="ativo" class="form-select">
+            <option [ngValue]="true">Ativo</option>
+            <option [ngValue]="false">Inativo</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

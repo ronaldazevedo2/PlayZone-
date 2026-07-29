@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { Observable, throwError, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { AuthService } from './auth.service';
 import { RespostaApi } from '../wrappers/api-response.wrapper';
@@ -121,66 +121,102 @@ export class QuadraService {
       .pipe(catchError(this.handleError));
   }
 
+  excluir(quadraId: string): Observable<any> {
+    return this.http
+      .delete<any>(
+        `${this.BASE_URL}/${quadraId}`,
+        { headers: this.getDeleteHeaders() }
+      )
+      .pipe(catchError((error: any) => {
+        console.error('[QuadraService] Erro na exclusão:', error);
+        return throwError(() => error);
+      }));
+  }
+
+  /**
+   * Salva a disponibilidade de datas e horários para a quadra especificada.
+   * Salva no localStorage como fallback e tenta sincronizar com a API via POST/PUT.
+   */
+  salvarDisponibilidade(quadraId: string, disponibilidade: { data: string; horarios: string[] }[]): Observable<RespostaApi<any>> {
+    try {
+      localStorage.setItem(`playzone_disponibilidade_${quadraId}`, JSON.stringify(disponibilidade));
+    } catch (e) {
+      console.warn('[QuadraService] Erro ao salvar no localStorage:', e);
+    }
+
+    const url = `${this.BASE_URL}/${quadraId}/disponibilidade`;
+    return this.http.post<RespostaApi<any>>(url, disponibilidade, { headers: this.getHeaders() }).pipe(
+      catchError((error: any) => {
+        console.warn('[QuadraService] Falha ao enviar disponibilidade para a API, salva localmente.', error);
+        const resposta: RespostaApi<any> = {
+          ok: true,
+          mensagem: 'Disponibilidade salva localmente.',
+          erros: null,
+          dados: disponibilidade
+        };
+        return of(resposta);
+      })
+    );
+  }
+
   /**
    * Obtém a disponibilidade de datas e horários para a quadra especificada.
    * Expect API endpoint: GET /api/Quadra/{quadraId}/disponibilidade
    * Returns array of { data: string (ISO), horarios: string[] }
    */
   obterDisponibilidade(quadraId: string): Observable<RespostaApi<any>> {
+    // 1. Verifica se existe no localStorage
+    try {
+      const local = localStorage.getItem(`playzone_disponibilidade_${quadraId}`);
+      if (local) {
+        const dados = JSON.parse(local);
+        return of({
+          ok: true,
+          mensagem: '',
+          erros: null,
+          dados
+        });
+      }
+    } catch (e) {
+      console.warn('[QuadraService] Erro ao ler do localStorage:', e);
+    }
+
+    // 2. Se não estiver no localStorage, tenta buscar da API
     const url = `${this.BASE_URL}/${quadraId}/disponibilidade`;
     return this.http.get<RespostaApi<any>>(url, { headers: this.getHeaders() }).pipe(
-      catchError((error) => {
-        console.warn('[QuadraService] Falha ao obter disponibilidade, usando mock.', error);
-        // Mock data fallback
-        const mock = {
+      catchError((error: any) => {
+        console.warn('[QuadraService] Falha ao obter disponibilidade da API, gerando padrão.', error);
+        // Gera mock padrão com os horários pré-definidos para o mês atual
+        const hoje = new Date();
+        const ano = hoje.getFullYear();
+        const mes = hoje.getMonth();
+        const totalDias = new Date(ano, mes + 1, 0).getDate();
+
+        const mockDados: { data: string; horarios: string[] }[] = [];
+        const slotsPadrao = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00'];
+
+        for (let dia = 1; dia <= totalDias; dia++) {
+          const dataISO = `${ano}-${String(mes + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+          mockDados.push({
+            data: dataISO,
+            horarios: [...slotsPadrao]
+          });
+        }
+
+        const mock: RespostaApi<any> = {
           ok: true,
-          dados: [
-            {
-              data: new Date().toISOString().split('T')[0],
-              horarios: [
-                '06:00 - 07:00',
-                '07:00 - 08:00',
-                '08:00 - 09:00',
-                '09:00 - 10:00',
-                '10:00 - 11:00',
-                '11:00 - 12:00',
-                '12:00 - 13:00',
-                '13:00 - 14:00',
-                '14:00 - 15:00',
-                '15:00 - 16:00',
-                '16:00 - 17:00',
-                '17:00 - 18:00',
-                '18:00 - 19:00',
-                '19:00 - 20:00',
-                '20:00 - 21:00',
-                '21:00 - 22:00'
-              ]
-            },
-            // Add next day as example
-            {
-              data: new Date(Date.now() + 86400000).toISOString().split('T')[0],
-              horarios: ['08:00 - 09:00', '09:00 - 10:00', '10:00 - 11:00']
-            }
-          ]
+          mensagem: '',
+          erros: null,
+          dados: mockDados
         };
         return of(mock);
       })
     );
   }
 
-    return this.http
-  .delete<any>(
-    `${this.BASE_URL}/${quadraId}`,
-    { headers: this.getDeleteHeaders() }
-  )
-  .pipe(catchError((error) => {
-    console.error('[QuadraService] Erro na exclusão:', error);
-    return throwError(() => error);
-  }));
-  }
-
   private handleError = (error: any): Observable<never> => {
-  console.error('[QuadraService] Erro na requisição:', error);
-  return throwError(() => error);
+    console.error('[QuadraService] Erro na requisição:', error);
+    return throwError(() => error);
+  }
 }
-}
+

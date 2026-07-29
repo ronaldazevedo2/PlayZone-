@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';
 import { QuadraService, ReservaQuadraDto } from '../../services/quadra.service';
@@ -35,7 +36,7 @@ interface PaginatedResult<T> {
 @Component({
   selector: 'app-vigilante',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './vigilante.component.html',
   styleUrl: './vigilante.component.css'
 })
@@ -77,7 +78,8 @@ export class VigilanteComponent implements OnInit {
   constructor(
     private http: HttpClient,
     private authService: AuthService,
-    private quadraService: QuadraService
+    private quadraService: QuadraService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -218,9 +220,7 @@ export class VigilanteComponent implements OnInit {
   }
 
   openAddModal(): void {
-    this.resetForm();
-    this.carregarQuadras();
-    this.showModal = true;
+    this.router.navigate(['/vigilante/novo']);
   }
 
   openVigilanteDetails(guard: Vigilante): void {
@@ -234,50 +234,10 @@ export class VigilanteComponent implements OnInit {
   }
 
   editarVigilante(guard: any): void {
-    this.resetForm();
-    this.carregarQuadras();
-
-    this.vigilanteEditandoId = guard.id || guard.Id || null;
-    if (!this.vigilanteEditandoId) return;
-
-    const token = this.authService.getToken();
-    if (!token) {
-      this.errorMessages = ['Usuário não autenticado.'];
-      return;
+    const id = guard.id || guard.Id;
+    if (id) {
+      this.router.navigate(['/vigilante/editar', id]);
     }
-
-    const headers = new HttpHeaders({
-      'accept': 'application/json',
-      'Authorization': `Bearer ${token}`
-    });
-
-    this.isLoading = true;
-    this.http.get<any>(`${this.API_URL}/${this.vigilanteEditandoId}`, { headers }).subscribe({
-      next: (res) => {
-        this.isLoading = false;
-        if (res.ok && res.dados) {
-          const detail = res.dados;
-          this.nomeCompleto = detail.nomeCompleto || detail.NomeCompleto || '';
-          this.cpf = this.formatCpf(detail.cpf || detail.Cpf || detail.CPF || '');
-          this.email = detail.email || detail.Email || detail.eMail || '';
-          this.telefone = this.formatTelefone(detail.telefone || detail.Telefone || detail.fone || detail.Fone || '');
-          this.dataNascimento = this.formatDateForInput(detail.dataNascimento || detail.DataNascimento || detail.nascimento || '');
-          this.fotoPerfil = this.getFoto(detail);
-          this.matricula = detail.matricula || detail.Matricula || '';
-          this.arena = detail.arena || detail.Arena || '';
-          this.ativo = detail.ativo !== undefined ? detail.ativo : (detail.Ativo !== undefined ? detail.Ativo : true);
-          
-          this.showModal = true;
-        } else {
-          this.errorMessages = ['Erro ao carregar os detalhes do vigilante.'];
-        }
-      },
-      error: (err) => {
-        this.isLoading = false;
-        console.error('Erro ao buscar detalhes do vigilante:', err);
-        this.errorMessages = ['Erro ao carregar detalhes do vigilante.'];
-      }
-    });
   }
 
   excluirVigilante(guard: Vigilante): void {

@@ -1,15 +1,7 @@
 using BaseApi.Application.Quadra.Commands.AdicionarQuadra;
-using BaseApi.Application.Usuarios.Commands.CriarUsuario;
-using BaseApi.Domain.Entidades;
-using BaseApi.Domain.Excecoes;
 using BaseApi.Domain.Interfaces.Repositorios;
 using BaseApi.Domain.Interfaces.Servicos;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 
 

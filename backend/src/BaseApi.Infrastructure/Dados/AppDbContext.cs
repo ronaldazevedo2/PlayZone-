@@ -1,4 +1,5 @@
 using BaseApi.Domain.Entidades;
+using BaseApi.Infrastructure.Repositorios;
 using Microsoft.EntityFrameworkCore;
 
 namespace BaseApi.Infrastructure.Dados;
@@ -21,6 +22,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Vigilantes> Vigilantes => Set<Vigilantes>();
 
     public DbSet<Notificacao> Telefones => Set<Notificacao>();
+
+    public DbSet<DataHorarioReserva> DataHorarioReservas => Set<DataHorarioReserva>();
 
     public object Notificacoes { get; internal set; }
 

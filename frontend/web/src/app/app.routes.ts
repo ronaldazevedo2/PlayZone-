@@ -15,11 +15,31 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: [
       { path: 'dashboard', component: DashboardComponent },
+      
+      // Vigilante
       { path: 'vigilante', component: VigilanteComponent },
+      { path: 'vigilante/novo', loadComponent: () => import('./components/vigilante/vigilante-form/vigilante-form.component').then(m => m.VigilanteFormComponent) },
+      { path: 'vigilante/editar/:id', loadComponent: () => import('./components/vigilante/vigilante-form/vigilante-form.component').then(m => m.VigilanteFormComponent) },
+
+      // Usuários
       { path: 'usuarios', loadComponent: () => import('./components/usuarios/usuarios.component').then(m => m.UsuariosComponent) },
+      { path: 'usuarios/novo', loadComponent: () => import('./components/usuarios/usuario-form/usuario-form.component').then(m => m.UsuarioFormComponent) },
+      { path: 'usuarios/editar/:id', loadComponent: () => import('./components/usuarios/usuario-form/usuario-form.component').then(m => m.UsuarioFormComponent) },
+
+      // Dados (Secretaria / Perfil)
       { path: 'dados', component: DadosComponent },
+      { path: 'dados/editar/:id', loadComponent: () => import('./components/dados/dados-form/dados-form.component').then(m => m.DadosFormComponent) },
+
+      // Quadras
       { path: 'quadras', component: QuadrasComponent },
+      { path: 'quadras/nova', loadComponent: () => import('./components/quadras/quadra-form/quadra-form.component').then(m => m.QuadraFormComponent) },
+      { path: 'quadras/editar/:id', loadComponent: () => import('./components/quadras/quadra-form/quadra-form.component').then(m => m.QuadraFormComponent) },
+
+      // Reservas
       { path: 'reservas', loadComponent: () => import('./components/reservas/reservas.component').then(m => m.ReservasComponent) },
+      { path: 'reservas/nova', loadComponent: () => import('./components/reservas/reserva-form/reserva-form.component').then(m => m.ReservaFormComponent) },
+      { path: 'reservas/editar/:id', loadComponent: () => import('./components/reservas/reserva-form/reserva-form.component').then(m => m.ReservaFormComponent) },
+
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },
