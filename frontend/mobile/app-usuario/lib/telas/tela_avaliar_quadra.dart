@@ -97,7 +97,7 @@ class _TelaAvaliarQuadraEstado extends State<TelaAvaliarQuadra> {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF1D3557),
+                color: Color(0xFF163791),
               ),
             ),
             const SizedBox(height: 12),
@@ -119,7 +119,7 @@ class _TelaAvaliarQuadraEstado extends State<TelaAvaliarQuadra> {
                       estrela <= _notaGeral
                           ? Icons.star_rounded
                           : Icons.star_outline_rounded,
-                      color: const Color(0xFF16A34A),
+                      color: const Color(0xFF238838),
                       size: 40,
                     ),
                   ),
@@ -157,7 +157,7 @@ class _TelaAvaliarQuadraEstado extends State<TelaAvaliarQuadra> {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF1D3557),
+                color: Color(0xFF163791),
               ),
             ),
             const SizedBox(height: 12),
@@ -178,7 +178,7 @@ class _TelaAvaliarQuadraEstado extends State<TelaAvaliarQuadra> {
                 children: [
                   Switch(
                     value: _enviarAnonimo,
-                    activeTrackColor: const Color(0xFF1D3557),
+                    activeTrackColor: const Color(0xFF163791),
                     onChanged: (val) {
                       setState(() {
                         _enviarAnonimo = val;
@@ -213,63 +213,6 @@ class _TelaAvaliarQuadraEstado extends State<TelaAvaliarQuadra> {
               ),
             ),
 
-            const SizedBox(height: 20),
-
-            // 7. Botões Secundários (Adicionar Fotos | Reportar Problema)
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Selecione fotos da galeria.'),
-                        ),
-                      );
-                    },
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF1D3557),
-                      side: const BorderSide(color: Color(0xFFCBD5E1)),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    icon: const Icon(Icons.camera_alt_outlined, size: 18),
-                    label: const Text(
-                      'Adicionar Fotos',
-                      style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Reportar problema ao suporte.'),
-                        ),
-                      );
-                    },
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFFD97706),
-                      side: const BorderSide(color: Color(0xFFFCD34D)),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    icon: const Icon(Icons.warning_amber_rounded, size: 18),
-                    label: const Text(
-                      'Reportar Problema',
-                      style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-
             const SizedBox(height: 24),
 
             // 8. Botão Principal ENVIAR AVALIAÇÃO
@@ -279,7 +222,7 @@ class _TelaAvaliarQuadraEstado extends State<TelaAvaliarQuadra> {
               child: ElevatedButton(
                 onPressed: _enviarAvaliacao,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1D3557),
+                  backgroundColor: const Color(0xFF163791),
                   elevation: 2,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -387,7 +330,7 @@ class _TelaAvaliarQuadraEstado extends State<TelaAvaliarQuadra> {
                       width: 16,
                       height: 16,
                       decoration: const BoxDecoration(
-                        color: Color(0xFF22C55E),
+                        color: Color(0xFF238838),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(Icons.check, size: 12, color: Colors.white),
@@ -398,7 +341,7 @@ class _TelaAvaliarQuadraEstado extends State<TelaAvaliarQuadra> {
                       style: TextStyle(
                         fontSize: 11.5,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF22C55E),
+                        color: Color(0xFF238838),
                       ),
                     ),
                   ],
@@ -438,7 +381,7 @@ class _TelaAvaliarQuadraEstado extends State<TelaAvaliarQuadra> {
             width: 20,
             height: 20,
             decoration: BoxDecoration(
-              color: const Color(0xFF16A34A),
+              color: const Color(0xFF238838),
               borderRadius: BorderRadius.circular(4),
             ),
             child: const Icon(Icons.check, size: 14, color: Colors.white),
@@ -471,7 +414,7 @@ class _TelaAvaliarQuadraEstado extends State<TelaAvaliarQuadra> {
                     estrela <= criterio.nota
                         ? Icons.star_rounded
                         : Icons.star_outline_rounded,
-                    color: const Color(0xFF16A34A),
+                    color: const Color(0xFF238838),
                     size: 22,
                   ),
                 ),

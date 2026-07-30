@@ -30,9 +30,9 @@ class MeuAplicativo extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF22C55E), // Verde clássico do app
-          primary: const Color(0xFF22C55E),
-          secondary: const Color(0xFF3B82F6), // Azul para focos secundários
+          seedColor: const Color(0xFF238838), // Verde clássico do app
+          primary: const Color(0xFF238838),
+          secondary: const Color(0xFF163791), // Azul para focos secundários
         ),
         scaffoldBackgroundColor: Colors.white,
       ),

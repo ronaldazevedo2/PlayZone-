@@ -6,6 +6,7 @@ import 'tela_detalhes_quadra.dart';
 import 'tela_login.dart';
 import 'tela_meus_agendamentos.dart';
 import 'tela_pesquisa_quadras.dart';
+import 'tela_perfil_usuario.dart';
 
 class TelaInicial extends StatefulWidget {
   final SessaoUsuario sessao;
@@ -194,7 +195,14 @@ class _TelaInicialEstado extends State<TelaInicial> {
           const TelaMeusAgendamentos(),
 
           // ABA 3: Perfil
-          _construirAbaPerfil(),
+          TelaPerfilUsuario(
+            sessao: _sessaoAtual,
+            aoVoltar: () {
+              setState(() {
+                _abaSelecionada = 0;
+              });
+            },
+          ),
         ],
       ),
       // 5. Barra de Navegação Inferior Customizada (Ativo em VERDE)
@@ -202,95 +210,7 @@ class _TelaInicialEstado extends State<TelaInicial> {
     );
   }
 
-  // WIDGET: Aba de Perfil do Usuário
-  Widget _construirAbaPerfil() {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          children: [
-            const SizedBox(height: 20),
-            CircleAvatar(
-              radius: 44,
-              backgroundColor: const Color(0xFF1D3557),
-              child: Text(
-                _sessaoAtual.nomeCompleto.isNotEmpty
-                    ? _sessaoAtual.nomeCompleto[0].toUpperCase()
-                    : 'U',
-                style: const TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              _sessaoAtual.nomeCompleto.isNotEmpty
-                  ? _sessaoAtual.nomeCompleto
-                  : 'Usuário PlayZone',
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF0F172A),
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              _sessaoAtual.email.isNotEmpty
-                  ? _sessaoAtual.email
-                  : 'usuario@playzone.com',
-              style: const TextStyle(
-                fontSize: 14,
-                color: Color(0xFF64748B),
-              ),
-            ),
-            const SizedBox(height: 32),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.person_outline, color: Color(0xFF1D3557)),
-              title: const Text('Dados Pessoais'),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () {},
-            ),
-            ListTile(
-              leading: const Icon(Icons.notifications_none, color: Color(0xFF1D3557)),
-              title: const Text('Notificações'),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () {},
-            ),
-            ListTile(
-              leading: const Icon(Icons.shield_outlined, color: Color(0xFF1D3557)),
-              title: const Text('Privacidade e Segurança'),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () {},
-            ),
-            const Spacer(),
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton.icon(
-                onPressed: _fazerLogout,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFEE2E2),
-                  foregroundColor: const Color(0xFFDC2626),
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                icon: const Icon(Icons.logout),
-                label: const Text(
-                  'Sair da Conta',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+
 
   // WIDGET: Cabeçalho (Apenas Logo PLAYZONE Centralizada - Sem Sininho e Sem Campo de Busca)
   Widget _construirCabecalho() {
@@ -846,14 +766,6 @@ class _TelaInicialEstado extends State<TelaInicial> {
         setState(() {
           _abaSelecionada = index;
         });
-        if (index > 2) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Aba "$rotulo" em desenvolvimento!'),
-              duration: const Duration(seconds: 1),
-            ),
-          );
-        }
       },
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -872,7 +784,7 @@ class _TelaInicialEstado extends State<TelaInicial> {
             child: Icon(
               icone,
               color: estaAtivo
-                  ? const Color(0xFF22C55E) // VERDE VIBRANTE quando ativo
+                  ? const Color(0xFF238838) // VERDE VIBRANTE quando ativo
                   : const Color(0xFF64748B),
               size: 22,
             ),
@@ -884,7 +796,7 @@ class _TelaInicialEstado extends State<TelaInicial> {
               fontSize: 10.5,
               fontWeight: estaAtivo ? FontWeight.bold : FontWeight.normal,
               color: estaAtivo
-                  ? const Color(0xFF22C55E) // Texto VERDE quando ativo
+                  ? const Color(0xFF238838) // Texto VERDE quando ativo
                   : const Color(0xFF64748B),
             ),
           ),

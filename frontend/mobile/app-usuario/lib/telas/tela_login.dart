@@ -145,7 +145,7 @@ class _TelaLoginUsuarioEstado extends State<TelaLoginUsuario> {
                 children: [
                   // Cabeçalho com logo e boas-vindas
                   const CabecalhoAutenticacao(
-                    titulo: 'Bem-vindo de volta! v1',
+                    titulo: 'Bem-vindo de volta!',
                     subtitulo:
                         'Entre com seus dados para acessar sua conta na PlayZone.',
                   ),
