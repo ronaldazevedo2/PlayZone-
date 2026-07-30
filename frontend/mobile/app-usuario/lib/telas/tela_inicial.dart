@@ -4,6 +4,7 @@ import '../servicos/servico_autenticacao.dart';
 import '../servicos/servico_quadras.dart';
 import 'tela_detalhes_quadra.dart';
 import 'tela_login.dart';
+import 'tela_meus_agendamentos.dart';
 import 'tela_pesquisa_quadras.dart';
 
 class TelaInicial extends StatefulWidget {
@@ -17,9 +18,6 @@ class TelaInicial extends StatefulWidget {
 
 class _TelaInicialEstado extends State<TelaInicial> {
   late SessaoUsuario _sessaoAtual;
-  final TextEditingController _controladorBusca = TextEditingController();
-  final FocusNode _buscaFoco = FocusNode();
-
   String? _bairroFiltrado;
   List<QuadraEsportiva> _quadrasFiltradas = [];
   int _abaSelecionada = 0;
@@ -32,7 +30,6 @@ class _TelaInicialEstado extends State<TelaInicial> {
   void initState() {
     super.initState();
     _sessaoAtual = widget.sessao;
-    _controladorBusca.addListener(_filtrarQuadras);
 
     // Busca assíncrona das quadras diretamente da API ao carregar a página
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -74,14 +71,6 @@ class _TelaInicialEstado extends State<TelaInicial> {
     }
   }
 
-  @override
-  void dispose() {
-    _controladorBusca.removeListener(_filtrarQuadras);
-    _controladorBusca.dispose();
-    _buscaFoco.dispose();
-    super.dispose();
-  }
-
   void _ordenarPorDistancia() {
     _quadrasFiltradas.sort(
       (a, b) => a.distanciaEmKm.compareTo(b.distanciaEmKm),
@@ -89,16 +78,11 @@ class _TelaInicialEstado extends State<TelaInicial> {
   }
 
   void _filtrarQuadras() {
-    final query = _controladorBusca.text.toLowerCase().trim();
     setState(() {
       _quadrasFiltradas = _todasAsQuadras.where((quadra) {
-        final matchesNome = quadra.nome.toLowerCase().contains(query);
-        final matchesModalidade = quadra.modalidade.toLowerCase().contains(
-          query,
-        );
         final matchesBairro =
             _bairroFiltrado == null || quadra.bairro == _bairroFiltrado;
-        return (matchesNome || matchesModalidade) && matchesBairro;
+        return matchesBairro;
       }).toList();
       _ordenarPorDistancia();
     });
@@ -148,7 +132,7 @@ class _TelaInicialEstado extends State<TelaInicial> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // 1. Cabeçalho Customizado
+                    // 1. Logo PLAYZONE Centralizada (Sem campo de pesquisa e sem sininho)
                     _construirCabecalho(),
 
                     // Indicador de progresso se estiver carregando
@@ -158,168 +142,181 @@ class _TelaInicialEstado extends State<TelaInicial> {
                         backgroundColor: Color(0xFFEFF6FF),
                       ),
 
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 12),
 
-                // Indicador de filtro ativo (Bairro)
-                if (_bairroFiltrado != null)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: Row(
-                      children: [
-                        InputChip(
-                          label: Text(
-                            'Bairro: $_bairroFiltrado',
-                            style: const TextStyle(
-                              color: Color(0xFF254EDB),
-                              fontWeight: FontWeight.bold,
+                    // Indicador de filtro ativo (Bairro)
+                    if (_bairroFiltrado != null)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                        child: Row(
+                          children: [
+                            InputChip(
+                              label: Text(
+                                'Bairro: $_bairroFiltrado',
+                                style: const TextStyle(
+                                  color: Color(0xFF254EDB),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              backgroundColor: const Color(0xFFEFF6FF),
+                              deleteIconColor: const Color(0xFF254EDB),
+                              onDeleted: _limparFiltroBairro,
                             ),
-                          ),
-                          backgroundColor: const Color(0xFFEFF6FF),
-                          deleteIconColor: const Color(0xFF254EDB),
-                          onDeleted: _limparFiltroBairro,
+                          ],
                         ),
-                      ],
+                      ),
+                    const SizedBox(height: 16),
+
+                    // 2. Seção Quadras Próximas
+                    _construirSecaoQuadrasProximas(),
+                    const SizedBox(height: 32),
+
+                    // 3. Seção Explorar por Bairro
+                    _construirSecaoBairros(),
+                    const SizedBox(height: 32),
+
+                    // 4. Banner Premium
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      child: _construirBannerPremium(),
                     ),
-                  ),
-                const SizedBox(height: 24),
-
-                // 3. Seção Quadras Próximas
-                _construirSecaoQuadrasProximas(),
-                const SizedBox(height: 32),
-
-                // 4. Seção Explorar por Bairro
-                _construirSecaoBairros(),
-                const SizedBox(height: 32),
-
-                // 5. Banner Premium
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: _construirBannerPremium(),
+                    const SizedBox(height: 24),
+                  ],
                 ),
-              ],
-            ),
-          ),
-        ),
-      ),
-
-      // ABA 1: Pesquisa de Quadras (Search)
-      const TelaPesquisaQuadras(),
-
-        // ABA 2: Agendamentos
-        const Center(
-          child: Text(
-            'Minhas Reservas',
-            style: TextStyle(fontSize: 16, color: Color(0xFF64748B)),
-          ),
-        ),
-
-        // ABA 3: Perfil
-        const Center(
-          child: Text(
-            'Perfil do Usuário',
-            style: TextStyle(fontSize: 16, color: Color(0xFF64748B)),
-          ),
-        ),
-      ],
-    ),
-    // 6. Barra de Navegação Inferior Customizada
-    bottomNavigationBar: _construirBarraNavegacao(),
-  );
-}
-
-  // WIDGET: Cabeçalho
-  Widget _construirCabecalho() {
-    return Padding(
-      padding: const EdgeInsets.only(left: 20.0, right: 20.0, top: 16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const SizedBox(width: 44),
-
-          // Logotipo: PLAYZONE
-          RichText(
-            text: const TextSpan(
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w900,
-                fontStyle: FontStyle.italic,
-                letterSpacing: -0.5,
               ),
-              children: [
-                TextSpan(
-                  text: 'PLAY',
-                  style: TextStyle(color: Color(0xFF0F172A)), // Quase preto
-                ),
-                TextSpan(
-                  text: 'ZONE',
-                  style: TextStyle(color: Color(0xFF22C55E)), // Verde
-                ),
-              ],
             ),
           ),
 
-          // Ícone do sino (apenas circulado)
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-              border: Border.all(color: const Color(0xFFE2E8F0)),
-            ),
-            child: const Icon(
-              Icons.notifications_none_outlined,
-              color: Color(0xFF0F172A),
-              size: 24,
-            ),
-          ),
+          // ABA 1: Pesquisa de Quadras (Search)
+          const TelaPesquisaQuadras(),
+
+          // ABA 2: Agendamentos
+          const TelaMeusAgendamentos(),
+
+          // ABA 3: Perfil
+          _construirAbaPerfil(),
         ],
+      ),
+      // 5. Barra de Navegação Inferior Customizada (Ativo em VERDE)
+      bottomNavigationBar: _construirBarraNavegacao(),
+    );
+  }
+
+  // WIDGET: Aba de Perfil do Usuário
+  Widget _construirAbaPerfil() {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          children: [
+            const SizedBox(height: 20),
+            CircleAvatar(
+              radius: 44,
+              backgroundColor: const Color(0xFF1D3557),
+              child: Text(
+                _sessaoAtual.nomeCompleto.isNotEmpty
+                    ? _sessaoAtual.nomeCompleto[0].toUpperCase()
+                    : 'U',
+                style: const TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              _sessaoAtual.nomeCompleto.isNotEmpty
+                  ? _sessaoAtual.nomeCompleto
+                  : 'Usuário PlayZone',
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF0F172A),
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              _sessaoAtual.email.isNotEmpty
+                  ? _sessaoAtual.email
+                  : 'usuario@playzone.com',
+              style: const TextStyle(
+                fontSize: 14,
+                color: Color(0xFF64748B),
+              ),
+            ),
+            const SizedBox(height: 32),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.person_outline, color: Color(0xFF1D3557)),
+              title: const Text('Dados Pessoais'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {},
+            ),
+            ListTile(
+              leading: const Icon(Icons.notifications_none, color: Color(0xFF1D3557)),
+              title: const Text('Notificações'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {},
+            ),
+            ListTile(
+              leading: const Icon(Icons.shield_outlined, color: Color(0xFF1D3557)),
+              title: const Text('Privacidade e Segurança'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {},
+            ),
+            const Spacer(),
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton.icon(
+                onPressed: _fazerLogout,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFFEE2E2),
+                  foregroundColor: const Color(0xFFDC2626),
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                icon: const Icon(Icons.logout),
+                label: const Text(
+                  'Sair da Conta',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  // WIDGET: Barra de Busca
-  Widget _construirBarraBusca() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16.0),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Row(
-        children: [
-          const Icon(Icons.search, color: Color(0xFF64748B), size: 22),
-          const SizedBox(width: 12),
-          Expanded(
-            child: TextField(
-              controller: _controladorBusca,
-              focusNode: _buscaFoco,
-              style: const TextStyle(fontSize: 15, color: Color(0xFF1E293B)),
-              decoration: const InputDecoration(
-                hintText: 'Buscar quadras, esportes ou locais',
-                hintStyle: TextStyle(color: Color(0xFF94A3B8), fontSize: 14),
-                border: InputBorder.none,
-                isDense: true,
-                contentPadding: EdgeInsets.symmetric(vertical: 14.0),
+  // WIDGET: Cabeçalho (Apenas Logo PLAYZONE Centralizada - Sem Sininho e Sem Campo de Busca)
+  Widget _construirCabecalho() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
+      child: Center(
+        child: RichText(
+          text: const TextSpan(
+            style: TextStyle(
+              fontSize: 26,
+              fontWeight: FontWeight.w900,
+              fontStyle: FontStyle.italic,
+              letterSpacing: -0.5,
+            ),
+            children: [
+              TextSpan(
+                text: 'PLAY',
+                style: TextStyle(color: Color(0xFF0F172A)), // Quase preto
               ),
-            ),
+              TextSpan(
+                text: 'ZONE',
+                style: TextStyle(color: Color(0xFF22C55E)), // Verde
+              ),
+            ],
           ),
-          GestureDetector(
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Filtro avançado em desenvolvimento!'),
-                  duration: Duration(seconds: 2),
-                ),
-              );
-            },
-            child: const Icon(
-              Icons.tune_outlined,
-              color: Color(0xFF254EDB),
-              size: 22,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -346,7 +343,6 @@ class _TelaInicialEstado extends State<TelaInicial> {
               GestureDetector(
                 onTap: () {
                   _limparFiltroBairro();
-                  _controladorBusca.clear();
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('Exibindo todas as quadras registradas.'),
@@ -426,7 +422,7 @@ class _TelaInicialEstado extends State<TelaInicial> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withValues(alpha: 0.04),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -469,7 +465,7 @@ class _TelaInicialEstado extends State<TelaInicial> {
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
+                              color: Colors.black.withValues(alpha: 0.1),
                               blurRadius: 4,
                             ),
                           ],
@@ -595,7 +591,7 @@ class _TelaInicialEstado extends State<TelaInicial> {
     );
   }
 
-  // WIDGET: Seção Explorar por Localidade (carregada dinamicamente do Banco de Dados / API)
+  // WIDGET: Seção Explorar por Localidade
   Widget _construirSecaoBairros() {
     final mapaLocalidades = _obterLocalidadesComContagem();
     final iconesDisponiveis = [
@@ -694,18 +690,15 @@ class _TelaInicialEstado extends State<TelaInicial> {
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
         child: Row(
           children: [
-            // Ícone com fundo azul-escuro
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: const Color(0xFF0F2C59), // Azul escuro
+                color: const Color(0xFF0F2C59),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(icone, color: Colors.white, size: 20),
             ),
             const SizedBox(width: 16),
-
-            // Informações textuais
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -729,8 +722,6 @@ class _TelaInicialEstado extends State<TelaInicial> {
                 ],
               ),
             ),
-
-            // Chevron de navegação
             const Icon(Icons.chevron_right, color: Color(0xFF64748B), size: 20),
           ],
         ),
@@ -742,11 +733,11 @@ class _TelaInicialEstado extends State<TelaInicial> {
   Widget _construirBannerPremium() {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF0A2240), // Azul marinho escuro
+        color: const Color(0xFF0A2240),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF0A2240).withOpacity(0.15),
+            color: const Color(0xFF0A2240).withValues(alpha: 0.15),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -759,19 +750,16 @@ class _TelaInicialEstado extends State<TelaInicial> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Tag "SEJA PREMIUM"
                 const Text(
                   'SEJA PREMIUM',
                   style: TextStyle(
-                    color: Color(0xFF22C55E), // Verde brilhante
+                    color: Color(0xFF22C55E),
                     fontSize: 11,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 1.0,
                   ),
                 ),
                 const SizedBox(height: 8),
-
-                // Descrição do banner
                 const Text(
                   'Descontos exclusivos e prioridade em agendamentos de pico.',
                   style: TextStyle(
@@ -782,8 +770,6 @@ class _TelaInicialEstado extends State<TelaInicial> {
                   ),
                 ),
                 const SizedBox(height: 16),
-
-                // Botão do banner
                 ElevatedButton(
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -816,12 +802,11 @@ class _TelaInicialEstado extends State<TelaInicial> {
             ),
           ),
           const SizedBox(width: 16),
-          // Desenho/Ícone grande de troféu
           Opacity(
             opacity: 0.2,
             child: Icon(
               Icons.emoji_events,
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withValues(alpha: 0.8),
               size: 90,
             ),
           ),
@@ -830,13 +815,13 @@ class _TelaInicialEstado extends State<TelaInicial> {
     );
   }
 
-  // WIDGET: Barra de Navegação Inferior
+  // WIDGET: Barra de Navegação Inferior (Ícones ativos em VERDE)
   Widget _construirBarraNavegacao() {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.white,
         border: Border(
-          top: BorderSide(color: const Color(0xFFE2E8F0), width: 1.0),
+          top: BorderSide(color: Color(0xFFE2E8F0), width: 1.0),
         ),
       ),
       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -852,7 +837,7 @@ class _TelaInicialEstado extends State<TelaInicial> {
     );
   }
 
-  // WIDGET: Item de Navegação Individual
+  // WIDGET: Item de Navegação Individual (Destaque Ativo em VERDE)
   Widget _construirItemNavegacao(int index, IconData icone, String rotulo) {
     final bool estaAtivo = _abaSelecionada == index;
 
@@ -861,7 +846,7 @@ class _TelaInicialEstado extends State<TelaInicial> {
         setState(() {
           _abaSelecionada = index;
         });
-        if (index > 1) {
+        if (index > 2) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Aba "$rotulo" em desenvolvimento!'),
@@ -875,19 +860,19 @@ class _TelaInicialEstado extends State<TelaInicial> {
         children: [
           Container(
             padding: const EdgeInsets.symmetric(
-              horizontal: 18.0,
+              horizontal: 16.0,
               vertical: 6.0,
             ),
             decoration: BoxDecoration(
               color: estaAtivo
-                  ? const Color(0xFFDCFCE7)
-                  : Colors.transparent, // Fundo verde claro para ativo
+                  ? const Color(0xFFDCFCE7) // Fundo VERDE CLARO quando ativo
+                  : Colors.transparent,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Icon(
               icone,
               color: estaAtivo
-                  ? const Color(0xFF22C55E)
+                  ? const Color(0xFF22C55E) // VERDE VIBRANTE quando ativo
                   : const Color(0xFF64748B),
               size: 22,
             ),
@@ -899,7 +884,7 @@ class _TelaInicialEstado extends State<TelaInicial> {
               fontSize: 10.5,
               fontWeight: estaAtivo ? FontWeight.bold : FontWeight.normal,
               color: estaAtivo
-                  ? const Color(0xFF22C55E)
+                  ? const Color(0xFF22C55E) // Texto VERDE quando ativo
                   : const Color(0xFF64748B),
             ),
           ),

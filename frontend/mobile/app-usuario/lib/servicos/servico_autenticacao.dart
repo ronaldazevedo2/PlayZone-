@@ -7,8 +7,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// Overrides para ignorar certificados autoassinados em ambiente de desenvolvimento local (localhost)
 class OverridesHttpPlayZone extends HttpOverrides {
   @override
-  HttpClient createHttpClient(SecurityContext? contexto) {
-    return super.createHttpClient(contexto)
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
       ..badCertificateCallback =
           (X509Certificate cert, String hospedeiro, int porta) => true;
   }

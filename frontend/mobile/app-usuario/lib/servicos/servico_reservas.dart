@@ -16,6 +16,52 @@ class ServicoReservas {
     return cabecalhos;
   }
 
+  /// Busca a lista completa de reservas cadastradas no backend API (/api/Reservas)
+  static Future<List<ModeloReserva>> obterTodasAsReservas() async {
+    final rotas = [
+      '/api/Reservas?pagina=1&tamanhoPagina=100',
+      '/api/Reserva?pagina=1&tamanhoPagina=100',
+    ];
+
+    for (final rota in rotas) {
+      try {
+        final url = Uri.parse('${ServicoAutenticacao.obterUrlBase()}$rota');
+        final cabecalhos = await _obterCabecalhos();
+        final resposta = await http
+            .get(url, headers: cabecalhos)
+            .timeout(const Duration(seconds: 4));
+
+        if (resposta.statusCode == 200) {
+          final dadosResposta = jsonDecode(resposta.body);
+          List<dynamic>? lista;
+
+          if (dadosResposta is Map<String, dynamic>) {
+            if (dadosResposta['dados'] != null) {
+              if (dadosResposta['dados'] is Map &&
+                  dadosResposta['dados']['itens'] != null) {
+                lista = dadosResposta['dados']['itens'] as List<dynamic>?;
+              } else if (dadosResposta['dados'] is List) {
+                lista = dadosResposta['dados'] as List<dynamic>?;
+              }
+            } else if (dadosResposta['itens'] != null) {
+              lista = dadosResposta['itens'] as List<dynamic>?;
+            }
+          } else if (dadosResposta is List) {
+            lista = dadosResposta;
+          }
+
+          if (lista != null && lista.isNotEmpty) {
+            return lista.map((item) => ModeloReserva.deJson(item)).toList();
+          }
+        }
+      } catch (_) {
+        // Tenta próxima rota se houver timeout ou erro
+      }
+    }
+
+    return [];
+  }
+
   /// Obter lista de reservas existentes para uma quadra e data agendada
   static Future<List<ModeloReserva>> obterReservasPorQuadraEData(
     String quadraId,
@@ -53,13 +99,12 @@ class ServicoReservas {
       // Fallback para desenvolvimento / mock caso a API não esteja ativa
     }
 
-    // Mock temporário no serviço para facilitar substituição pela API
     return _gerarReservasMockTemporarias(quadraId, dataAgendada);
   }
 
   /// Criar uma nova reserva na API
   static Future<bool> criarReserva(ModeloReserva reserva) async {
-    const rota = '/api/Reserva';
+    const rota = '/api/Reservas';
     try {
       final url = Uri.parse('${ServicoAutenticacao.obterUrlBase()}$rota');
       final cabecalhos = await _obterCabecalhos();
@@ -83,7 +128,6 @@ class ServicoReservas {
     String quadraId,
     DateTime dataAgendada,
   ) {
-    // Horários reservados de exemplo para demonstrar horários ocupados (18:00 e 21:00)
     final horariosOcupados = ['18:00', '21:00'];
 
     return horariosOcupados.map((horario) {

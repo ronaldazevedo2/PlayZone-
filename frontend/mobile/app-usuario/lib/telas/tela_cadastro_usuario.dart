@@ -709,8 +709,8 @@ class _TelaCadastroUsuarioEstado extends State<TelaCadastroUsuario> {
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 16.0),
                           elevation: 0,
-                          disabledBackgroundColor: corAzulDestaque.withOpacity(
-                            0.6,
+                          disabledBackgroundColor: corAzulDestaque.withValues(
+                            alpha: 0.6,
                           ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12.0),

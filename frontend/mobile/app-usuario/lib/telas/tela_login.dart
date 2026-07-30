@@ -213,7 +213,7 @@ class _TelaLoginUsuarioEstado extends State<TelaLoginUsuario> {
                       elevation: 0,
                       disabledBackgroundColor: const Color(
                         0xFF22C55E,
-                      ).withOpacity(0.6),
+                      ).withValues(alpha: 0.6),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12.0),
                       ),
