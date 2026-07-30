@@ -9,8 +9,8 @@ public class ObterUsuarioPorIdHandler(IUsuarioRepositorio repositorio) : IReques
 {
     public async Task<UsuarioDetalheDto> Handle(ObterUsuarioPorIdQuery query, CancellationToken ct)
     {
-        var usuario = await repositorio.ObterPorIdAsync(query.Id, ct)
-            ?? throw new ExcecaoNaoEncontrado($"Usuário com Id '{query.Id}' não encontrado.");
+        var usuario = await repositorio.ObterPorIdAsync(query.UsuariosId, ct)
+            ?? throw new ExcecaoNaoEncontrado($"Usuário com Id '{query.UsuariosId}' não encontrado.");
 
         return usuario.Adapt<UsuarioDetalheDto>();
     }

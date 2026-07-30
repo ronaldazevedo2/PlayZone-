@@ -8,8 +8,8 @@ public class ExcluirUsuarioHandler(IUsuarioRepositorio repositorio) : IRequestHa
 {
     public async Task<Unit> Handle(ExcluirUsuarioCommand command, CancellationToken ct)
     {
-        var usuario = await repositorio.ObterPorIdAsync(command.Id, ct)
-            ?? throw new ExcecaoNaoEncontrado($"Usuário com Id '{command.Id}' não encontrado.");
+        var usuario = await repositorio.ObterPorIdAsync(command.UsuariosId, ct)
+            ?? throw new ExcecaoNaoEncontrado($"Usuário com Id '{command.UsuariosId}' não encontrado.");
 
         repositorio.Remover(usuario);
         await repositorio.SalvarAsync(ct);

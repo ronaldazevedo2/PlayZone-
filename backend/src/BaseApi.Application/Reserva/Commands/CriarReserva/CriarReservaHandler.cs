@@ -16,8 +16,9 @@ namespace BaseApi.Application.Reserva.Commands.CriarReserva
         {
             var reserva = new BaseApi.Domain.Entidades.Reserva // Fully qualify the Reserva class to avoid namespace conflict
             {
-                Id = Guid.NewGuid(), // Ensure the Id is initialized
+                ReservasId = Guid.NewGuid(), // Ensure the Id is initialized
                 QuadraId = command.QuadraId, // Assuming QuadraId is part of the command
+                UsuarioId = command.UsuarioId, // Assuming UsuarioId is part of the command
                 DataAgendada = command.DataAgendada, // Assuming DataAgendada is part of the command
                 HorarioAgendado = command.HorarioAgendado
             };
@@ -27,10 +28,11 @@ namespace BaseApi.Application.Reserva.Commands.CriarReserva
 
             return new CriarReservaResposta(
 
-                reserva.Id,
+                reserva.ReservasId,
+                reserva.QuadraId,
+                reserva.UsuarioId,
                 reserva.DataAgendada,
-                reserva.HorarioAgendado,
-                reserva.QuadraId
+                reserva.HorarioAgendado
             );
         }
     }

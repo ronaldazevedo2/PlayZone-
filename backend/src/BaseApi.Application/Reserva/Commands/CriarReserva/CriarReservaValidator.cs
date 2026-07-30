@@ -9,7 +9,6 @@ namespace BaseApi.Application.Reserva.Commands.CriarReserva
             RuleFor(x => x.QuadraId)
                 .NotEmpty().WithMessage("Marca é obrigatória.");
 
-
             RuleFor(x => x.DataAgendada)
            .NotEmpty()
            .WithMessage("Data agendada é obrigatória.");
@@ -18,6 +17,8 @@ namespace BaseApi.Application.Reserva.Commands.CriarReserva
            .NotEmpty()
            .WithMessage("Data agendada é obrigatória.");
 
+            RuleFor(x => x.UsuarioId)
+                .NotEmpty().WithMessage("Usuário é obrigatório.");
         }
     }
 

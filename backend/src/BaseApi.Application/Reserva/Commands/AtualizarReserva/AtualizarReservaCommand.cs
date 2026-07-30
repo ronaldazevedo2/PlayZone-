@@ -10,11 +10,12 @@ public class AtualizarReservaHandler(IReservaRepositorio repositorio)
 {
     public async Task<Unit> Handle(AtualizarReservaCommand command, CancellationToken ct)
     {
-        var reserva = await repositorio.ObterPorIdAsync(command.Id, ct)
-            ?? throw new ExcecaoNaoEncontrado($"Telefone com Id '{command.Id}' não encontrado.");
+        var reserva = await repositorio.ObterPorIdAsync(command.ReservasId, ct)
+            ?? throw new ExcecaoNaoEncontrado($"Telefone com Id '{command.ReservasId}' não encontrado.");
 
         // Atualiza apenas os campos permitidos
         reserva.QuadraId = command.QuadraId;
+        reserva.UsuarioId= command.UsuarioId;
         reserva.DataAgendada = command.DataAgendada;
         reserva.HorarioAgendado = command.HorarioAgendado;
         

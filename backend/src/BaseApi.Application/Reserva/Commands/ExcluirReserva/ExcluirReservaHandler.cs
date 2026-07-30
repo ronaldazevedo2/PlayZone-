@@ -9,8 +9,8 @@ public class ExcluirReservaHandler(IReservaRepositorio repositorio)
 {
     public async Task<Unit> Handle(ExcluirReservaCommand command, CancellationToken ct)
     {
-        var reserva = await repositorio.ObterPorIdAsync(command.Id, ct)
-            ?? throw new ExcecaoNaoEncontrado($"Reserva com Id '{command.Id}' não encontrado.");
+        var reserva = await repositorio.ObterPorIdAsync(command.ReservasId, ct)
+            ?? throw new ExcecaoNaoEncontrado($"Reserva com Id '{command.ReservasId}' não encontrado.");
 
         repositorio.Remover(reserva);
         await repositorio.SalvarAsync(ct);

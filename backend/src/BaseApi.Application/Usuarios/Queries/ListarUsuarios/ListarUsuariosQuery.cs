@@ -14,7 +14,7 @@ public record ListarUsuariosQuery(
 
 /// <summary>DTO resumido para listagem (sem dados sensíveis)</summary>
 public record UsuarioListaDto(
-    Guid Id,
+    Guid UsuariosId,
     string NomeCompleto,
     string Email,
     string Cpf,

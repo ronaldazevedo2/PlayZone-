@@ -7,7 +7,7 @@ public class AtualizarUsuarioValidator : AbstractValidator<AtualizarUsuarioComma
 {
     public AtualizarUsuarioValidator(IUsuarioRepositorio repositorio)
     {
-        RuleFor(x => x.Id)
+        RuleFor(x => x.UsuariosId)
             .NotEmpty().WithMessage("Id do usuário é obrigatório.");
 
         RuleFor(x => x.NomeCompleto)
@@ -28,7 +28,7 @@ public class AtualizarUsuarioValidator : AbstractValidator<AtualizarUsuarioComma
             .NotEmpty().WithMessage("E-mail é obrigatório.")
             .EmailAddress().WithMessage("E-mail inválido.")
             .MustAsync(async (command, email, ct) =>
-                !await repositorio.EmailExisteAsync(email, command.Id, ct))
+                !await repositorio.EmailExisteAsync(email, command.UsuariosId, ct))
             .WithMessage("Este e-mail já está em uso por outro usuário.");
 
         RuleFor(x => x.PerfilId)

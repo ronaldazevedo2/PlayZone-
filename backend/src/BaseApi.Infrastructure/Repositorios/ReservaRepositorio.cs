@@ -30,7 +30,7 @@ namespace BaseApi.Infrastructure.Repositorios
         public async Task<Reserva?> ObterPorIdAsync(Guid id, CancellationToken ct = default)
         {
             return await contexto.Reserva
-                .FirstOrDefaultAsync(x => x.Id == id, ct);
+                .FirstOrDefaultAsync(x => x.ReservasId == id, ct);
         }
             
         
@@ -61,7 +61,7 @@ namespace BaseApi.Infrastructure.Repositorios
                 x.QuadraId == quadraId &&
                 x.DataAgendada.Date == dataAgendada.Date &&
                 x.HorarioAgendado == horarioAgendado &&
-                (!ignorarId.HasValue || x.Id != ignorarId.Value),
+                (!ignorarId.HasValue || x.ReservasId != ignorarId.Value),
                 ct);
         }
 

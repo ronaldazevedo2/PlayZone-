@@ -17,7 +17,7 @@ public record ComandoRegistrarUsuario(
 /// Resposta de sucesso do registro de usuário.
 /// </summary>
 public record RespostaRegistrarUsuario(
-    Guid Id,
+    Guid UsuariosId,
     string NomeCompleto,
     string Email,
     string Cpf,

@@ -8,8 +8,8 @@ public class AtualizarUsuarioHandler(IUsuarioRepositorio repositorio) : IRequest
 {
     public async Task<Unit> Handle(AtualizarUsuarioCommand command, CancellationToken ct)
     {
-        var usuario = await repositorio.ObterPorIdAsync(command.Id, ct)
-            ?? throw new ExcecaoNaoEncontrado($"Usuário com Id '{command.Id}' não encontrado.");
+        var usuario = await repositorio.ObterPorIdAsync(command.UsuariosId, ct)
+            ?? throw new ExcecaoNaoEncontrado($"Usuário com Id '{command.UsuariosId}' não encontrado.");
 
         usuario.NomeCompleto = command.NomeCompleto;
         usuario.Email = command.Email.ToLowerInvariant().Trim();

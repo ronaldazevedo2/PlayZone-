@@ -10,8 +10,8 @@ public class ObterReservaPorIdHandler(IReservaRepositorio repositorio)
 {
     public async Task<ReservaDetalheDto> Handle(ObterReservaPorIdQuery query, CancellationToken ct)
     {
-        var reserva = await repositorio.ObterPorIdAsync(query.Id, ct)
-            ?? throw new ExcecaoNaoEncontrado($"Reserva com Id '{query.Id}' não encontrado.");
+        var reserva = await repositorio.ObterPorIdAsync(query.ReservasId, ct)
+            ?? throw new ExcecaoNaoEncontrado($"Reserva com Id '{query.ReservasId}' não encontrado.");
 
         // Mapster converte a entidade para o DTO automaticamente
         return reserva.Adapt<ReservaDetalheDto>();

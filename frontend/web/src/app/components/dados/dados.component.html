@@ -6,15 +6,17 @@
       <p class="dados-page-subtitle">Gerencie as informações do seu perfil e endereço.</p>
     </div>
     <div class="dados-actions" style="display: flex; gap: 10px;">
-      <button *ngIf="isAdmin && !isEditing" class="btn-salvar-dados" (click)="toggleEdit()" style="background-color: var(--primary-color, #1a73e8);">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <button *ngIf="isAdmin && !isEditing" class="btn-primary btn-salvar-dados" (click)="toggleEdit()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2">
           <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
           <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
         </svg>
         Editar
       </button>
-      <button *ngIf="isAdmin && isEditing" class="btn-salvar-dados" (click)="salvarDados()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <button *ngIf="isAdmin && isEditing" class="btn-primary btn-salvar-dados" (click)="salvarDados()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2">
           <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
           <polyline points="17 21 17 13 7 13 7 21"></polyline>
           <polyline points="7 3 7 8 15 8"></polyline>
@@ -43,19 +45,22 @@
       <!-- Nome -->
       <div class="dados-field-group full-width">
         <label class="dados-label" for="campo-nome">Nome</label>
-        <input id="campo-nome" class="dados-input" type="text" placeholder="Digite seu nome completo" [(ngModel)]="dadosNome" [disabled]="!isEditing">
+        <input id="campo-nome" class="dados-input" type="text" placeholder="Digite seu nome completo"
+          [(ngModel)]="dadosNome" [disabled]="!isEditing">
       </div>
 
       <!-- Email -->
       <div class="dados-field-group">
         <label class="dados-label" for="campo-email">E-mail</label>
-        <input id="campo-email" class="dados-input" type="email" placeholder="seu@email.com" [(ngModel)]="dadosEmail" [disabled]="!isEditing">
+        <input id="campo-email" class="dados-input" type="email" placeholder="seu@email.com" [(ngModel)]="dadosEmail"
+          [disabled]="!isEditing">
       </div>
 
       <!-- Contato -->
       <div class="dados-field-group">
         <label class="dados-label" for="campo-contato">Contato</label>
-        <input id="campo-contato" class="dados-input" type="text" placeholder="(00) 00000-0000" [(ngModel)]="dadosContato" [disabled]="!isEditing">
+        <input id="campo-contato" class="dados-input" type="text" placeholder="(00) 00000-0000"
+          [(ngModel)]="dadosContato" [disabled]="!isEditing">
       </div>
     </div>
   </div>
@@ -79,31 +84,36 @@
       <!-- CEP -->
       <div class="dados-field-group">
         <label class="dados-label" for="campo-cep">CEP</label>
-        <input id="campo-cep" class="dados-input" type="text" placeholder="00000-000" [(ngModel)]="dadosCep" [disabled]="!isEditing">
+        <input id="campo-cep" class="dados-input" type="text" placeholder="00000-000" [(ngModel)]="dadosCep"
+          [disabled]="!isEditing">
       </div>
 
       <!-- Endereço -->
       <div class="dados-field-group flex-3">
         <label class="dados-label" for="campo-endereco">Endereço</label>
-        <input id="campo-endereco" class="dados-input" type="text" placeholder="Rua, Avenida, etc." [(ngModel)]="dadosEndereco" [disabled]="!isEditing">
+        <input id="campo-endereco" class="dados-input" type="text" placeholder="Rua, Avenida, etc."
+          [(ngModel)]="dadosEndereco" [disabled]="!isEditing">
       </div>
 
       <!-- Número -->
       <div class="dados-field-group">
         <label class="dados-label" for="campo-numero">Número</label>
-        <input id="campo-numero" class="dados-input" type="text" placeholder="Ex: 123" [(ngModel)]="dadosNumero" [disabled]="!isEditing">
+        <input id="campo-numero" class="dados-input" type="text" placeholder="Ex: 123" [(ngModel)]="dadosNumero"
+          [disabled]="!isEditing">
       </div>
 
       <!-- Bairro -->
       <div class="dados-field-group">
         <label class="dados-label" for="campo-bairro">Bairro</label>
-        <input id="campo-bairro" class="dados-input" type="text" placeholder="Nome do bairro" [(ngModel)]="dadosBairro" [disabled]="!isEditing">
+        <input id="campo-bairro" class="dados-input" type="text" placeholder="Nome do bairro" [(ngModel)]="dadosBairro"
+          [disabled]="!isEditing">
       </div>
 
       <!-- Cidade -->
       <div class="dados-field-group">
         <label class="dados-label" for="campo-cidade">Cidade</label>
-        <input id="campo-cidade" class="dados-input" type="text" placeholder="Nome da cidade" [(ngModel)]="dadosCidade" [disabled]="!isEditing">
+        <input id="campo-cidade" class="dados-input" type="text" placeholder="Nome da cidade" [(ngModel)]="dadosCidade"
+          [disabled]="!isEditing">
       </div>
     </div>
   </div>

@@ -14,8 +14,9 @@ public record ListarReservaQuery(
 
 /// <summary>DTO resumido para listagem</summary>
 public record ReservaListaDto(
-    Guid Id,
+    Guid ReservasId,
     Guid QuadraId,
+    Guid UsuariosId,
     DateTime DataAgendada,
     TimeSpan HorarioAgendado
 );
