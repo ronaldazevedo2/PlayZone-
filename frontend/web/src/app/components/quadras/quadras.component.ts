@@ -51,6 +51,16 @@ export class QuadrasComponent implements OnInit {
   toastTipo: 'erro' | 'aviso' | 'sucesso' = 'erro';
   private toastTimer: any = null;
 
+  defaultQuadraImage = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200"><rect width="300" height="200" fill="%231e2248"/><rect x="20" y="20" width="260" height="160" fill="none" stroke="%233b82f6" stroke-width="3" rx="8"/><line x1="150" y1="20" x2="150" y2="180" stroke="%233b82f6" stroke-width="3"/><circle cx="150" cy="100" r="35" fill="none" stroke="%233b82f6" stroke-width="3"/><text x="150" y="105" fill="%23ffffff" font-family="sans-serif" font-size="14" font-weight="bold" text-anchor="middle">PLAYZONE</text></svg>`;
+
+  onImageError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    if (img) {
+      img.onerror = null;
+      img.src = this.defaultQuadraImage;
+    }
+  }
+
   constructor(
     private quadraService: QuadraService,
     private router: Router
@@ -224,6 +234,10 @@ export class QuadrasComponent implements OnInit {
 
   editarQuadra(quadra: QuadraExibicao): void {
     this.router.navigate(['/quadras/editar', quadra.id]);
+  }
+
+  verReservasQuadra(quadra: QuadraExibicao): void {
+    this.router.navigate(['/reservas'], { queryParams: { quadraId: quadra.id } });
   }
 
   abrirOpcoes(quadra: QuadraExibicao, event: MouseEvent): void {

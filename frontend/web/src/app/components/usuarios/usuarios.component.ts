@@ -97,10 +97,11 @@ export class UsuariosComponent implements OnInit {
       next: (res) => {
         this.isLoading = false;
         if (res.ok && res.dados) {
-          this.usuarios = res.dados.itens.map(u => ({
+          this.usuarios = res.dados.itens.map((u: any) => ({
             ...u,
+            id: u.id || u.usuariosId || u.usuarioId || '',
             avaliacao: Math.round((Math.random() * 2 + 3) * 10) / 10,
-            dataCriacao: (u as any).dataCriacao || (u as any).createdAt || (u as any).criadoEm || new Date(Date.now() - Math.random() * 31536000000).toISOString()
+            dataCriacao: u.dataCriacao || u.createdAt || u.criadoEm || new Date(Date.now() - Math.random() * 31536000000).toISOString()
           }));
           this.filtrarUsuarios();
         } else if (res.erros && res.erros.length > 0) {
@@ -198,8 +199,9 @@ export class UsuariosComponent implements OnInit {
   }
 
   abrirModalEdicao(usuario: Usuario): void {
-    if (usuario.id) {
-      this.router.navigate(['/usuarios/editar', usuario.id]);
+    const id = usuario.id || (usuario as any).usuariosId || (usuario as any).usuarioId;
+    if (id) {
+      this.router.navigate(['/usuarios/editar', id]);
     }
   }
 

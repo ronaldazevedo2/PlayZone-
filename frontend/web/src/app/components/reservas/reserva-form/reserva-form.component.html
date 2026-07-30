@@ -72,7 +72,7 @@
       <div class="form-fields-row">
         <div class="form-field-group">
           <label>Quadra <span class="required">*</span></label>
-          <select [(ngModel)]="formQuadraId" class="form-select">
+          <select [(ngModel)]="formQuadraId" (change)="onQuadraOuDataChange()" class="form-select">
             <option value="" disabled>-- Selecione uma Quadra --</option>
             <option *ngFor="let q of quadras" [value]="q.id">{{ q.nome }} ({{ q.modalidade }})</option>
           </select>
@@ -80,15 +80,25 @@
 
         <div class="form-field-group">
           <label>Data da Reserva <span class="required">*</span></label>
-          <input type="date" [(ngModel)]="formData">
+          <input type="date" [(ngModel)]="formData" (change)="onQuadraOuDataChange()">
         </div>
 
         <div class="form-field-group">
           <label>Horário <span class="required">*</span></label>
-          <select [(ngModel)]="formHorario" class="form-select">
-            <option value="" disabled>-- Selecione o Horário --</option>
-            <option *ngFor="let h of horariosDisponiveis" [value]="h">{{ h }}</option>
+          <select [(ngModel)]="formHorario" class="form-select" [disabled]="carregandoHorarios || !formQuadraId || !formData">
+            <option value="" disabled>
+              {{ carregandoHorarios ? 'Carregando horários cadastrados...' : (!formQuadraId || !formData ? '-- Selecione a Quadra e a Data --' : '-- Selecione o Horário --') }}
+            </option>
+            <option *ngFor="let h of horariosCadastradosAdmin" [value]="h.horario" [disabled]="!h.disponivel && h.horario !== formHorario">
+              {{ h.rotulo }}
+            </option>
           </select>
+          <span class="field-helper text-amber" *ngIf="semHorariosMensagem">
+            {{ semHorariosMensagem }}
+          </span>
+          <span class="field-helper" *ngIf="!semHorariosMensagem && horariosCadastradosAdmin.length > 0">
+            Apenas horários previamente cadastrados pelo administrador.
+          </span>
         </div>
       </div>
 

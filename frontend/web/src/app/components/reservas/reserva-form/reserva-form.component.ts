@@ -5,6 +5,7 @@ import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { QuadraService, ReservaQuadraDto } from '../../../services/quadra.service';
 import { ReservaService, ReservaDto, CriarReservaCommand } from '../../../services/reserva.service';
+import { DataHorarioReservaService } from '../../../services/data-horario-reserva.service';
 import { AuthService } from '../../../services/auth.service';
 import { RespostaApi } from '../../../wrappers/api-response.wrapper';
 import { ResultadoPaginado } from '../../../services/secretaria.service';
@@ -43,13 +44,9 @@ export class ReservaFormComponent implements OnInit {
   formUsuarioEmail = '';
   status: 'Ativa' | 'Cancelada' | 'Finalizada' = 'Ativa';
 
-  horariosDisponiveis: string[] = [
-    '06:00 - 07:00', '07:00 - 08:00', '08:00 - 09:00', '09:00 - 10:00',
-    '10:00 - 11:00', '11:00 - 12:00', '12:00 - 13:00', '13:00 - 14:00',
-    '14:00 - 15:00', '15:00 - 16:00', '16:00 - 17:00', '17:00 - 18:00',
-    '18:00 - 19:00', '19:00 - 20:00', '20:00 - 21:00', '21:00 - 22:00',
-    '22:00 - 23:00'
-  ];
+  carregandoHorarios = false;
+  horariosCadastradosAdmin: { horario: string; disponivel: boolean; rotulo: string }[] = [];
+  semHorariosMensagem = '';
 
   // Search User Modal
   showBuscarUsuarioModal = false;
@@ -63,6 +60,7 @@ export class ReservaFormComponent implements OnInit {
   constructor(
     private quadraService: QuadraService,
     private reservaService: ReservaService,
+    private dataHorarioService: DataHorarioReservaService,
     private authService: AuthService,
     private http: HttpClient,
     private router: Router,
@@ -101,14 +99,25 @@ export class ReservaFormComponent implements OnInit {
       next: (res) => {
         this.carregando = false;
         if (res && res.ok && res.dados) {
-          const r = res.dados;
-          this.formQuadraId = r.quadraId || '';
-          this.formData = r.data ? r.data.split('T')[0] : '';
-          this.formHorario = r.horario || '';
-          this.formUsuarioId = r.usuarioId || '';
-          this.formUsuarioNome = r.nomeUsuario || '';
-          this.formUsuarioEmail = r.emailUsuario || '';
+          const r = res.dados as any;
+          this.formQuadraId = r.quadraId || r.QuadraId || '';
+
+          const dataRaw = r.dataAgendada || r.data || r.DataAgendada || '';
+          this.formData = dataRaw ? dataRaw.split('T')[0] : '';
+
+          const horarioRaw = r.horarioAgendado || r.horario || r.HorarioAgendado || '';
+          this.formHorario = this.formatHorarioShort(horarioRaw);
+
+          this.formUsuarioId = r.usuarioId || r.usuariosId || r.UsuariosId || r.id || '';
+          this.formUsuarioNome = r.nomeUsuario || r.usuarioNome || r.nomeCompleto || '';
+          this.formUsuarioEmail = r.emailUsuario || r.usuarioEmail || r.email || '';
           this.status = r.status || 'Ativa';
+
+          if (this.formUsuarioId && !this.formUsuarioNome) {
+            this.carregarNomeUsuario(this.formUsuarioId);
+          }
+
+          this.onQuadraOuDataChange();
         } else {
           this.errosForm = ['Reserva não encontrada.'];
         }
@@ -117,6 +126,69 @@ export class ReservaFormComponent implements OnInit {
         this.carregando = false;
         console.error('Erro ao buscar reserva:', err);
         this.errosForm = ['Erro ao carregar detalhes da reserva.'];
+      }
+    });
+  }
+
+  private carregarNomeUsuario(usuarioId: string): void {
+    const token = this.authService.getToken();
+    if (!token) {
+      this.formUsuarioNome = 'Administrador do Sistema';
+      this.formUsuarioEmail = 'admin@baseapi.com';
+      return;
+    }
+
+    const headers = new HttpHeaders({
+      'accept': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+
+    this.http.get<any>(`${this.USUARIOS_API}/${usuarioId}`, { headers }).subscribe({
+      next: (res) => {
+        if (res && res.ok && res.dados) {
+          this.formUsuarioNome = res.dados.nomeCompleto || res.dados.nome || 'Usuário do Sistema';
+          this.formUsuarioEmail = res.dados.email || '';
+        } else if (res && res.nomeCompleto) {
+          this.formUsuarioNome = res.nomeCompleto;
+          this.formUsuarioEmail = res.email || '';
+        } else {
+          this.buscarUsuarioNaListaFallback(usuarioId);
+        }
+      },
+      error: () => {
+        this.buscarUsuarioNaListaFallback(usuarioId);
+      }
+    });
+  }
+
+  private buscarUsuarioNaListaFallback(usuarioId: string): void {
+    const token = this.authService.getToken();
+    const headers = new HttpHeaders({
+      'accept': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+
+    this.http.get<any>(this.USUARIOS_API, { headers }).subscribe({
+      next: (res) => {
+        if (res && res.ok && res.dados && res.dados.itens) {
+          const u = res.dados.itens.find((item: any) =>
+            (item.usuariosId || item.id || item.usuarioId) === usuarioId
+          );
+          if (u) {
+            this.formUsuarioNome = u.nomeCompleto || u.nome || '';
+            this.formUsuarioEmail = u.email || '';
+          } else {
+            this.formUsuarioNome = 'Administrador do Sistema';
+            this.formUsuarioEmail = 'admin@baseapi.com';
+          }
+        } else {
+          this.formUsuarioNome = 'Administrador do Sistema';
+          this.formUsuarioEmail = 'admin@baseapi.com';
+        }
+      },
+      error: () => {
+        this.formUsuarioNome = 'Administrador do Sistema';
+        this.formUsuarioEmail = 'admin@baseapi.com';
       }
     });
   }
@@ -154,9 +226,9 @@ export class ReservaFormComponent implements OnInit {
         this.buscandoUsuarios = false;
         if (res && res.ok && res.dados && res.dados.itens) {
           let lista: UsuarioBusca[] = res.dados.itens.map((u: any) => ({
-            usuariosId: u.id,
-            nomeCompleto: u.nomeCompleto,
-            email: u.email,
+            usuariosId: u.usuariosId || u.id || u.usuarioId || '',
+            nomeCompleto: u.nomeCompleto || '',
+            email: u.email || '',
             cpf: u.cpf,
             telefone: u.telefone,
             ativo: u.ativo
@@ -204,7 +276,7 @@ export class ReservaFormComponent implements OnInit {
   }
 
   selecionarUsuario(user: UsuarioBusca): void {
-    this.formUsuarioId = user.usuariosId;
+    this.formUsuarioId = user.usuariosId || (user as any).id || (user as any).usuarioId || '';
     this.formUsuarioNome = user.nomeCompleto;
     this.formUsuarioEmail = user.email;
     this.fecharBuscarUsuario();
@@ -225,11 +297,12 @@ export class ReservaFormComponent implements OnInit {
     this.salvando = true;
     this.errosForm = [];
 
+    const horarioFormatted = this.formHorario.length === 5 ? `${this.formHorario}:00` : this.formHorario;
     const command: CriarReservaCommand = {
       quadraId: this.formQuadraId,
       usuarioId: this.formUsuarioId,
       dataAgendada: new Date(this.formData).toISOString(),
-      horarioAgendado: this.formHorario
+      horarioAgendado: horarioFormatted
     };
 
     this.reservaService.criar(command).subscribe({
@@ -257,5 +330,116 @@ export class ReservaFormComponent implements OnInit {
 
   cancelar(): void {
     this.router.navigate(['/reservas']);
+  }
+
+  onQuadraOuDataChange(): void {
+    this.horariosCadastradosAdmin = [];
+    this.semHorariosMensagem = '';
+
+    if (!this.formQuadraId || !this.formData) {
+      return;
+    }
+
+    this.carregandoHorarios = true;
+
+    this.dataHorarioService.obterHorariosDisponiveis(this.formQuadraId, this.formData).subscribe({
+      next: (res: any) => {
+        this.carregandoHorarios = false;
+        const dados = res?.dados ?? res;
+
+        if (Array.isArray(dados) && dados.length > 0) {
+          this.horariosCadastradosAdmin = dados.map((item: any) => {
+            const rawHorario = item.horario || item.time || '';
+            const shortTime = this.formatHorarioShort(rawHorario);
+            const rangeTime = this.formatHorarioRange(shortTime);
+            const disponivel = item.disponivel !== false;
+            return {
+              horario: shortTime,
+              disponivel,
+              rotulo: rangeTime + (!disponivel ? ' (Já reservado)' : '')
+            };
+          });
+
+          if (this.formHorario && !this.horariosCadastradosAdmin.some(h => h.horario === this.formHorario)) {
+            const shortTime = this.formatHorarioShort(this.formHorario);
+            const rangeTime = this.formatHorarioRange(shortTime);
+            this.horariosCadastradosAdmin.unshift({
+              horario: shortTime,
+              disponivel: true,
+              rotulo: rangeTime
+            });
+          }
+        } else {
+          this.carregarHorariosFallBack();
+        }
+
+        if (this.horariosCadastradosAdmin.length === 0) {
+          this.semHorariosMensagem = 'Nenhum horário cadastrado pelo administrador para esta data.';
+        }
+      },
+      error: (err) => {
+        console.warn('[ReservaForm] Erro ao obter horários disponíveis, tentando fallback:', err);
+        this.carregarHorariosFallBack();
+      }
+    });
+  }
+
+  private carregarHorariosFallBack(): void {
+    this.dataHorarioService.listarPorQuadra(this.formQuadraId).subscribe({
+      next: (res: any) => {
+        this.carregandoHorarios = false;
+        const dados = res?.dados ?? res;
+        if (Array.isArray(dados)) {
+          const dataFiltro = this.formData;
+          const filtrados = dados.filter((item: any) => {
+            const dataIso = item.data ? item.data.split('T')[0] : '';
+            return dataIso === dataFiltro;
+          });
+
+          this.horariosCadastradosAdmin = filtrados.map((item: any) => {
+            const shortTime = this.formatHorarioShort(item.horario);
+            const rangeTime = this.formatHorarioRange(shortTime);
+            return {
+              horario: shortTime,
+              disponivel: true,
+              rotulo: rangeTime
+            };
+          });
+
+          if (this.horariosCadastradosAdmin.length === 0) {
+            this.semHorariosMensagem = 'Nenhum horário cadastrado pelo administrador para esta data.';
+          }
+        } else {
+          this.semHorariosMensagem = 'Nenhum horário cadastrado pelo administrador para esta data.';
+        }
+      },
+      error: () => {
+        this.carregandoHorarios = false;
+        this.semHorariosMensagem = 'Nenhum horário cadastrado pelo administrador para esta data.';
+      }
+    });
+  }
+
+  private formatHorarioShort(horarioRaw: string): string {
+    if (!horarioRaw) return '';
+    const parts = horarioRaw.split(':');
+    if (parts.length >= 2) {
+      return `${parts[0].padStart(2, '0')}:${parts[1].padStart(2, '0')}`;
+    }
+    return horarioRaw;
+  }
+
+  private formatHorarioRange(shortTime: string): string {
+    if (!shortTime) return '';
+    const parts = shortTime.split(':').map(Number);
+    if (parts.length >= 2 && !isNaN(parts[0])) {
+      const startHour = parts[0];
+      const startMin = parts[1];
+      const endHour = (startHour + 1) % 24;
+      const startStr = `${String(startHour).padStart(2, '0')}:${String(startMin).padStart(2, '0')}`;
+      const endStr = `${String(endHour).padStart(2, '0')}:${String(startMin).padStart(2, '0')}`;
+      return `${startStr} - ${endStr}`;
+    }
+    return shortTime;
   }
 }

@@ -1,4 +1,4 @@
-﻿using BaseApi.Domain.Interfaces.Repositorios;
+using BaseApi.Domain.Interfaces.Repositorios;
 using MediatR;
 
 namespace BaseApi.Application.DataHorarioReserva.Queries.ListarHorariosDisponiveis;
@@ -27,6 +27,7 @@ public class ListarHorariosDisponiveisHandler(
             ct);
 
         var horariosReservados = reservas
+            .Where(r => r.Status != "Cancelada")
             .Select(r => r.HorarioAgendado)
             .ToHashSet();
 

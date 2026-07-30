@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,5 +17,6 @@ namespace BaseApi.Domain.Entidades
 
         public TimeSpan HorarioAgendado { get; set; }
 
+        public string Status { get; set; } = "Ativa";
     }
 }

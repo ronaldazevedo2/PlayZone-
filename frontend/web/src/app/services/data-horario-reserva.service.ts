@@ -98,6 +98,23 @@ export class DataHorarioReservaService {
     return this.listar(quadraId, data);
   }
 
+  /**
+   * Lists available time slots registered by admin for a specific quadra and date.
+   * GET /api/DataHorarioReserva/disponiveis?quadraId=xxx&data=yyyy-MM-dd
+   */
+  obterHorariosDisponiveis(quadraId: string, data: string): Observable<RespostaApi<{ horario: string; disponivel: boolean }[]>> {
+    let params = new HttpParams()
+      .set('quadraId', quadraId)
+      .set('data', data);
+
+    return this.http
+      .get<RespostaApi<{ horario: string; disponivel: boolean }[]>>(
+        `${this.BASE_URL}/disponiveis`,
+        { headers: this.getHeaders(), params }
+      )
+      .pipe(catchError(this.handleError));
+  }
+
   private handleError = (error: any): Observable<never> => {
     console.error('[DataHorarioReservaService] Erro na requisição:', error);
     return throwError(() => error);

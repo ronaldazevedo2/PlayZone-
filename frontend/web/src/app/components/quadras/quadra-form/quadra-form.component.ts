@@ -360,6 +360,11 @@ export class QuadraFormComponent implements OnInit {
     return this.disponibilidadePorData[this.dataSelecionadaISO]?.includes(slot) ?? false;
   }
 
+  isHorarioSalvoNoBanco(slot: string): boolean {
+    if (!this.dataSelecionadaISO) return false;
+    return this.horariosSalvosGlobal.get(this.dataSelecionadaISO)?.has(slot) ?? false;
+  }
+
   selecionarTodosHorariosData(): void {
     if (!this.dataSelecionadaISO) return;
     this.disponibilidadePorData[this.dataSelecionadaISO] = [...this.slotsHorariosDisponiveis];
@@ -388,8 +393,22 @@ export class QuadraFormComponent implements OnInit {
     this.gerarCalendario();
   }
 
+  abaAtivaForm: 'geral' | 'horarios' = 'geral';
+
+  selecionarAbaForm(aba: 'geral' | 'horarios'): void {
+    this.abaAtivaForm = aba;
+  }
+
   // --- Salvamento e Cancelamento com Roteamento ---
   salvarQuadra(): void {
+    if (this.abaAtivaForm === 'geral') {
+      this.salvarInformacoesGerais();
+    } else {
+      this.salvarApenasHorarios();
+    }
+  }
+
+  salvarInformacoesGerais(): void {
     if (this.novaQuadra.nome) {
       this.novaQuadra.nome = this.novaQuadra.nome.toUpperCase();
     }
@@ -401,13 +420,13 @@ export class QuadraFormComponent implements OnInit {
 
     if (!this.novaQuadra.imagemUrl) {
       if (this.novaQuadra.modalidade.includes('Beach')) {
-        this.novaQuadra.imagemUrl = 'https://images.unsplash.com/photo-1593787406536-3676a152d9cb?q=80&w=300';
+        this.novaQuadra.imagemUrl = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200"><rect width="300" height="200" fill="%23d97706"/><rect x="20" y="20" width="260" height="160" fill="%23f59e0b" stroke="%23ffffff" stroke-width="3" rx="8"/><line x1="150" y1="20" x2="150" y2="180" stroke="%23ffffff" stroke-width="3"/><text x="150" y="105" fill="%23ffffff" font-family="sans-serif" font-size="14" font-weight="bold" text-anchor="middle">BEACH TENNIS</text></svg>`;
       } else if (this.novaQuadra.modalidade.includes('Futsal')) {
-        this.novaQuadra.imagemUrl = 'https://images.unsplash.com/photo-1518063319789-7217e6706b04?q=80&w=300';
-      } else if (this.novaQuadra.modalidade.includes('Vôlei')) {
-        this.novaQuadra.imagemUrl = 'https://images.unsplash.com/photo-1547941126-3d5322b218b6?q=80&w=300';
+        this.novaQuadra.imagemUrl = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200"><rect width="300" height="200" fill="%230284c7"/><rect x="20" y="20" width="260" height="160" fill="%230369a1" stroke="%23ffffff" stroke-width="3" rx="8"/><line x1="150" y1="20" x2="150" y2="180" stroke="%23ffffff" stroke-width="3"/><circle cx="150" cy="100" r="30" fill="none" stroke="%23ffffff" stroke-width="3"/><text x="150" y="105" fill="%23ffffff" font-family="sans-serif" font-size="14" font-weight="bold" text-anchor="middle">FUTSAL</text></svg>`;
+      } else if (this.novaQuadra.modalidade.includes('Vôlei') || this.novaQuadra.modalidade.includes('Volei')) {
+        this.novaQuadra.imagemUrl = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200"><rect width="300" height="200" fill="%23ea580c"/><rect x="20" y="20" width="260" height="160" fill="%23f97316" stroke="%23ffffff" stroke-width="3" rx="8"/><line x1="150" y1="20" x2="150" y2="180" stroke="%23ffffff" stroke-width="3"/><text x="150" y="105" fill="%23ffffff" font-family="sans-serif" font-size="14" font-weight="bold" text-anchor="middle">VÔLEI</text></svg>`;
       } else {
-        this.novaQuadra.imagemUrl = 'https://images.unsplash.com/photo-1545807191-178a3752c51e?q=80&w=300';
+        this.novaQuadra.imagemUrl = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200"><rect width="300" height="200" fill="%2315803d"/><rect x="20" y="20" width="260" height="160" fill="%2316a34a" stroke="%23ffffff" stroke-width="3" rx="8"/><line x1="150" y1="20" x2="150" y2="180" stroke="%23ffffff" stroke-width="3"/><circle cx="150" cy="100" r="35" fill="none" stroke="%23ffffff" stroke-width="3"/><text x="150" y="105" fill="%23ffffff" font-family="sans-serif" font-size="14" font-weight="bold" text-anchor="middle">SOCIETY</text></svg>`;
       }
     }
 
@@ -427,7 +446,9 @@ export class QuadraFormComponent implements OnInit {
     if (this.quadraEditandoId) {
       this.quadraService.atualizar(this.quadraEditandoId, commandToSave).subscribe({
         next: () => {
-          this.salvarHorariosNaApi(this.quadraEditandoId!);
+          this.salvando = false;
+          this.successMessage = 'Informações gerais da quadra salvas com sucesso!';
+          setTimeout(() => this.router.navigate(['/quadras']), 1500);
         },
         error: (err) => {
           this.tratarErroSalvar(err);
@@ -437,11 +458,12 @@ export class QuadraFormComponent implements OnInit {
       this.quadraService.criar(commandToSave).subscribe({
         next: (res: any) => {
           const newId = res?.dados?.id || res?.id;
+          this.salvando = false;
           if (newId) {
             this.quadraEditandoId = newId;
-            this.salvarHorariosNaApi(newId);
+            this.successMessage = 'Quadra criada com sucesso! Agora você pode cadastrar os horários.';
+            this.abaAtivaForm = 'horarios';
           } else {
-            this.salvando = false;
             this.successMessage = 'Quadra criada com sucesso!';
             setTimeout(() => this.router.navigate(['/quadras']), 1500);
           }
@@ -450,6 +472,18 @@ export class QuadraFormComponent implements OnInit {
           this.tratarErroSalvar(err);
         }
       });
+    }
+  }
+
+  salvarApenasHorarios(): void {
+    this.erro = '';
+    this.successMessage = '';
+
+    if (this.quadraEditandoId) {
+      this.salvando = true;
+      this.salvarHorariosNaApi(this.quadraEditandoId);
+    } else {
+      this.salvarInformacoesGerais();
     }
   }
 
