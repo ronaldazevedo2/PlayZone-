@@ -295,18 +295,14 @@
             <!-- Grade de Checkboxes de Horários -->
             <div class="slots-checkbox-grid">
               <label *ngFor="let slot of slotsHorariosDisponiveis" class="slot-checkbox-card"
-                [class.checked]="horarioSlotSelecionado(slot)"
-                [class.salvo-banco]="isHorarioSalvoNoBanco(slot)">
+                [class.checked]="horarioSlotSelecionado(slot)">
                 <input type="checkbox" [checked]="horarioSlotSelecionado(slot)" (change)="alternarHorarioSlot(slot)" class="slot-checkbox-input">
                 <span class="custom-checkbox-box">
                   <svg *ngIf="horarioSlotSelecionado(slot)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
                     <polyline points="20 6 9 17 4 12"></polyline>
                   </svg>
                 </span>
-                <div class="slot-text-container">
-                  <span class="slot-time-text">{{ slot }}</span>
-                  <span class="slot-status-badge" *ngIf="isHorarioSalvoNoBanco(slot)">Cadastrado</span>
-                </div>
+                <span class="slot-time-text">{{ slot }}</span>
               </label>
             </div>
           </div>

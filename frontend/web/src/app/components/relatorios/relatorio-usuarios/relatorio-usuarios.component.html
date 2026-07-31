@@ -1,0 +1,273 @@
+<div class="relatorios-page-container">
+  <!-- Cabeçalho Principal -->
+  <div class="relatorios-header-bar">
+    <div class="relatorios-title-group">
+      <h1>Relatório Geral de Usuários</h1>
+      <p>Configure os filtros e selecione as informações para gerar o relatório</p>
+    </div>
+    <div class="relatorios-header-actions">
+      <button type="button" class="btn-secondary" (click)="limparFiltros()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+          <path d="M3 3v5h5"></path>
+        </svg>
+        Limpar filtros
+      </button>
+      <button type="button" class="btn-primary" (click)="gerarEVisualizarRelatorio()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        Visualizar Relatório
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="carregando">
+    <div class="spinner"></div>
+    <p>Carregando dados da API...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="alert alert-error" *ngIf="erro && !carregando">
+    <p>{{ erro }}</p>
+    <button type="button" class="btn-secondary btn-sm" (click)="carregarDadosBase()">Tentar Novamente</button>
+  </div>
+
+  <!-- SEÇÕES DE FILTROS (Estilo ERP ERP-Cards Grid) -->
+  <div class="filter-sections-grid" *ngIf="!carregando">
+    
+    <!-- 1. Período -->
+    <div class="erp-filter-card">
+      <div class="card-section-title">
+        <span class="section-number">1.</span>
+        <h3>Período</h3>
+      </div>
+      <div class="card-form-grid">
+        <div class="form-group">
+          <label>Data inicial</label>
+          <input type="date" [(ngModel)]="dataInicial" class="form-control">
+        </div>
+        <div class="form-group">
+          <label>Data final</label>
+          <input type="date" [(ngModel)]="dataFinal" class="form-control">
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Status do Usuário -->
+    <div class="erp-filter-card">
+      <div class="card-section-title">
+        <span class="section-number">2.</span>
+        <h3>Status do usuário</h3>
+      </div>
+      <div class="radio-options-group">
+        <label class="radio-label">
+          <input type="radio" name="filtroStatus" value="Todos" [(ngModel)]="filtroStatus">
+          <span>Todos</span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="filtroStatus" value="Ativos" [(ngModel)]="filtroStatus">
+          <span>Apenas ativos</span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="filtroStatus" value="Inativos" [(ngModel)]="filtroStatus">
+          <span>Apenas inativos</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- 3. Busca por Termo -->
+    <div class="erp-filter-card">
+      <div class="card-section-title">
+        <span class="section-number">3.</span>
+        <h3>Buscar por termo</h3>
+      </div>
+      <div class="form-group">
+        <input type="text" [(ngModel)]="termoBusca" placeholder="Nome, E-mail, CPF ou Telefone..." class="form-control">
+      </div>
+    </div>
+
+    <!-- 4. Ordenar Por -->
+    <div class="erp-filter-card">
+      <div class="card-section-title">
+        <span class="section-number">4.</span>
+        <h3>Ordenar por</h3>
+      </div>
+      <div class="form-group">
+        <select [(ngModel)]="ordenarPor" class="form-control">
+          <option value="nomeCompleto">Nome do Usuário</option>
+          <option value="email">E-mail</option>
+          <option value="cpf">CPF</option>
+          <option value="dataCriacao">Data de Cadastro</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 5. Ordem da Listagem -->
+    <div class="erp-filter-card">
+      <div class="card-section-title">
+        <span class="section-number">5.</span>
+        <h3>Ordem</h3>
+      </div>
+      <div class="radio-options-group inline-radios">
+        <label class="radio-label">
+          <input type="radio" name="ordem" value="asc" [(ngModel)]="ordem">
+          <span>Crescente</span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="ordem" value="desc" [(ngModel)]="ordem">
+          <span>Decrescente</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- 6. Informações a Mostrar no Relatório (Colunas Visíveis) -->
+    <div class="erp-filter-card full-width-card">
+      <div class="card-section-title">
+        <span class="section-number">6.</span>
+        <h3>Informações que deseja mostrar no relatório</h3>
+      </div>
+      <div class="checkbox-columns-grid">
+        <label *ngFor="let col of colunas" class="checkbox-label">
+          <input type="checkbox" [(ngModel)]="col.ativo">
+          <span>Mostrar {{ col.label }}</span>
+        </label>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Barra de Ações Inferior -->
+  <div class="bottom-action-bar" *ngIf="!carregando">
+    <button type="button" class="btn-secondary" (click)="limparFiltros()">Limpar filtros</button>
+    <button type="button" class="btn-primary" (click)="gerarEVisualizarRelatorio()">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      Visualizar Relatório
+    </button>
+  </div>
+</div>
+
+<!-- =========================================================
+     MODAL DE PRÉ-VISUALIZAÇÃO DO RELATÓRIO
+     ========================================================= -->
+<div class="modal-overlay" *ngIf="exibirModalPreview" (click)="fecharModalPreview()">
+  <div class="preview-modal-dialog" (click)="$event.stopPropagation()">
+    
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div class="modal-title-group">
+        <h2>Pré-visualização do Relatório de Usuários</h2>
+        <p class="modal-subtitle">Documento gerado dinamicamente com base nos filtros selecionados</p>
+      </div>
+      
+      <div class="modal-header-right-actions">
+        <!-- Botões de Exportação EXCLUSIVAMENTE no Topo do Modal (Sem Excel) -->
+        <div class="export-buttons-group">
+          <button type="button" class="btn-export btn-print" (click)="imprimir()" title="Imprimir Relatório">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 6 2 18 2 18 9"></polyline>
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+              <rect x="6" y="14" width="12" height="8"></rect>
+            </svg>
+            Imprimir
+          </button>
+
+          <button type="button" class="btn-export btn-pdf" (click)="exportarPdf()" title="Exportar em formato PDF">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+            PDF
+          </button>
+
+          <button type="button" class="btn-export btn-word" (click)="exportarWord()" title="Exportar em formato Word (.docx)">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <path d="M9 12h6"></path>
+              <path d="M9 16h6"></path>
+            </svg>
+            Word (.docx)
+          </button>
+        </div>
+
+        <button type="button" class="btn-close-modal" (click)="fecharModalPreview()" title="Fechar">&times;</button>
+      </div>
+    </div>
+
+    <!-- Modal Body: Document Preview -->
+    <div class="modal-body">
+      <div id="relatorio-preview-printable" class="printable-document-container">
+        
+        <!-- Header Institucional do Relatório -->
+        <div class="doc-header-banner">
+          <div class="doc-brand">
+            <h2 class="doc-logo-title">PLAY<span>ZONE</span></h2>
+            <span class="doc-subtitle-tag">PAINEL ADMINISTRATIVO — RELATÓRIO OFICIAL</span>
+          </div>
+          <div class="doc-meta-info">
+            <p><strong>Gerado em:</strong> {{ dataGeracaoStr }}</p>
+            <p><strong>Total de Registros:</strong> {{ usuariosFiltrados.length }} usuário(s)</p>
+          </div>
+        </div>
+
+        <div class="doc-title-block">
+          <h3>Relatório de Usuários Cadastrados</h3>
+          <div class="doc-filters-chips">
+            <span class="chip">Status: <strong>{{ filtroStatus }}</strong></span>
+            <span class="chip" *ngIf="termoBusca">Busca: <strong>"{{ termoBusca }}"</strong></span>
+            <span class="chip">Período: <strong>{{ dataInicial || 'Início' }} até {{ dataFinal || 'Atual' }}</strong></span>
+          </div>
+        </div>
+
+        <!-- Empty Results Alert -->
+        <div class="empty-results-box" *ngIf="usuariosFiltrados.length === 0">
+          <p>Nenhum usuário foi encontrado para os filtros selecionados.</p>
+        </div>
+
+        <!-- Tabela do Relatório Dinâmico -->
+        <div class="table-container" *ngIf="usuariosFiltrados.length > 0">
+          <table class="data-table preview-report-table">
+            <thead>
+              <tr>
+                <th *ngFor="let col of getColunasAtivas()">{{ col.label }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let u of usuariosFiltrados">
+                <td *ngFor="let col of getColunasAtivas()">
+                  <ng-container [ngSwitch]="col.key">
+                    <span *ngSwitchCase="'statusFormatado'" class="status-badge" [class.status-active]="u.ativo" [class.status-inactive]="!u.ativo">
+                      {{ u.ativo ? 'Ativo' : 'Inativo' }}
+                    </span>
+                    <span *ngSwitchDefault>
+                      {{ getValorCampo(u, col.key) }}
+                    </span>
+                  </ng-container>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Rodapé do Relatório -->
+        <div class="doc-footer">
+          <p>Documento gerado automaticamente pelo Sistema PlayZone. Todos os direitos reservados.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer: Apenas Botão Fechar -->
+    <div class="modal-footer modal-footer-simple">
+      <button type="button" class="btn-secondary" (click)="fecharModalPreview()">Fechar</button>
+    </div>
+
+  </div>
+</div>

@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { QuadraService, ReservaQuadraDto } from '../../../services/quadra.service';
 import { ReservaService, ReservaDto, CriarReservaCommand } from '../../../services/reserva.service';
 import { DataHorarioReservaService } from '../../../services/data-horario-reserva.service';
@@ -39,6 +41,7 @@ export class ReservaFormComponent implements OnInit {
   formQuadraId = '';
   formData = '';
   formHorario = '';
+  formHorarios: string[] = []; // Array para seleção múltipla de horários
   formUsuarioId = '';
   formUsuarioNome = '';
   formUsuarioEmail = '';
@@ -75,7 +78,7 @@ export class ReservaFormComponent implements OnInit {
       this.reservaEditandoId = idParam;
       this.carregarReserva(idParam);
     } else {
-      // Default date: tomorrow
+      // Data padrão: amanhã
       const d = new Date();
       d.setDate(d.getDate() + 1);
       this.formData = d.toISOString().split('T')[0];
@@ -107,6 +110,9 @@ export class ReservaFormComponent implements OnInit {
 
           const horarioRaw = r.horarioAgendado || r.horario || r.HorarioAgendado || '';
           this.formHorario = this.formatHorarioShort(horarioRaw);
+          if (this.formHorario) {
+            this.formHorarios = [this.formHorario];
+          }
 
           this.formUsuarioId = r.usuarioId || r.usuariosId || r.UsuariosId || r.id || '';
           this.formUsuarioNome = r.nomeUsuario || r.usuarioNome || r.nomeCompleto || '';
@@ -282,48 +288,93 @@ export class ReservaFormComponent implements OnInit {
     this.fecharBuscarUsuario();
   }
 
+  // --- Métodos de Seleção de Horários Múltiplos ---
+  toggleHorario(horario: string, disponivel: boolean): void {
+    if (!disponivel) return;
+
+    const idx = this.formHorarios.indexOf(horario);
+    if (idx > -1) {
+      this.formHorarios.splice(idx, 1);
+    } else {
+      this.formHorarios.push(horario);
+    }
+
+    if (this.formHorarios.length > 0) {
+      this.formHorario = this.formHorarios[0];
+    } else {
+      this.formHorario = '';
+    }
+  }
+
+  isHorarioSelecionado(horario: string): boolean {
+    return this.formHorarios.includes(horario) || this.formHorario === horario;
+  }
+
   validarForm(): boolean {
     this.errosForm = [];
     if (!this.formQuadraId) this.errosForm.push('Selecione uma quadra.');
     if (!this.formData) this.errosForm.push('Informe a data da reserva.');
-    if (!this.formHorario) this.errosForm.push('Informe o horário da reserva.');
+
+    const temHorarios = this.formHorarios.length > 0 || !!this.formHorario;
+    if (!temHorarios) this.errosForm.push('Selecione ao menos um horário para a reserva.');
+
     if (!this.formUsuarioId) this.errosForm.push('Selecione um usuário.');
     return this.errosForm.length === 0;
   }
 
+  /**
+   * Ao clicar no botão Salvar Reserva, itera sobre a lista de horários selecionados
+   * e envia cada CriarReservaCommand 1 a 1 para a API (this.reservaService.criar(command)).
+   */
   salvarReserva(): void {
     if (!this.validarForm()) return;
 
     this.salvando = true;
     this.errosForm = [];
 
-    const horarioFormatted = this.formHorario.length === 5 ? `${this.formHorario}:00` : this.formHorario;
-    const command: CriarReservaCommand = {
-      quadraId: this.formQuadraId,
-      usuarioId: this.formUsuarioId,
-      dataAgendada: new Date(this.formData).toISOString(),
-      horarioAgendado: horarioFormatted
-    };
+    // Coleta a lista final de horários selecionados
+    const listaHorarios = this.formHorarios.length > 0
+      ? [...this.formHorarios]
+      : (this.formHorario ? [this.formHorario] : []);
 
-    this.reservaService.criar(command).subscribe({
-      next: (res: RespostaApi<ReservaDto>) => {
+    // Monta os comandos CriarReservaCommand para enviar 1 a 1 à API
+    const comandos: CriarReservaCommand[] = listaHorarios.map(h => {
+      const horarioFormatted = h.length === 5 ? `${h}:00` : h;
+      const dataIsoFormat = this.formData.includes('T') ? this.formData : `${this.formData}T00:00:00`;
+
+      return {
+        quadraId: this.formQuadraId,
+        usuarioId: this.formUsuarioId,
+        dataAgendada: dataIsoFormat,
+        horarioAgendado: horarioFormatted
+      };
+    });
+
+    // Mapeia cada comando para uma chamada HTTP individual enviada 1 a 1 via forkJoin
+    const requests = comandos.map(cmd =>
+      this.reservaService.criar(cmd).pipe(
+        catchError(err => of({ ok: false, error: err }))
+      )
+    );
+
+    forkJoin(requests).subscribe({
+      next: (results: any[]) => {
         this.salvando = false;
-        if (res && res.ok) {
-          this.successMessage = 'Reserva salva com sucesso!';
+        const sucessos = results.filter(r => r?.ok !== false && !r?.error).length;
+
+        if (sucessos > 0) {
+          this.successMessage = `${sucessos} reserva(s) enviada(s) e cadastrada(s) 1 a 1 com sucesso!`;
           setTimeout(() => {
             this.router.navigate(['/reservas']);
           }, 1200);
         } else {
-          this.errosForm = res?.erros?.length ? res.erros : ['Erro ao salvar reserva.'];
+          this.errosForm = ['Erro ao salvar as reservas na API.'];
         }
       },
       error: (err) => {
         this.salvando = false;
-        console.warn('Erro na API ao salvar reserva.', err);
-        this.successMessage = 'Reserva registrada com sucesso!';
-        setTimeout(() => {
-          this.router.navigate(['/reservas']);
-        }, 1200);
+        console.error('Erro na requisição das reservas:', err);
+        this.errosForm = ['Ocorreu um erro ao comunicar com a API de Reservas.'];
       }
     });
   }
@@ -334,6 +385,7 @@ export class ReservaFormComponent implements OnInit {
 
   onQuadraOuDataChange(): void {
     this.horariosCadastradosAdmin = [];
+    this.formHorarios = [];
     this.semHorariosMensagem = '';
 
     if (!this.formQuadraId || !this.formData) {

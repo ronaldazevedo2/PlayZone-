@@ -29,14 +29,18 @@
   width: 420px;
 }
 
+.data-table {
+  min-width: 900px;
+}
+
 /* Larguras das colunas — 7 colunas (Quadras) */
 .data-table th:nth-child(1) {
-  width: 26%;
+  width: 24%;
 }
 
 /* Quadra (foto + nome) */
 .data-table th:nth-child(2) {
-  width: 12%;
+  width: 10%;
 }
 
 /* Tipo */
@@ -46,12 +50,12 @@
 
 /* Capacidade */
 .data-table th:nth-child(4) {
-  width: 18%;
+  width: 24%;
 }
 
 /* Dias Disponíveis */
 .data-table th:nth-child(5) {
-  width: 12%;
+  width: 14%;
 }
 
 /* Horários */
@@ -61,13 +65,11 @@
 
 /* Status */
 .data-table th:nth-child(7) {
-  width: 12%;
+  width: 8%;
   text-align: right;
 }
 
 /* Ações */
-
-
 .data-table td:nth-child(7) {
   text-align: right;
 }
@@ -1139,7 +1141,10 @@ input:checked+.switch-slider:before {
 /* Days Indicator */
 .days-indicator {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   gap: 4px;
+  max-width: 100%;
 }
 
 .day-badge {
@@ -1149,6 +1154,7 @@ input:checked+.switch-slider:before {
   border-radius: 4px;
   background-color: #f1f3f5;
   color: #adb5bd;
+  white-space: nowrap;
 }
 
 .day-badge.available {
@@ -1161,6 +1167,7 @@ input:checked+.switch-slider:before {
 .hours-info {
   display: flex;
   flex-direction: column;
+  white-space: nowrap;
 }
 
 .hours-range {

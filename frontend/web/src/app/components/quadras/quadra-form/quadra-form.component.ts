@@ -159,7 +159,7 @@ export class QuadraFormComponent implements OnInit {
         this.horariosSalvosGlobal.clear();
         // Handle both wrapped and direct array responses
         const dados = res?.dados ?? res;
-        if (Array.isArray(dados)) {
+        if (Array.isArray(dados) && dados.length > 0) {
           dados.forEach((item: DataHorarioReservaDto) => {
             // API returns data as "2026-07-28T00:00:00" and horario as "08:00:00"
             const dataISO = this.apiDataParaISO(item.data);
@@ -179,28 +179,31 @@ export class QuadraFormComponent implements OnInit {
             }
             this.horariosSalvosGlobal.get(dataISO)!.add(horarioShort);
           });
+          this.gerarCalendario();
+        } else {
+          this.carregarFallbackDisponibilidade(quadraId);
         }
-        this.gerarCalendario();
       },
       error: () => {
-        // If API fails, try localStorage fallback
-        this.quadraService.obterDisponibilidade(quadraId).subscribe({
-          next: (res: any) => {
-            if (res && res.ok && res.dados && Array.isArray(res.dados)) {
-              res.dados.forEach((item: any) => {
-                if (item.data && Array.isArray(item.horarios)) {
-                  this.disponibilidadePorData[item.data] = [...item.horarios];
-                }
-              });
-            }
-            this.gerarCalendario();
-          },
-          error: () => {
-            this.gerarCalendario();
-          }
-        });
+        this.carregarFallbackDisponibilidade(quadraId);
       }
     });
+  }
+
+  private carregarFallbackDisponibilidade(quadraId: string): void {
+    this.preencherDisponibilidadePadrao();
+    this.gerarCalendario();
+  }
+
+  private preencherDisponibilidadePadrao(): void {
+    const ano = this.dataCalendarioAtual.getFullYear();
+    const mes = this.dataCalendarioAtual.getMonth();
+    const totalDias = new Date(ano, mes + 1, 0).getDate();
+
+    for (let d = 1; d <= totalDias; d++) {
+      const iso = `${ano}-${String(mes + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      this.disponibilidadePorData[iso] = [...this.slotsHorariosDisponiveis];
+    }
   }
 
   /**
@@ -309,8 +312,8 @@ export class QuadraFormComponent implements OnInit {
 
   selecionarData(dataISO: string): void {
     this.dataSelecionadaISO = dataISO;
-    if (!this.disponibilidadePorData[dataISO]) {
-      this.disponibilidadePorData[dataISO] = [];
+    if (!this.disponibilidadePorData[dataISO] || this.disponibilidadePorData[dataISO].length === 0) {
+      this.disponibilidadePorData[dataISO] = [...this.slotsHorariosDisponiveis];
     }
     this.gerarCalendario();
   }

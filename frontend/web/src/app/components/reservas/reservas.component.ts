@@ -5,6 +5,7 @@ import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { QuadraService, ReservaQuadraDto } from '../../services/quadra.service';
 import { ReservaService, ReservaDto, CriarReservaCommand } from '../../services/reserva.service';
+import { DataHorarioReservaService } from '../../services/data-horario-reserva.service';
 import { AuthService } from '../../services/auth.service';
 import { RespostaApi } from '../../wrappers/api-response.wrapper';
 import { ResultadoPaginado } from '../../services/secretaria.service';
@@ -82,6 +83,7 @@ export class ReservasComponent implements OnInit {
   constructor(
     private quadraService: QuadraService,
     private reservaService: ReservaService,
+    private dataHorarioService: DataHorarioReservaService,
     private authService: AuthService,
     private http: HttpClient,
     private router: Router,
@@ -343,20 +345,29 @@ export class ReservasComponent implements OnInit {
       this.disponibilidadeMap.clear();
       return;
     }
-    this.quadraService.obterDisponibilidade(this.formQuadraId).subscribe({
+    this.dataHorarioService.listarPorQuadra(this.formQuadraId).subscribe({
       next: (res: any) => {
-        if (res && res.ok && res.dados) {
-          // Assume res.dados is an array of { data: string, horarios: string[] }
-          this.availableDates = res.dados.map((d: any) => d.data);
-          this.disponibilidadeMap.clear();
-          res.dados.forEach((d: any) => {
-            this.disponibilidadeMap.set(d.data, d.horarios);
+        const dados = res?.dados ?? res;
+        if (Array.isArray(dados) && dados.length > 0) {
+          const mapData = new Map<string, string[]>();
+          dados.forEach((d: any) => {
+            const dataIso = d.data ? d.data.split('T')[0] : '';
+            const horarioShort = d.horario ? d.horario.substring(0, 5) : '';
+            if (dataIso) {
+              if (!mapData.has(dataIso)) {
+                mapData.set(dataIso, []);
+              }
+              if (horarioShort && !mapData.get(dataIso)!.includes(horarioShort)) {
+                mapData.get(dataIso)!.push(horarioShort);
+              }
+            }
           });
+          this.availableDates = Array.from(mapData.keys());
+          this.disponibilidadeMap = mapData;
         } else {
           this.availableDates = [];
           this.disponibilidadeMap.clear();
         }
-        // Reset date and time selections
         this.formData = '';
         this.formHorario = '';
         this.availableTimes = [];

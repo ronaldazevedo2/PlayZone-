@@ -23,6 +23,10 @@
   border-top: 1px solid var(--border-color, #e2e8f0);
 }
 
+.data-table {
+  min-width: 950px;
+}
+
 /* Larguras das colunas — 8 colunas (Vigilantes) */
 .data-table th:nth-child(1) {
   width: 22%;

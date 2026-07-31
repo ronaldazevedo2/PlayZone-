@@ -40,6 +40,11 @@ export const routes: Routes = [
       { path: 'reservas/nova', loadComponent: () => import('./components/reservas/reserva-form/reserva-form.component').then(m => m.ReservaFormComponent) },
       { path: 'reservas/editar/:id', loadComponent: () => import('./components/reservas/reserva-form/reserva-form.component').then(m => m.ReservaFormComponent) },
 
+      // Relatórios
+      { path: 'relatorios', redirectTo: 'relatorios/usuarios', pathMatch: 'full' },
+      { path: 'relatorios/usuarios', loadComponent: () => import('./components/relatorios/relatorio-usuarios/relatorio-usuarios.component').then(m => m.RelatorioUsuariosComponent) },
+      { path: 'relatorios/quadras', loadComponent: () => import('./components/relatorios/relatorio-quadras/relatorio-quadras.component').then(m => m.RelatorioQuadrasComponent) },
+
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },
