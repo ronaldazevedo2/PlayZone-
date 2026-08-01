@@ -1,25 +1,25 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "mobile",
-            "request": "launch",
-            "type": "dart"
-        },
-        {
-            "name": "mobile (profile mode)",
+            "name": "Iniciar Flutter AppVigilante",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "profile"
+            "program": "lib/main.dart"
         },
         {
-            "name": "mobile (release mode)",
+            "name": "Iniciar Flutter AppVigilante (modo perfil)",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "release"
+            "flutterMode": "profile",
+            "program": "lib/main.dart"
+        },
+        {
+            "name": "Iniciar Flutter AppVigilante (modo release)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release",
+            "program": "lib/main.dart"
         }
     ]
 }

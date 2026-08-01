@@ -10,7 +10,6 @@ import 'telas/tela_notificacoes.dart';
 import 'telas/tela_sobre_aplicativo.dart';
 import 'telas/tela_termos_uso.dart';
 import 'telas/tela_politica_privacidade.dart';
-import 'telas/tela_feedback.dart';
 import 'estado_central.dart';
 
 void main() async {
