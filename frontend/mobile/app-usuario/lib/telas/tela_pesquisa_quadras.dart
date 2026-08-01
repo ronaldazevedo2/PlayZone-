@@ -310,14 +310,11 @@ class _TelaPesquisaQuadrasEstado extends State<TelaPesquisaQuadras> {
                   height: 180,
                   width: double.infinity,
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => Container(
+                  errorBuilder: (context, error, stackTrace) => Image.network(
+                    'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=600&auto=format&fit=crop',
                     height: 180,
-                    color: const Color(0xFFE2E8F0),
-                    child: const Icon(
-                      Icons.stadium,
-                      size: 50,
-                      color: Color(0xFF94A3B8),
-                    ),
+                    width: double.infinity,
+                    fit: BoxFit.cover,
                   ),
                 ),
               ),

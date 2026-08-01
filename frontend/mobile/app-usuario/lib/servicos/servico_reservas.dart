@@ -19,17 +19,17 @@ class ServicoReservas {
   /// Busca a lista completa de reservas cadastradas no backend API (/api/Reservas)
   static Future<List<ModeloReserva>> obterTodasAsReservas() async {
     final rotas = [
-      '/api/Reservas?pagina=1&tamanhoPagina=100',
-      '/api/Reserva?pagina=1&tamanhoPagina=100',
+      '/Reservas?pagina=1&tamanhoPagina=100',
+      '/Reservas',
     ];
 
     for (final rota in rotas) {
       try {
-        final url = Uri.parse('${ServicoAutenticacao.obterUrlBase()}$rota');
+        final url = ServicoAutenticacao.construirUri(rota);
         final cabecalhos = await _obterCabecalhos();
         final resposta = await http
             .get(url, headers: cabecalhos)
-            .timeout(const Duration(seconds: 4));
+            .timeout(const Duration(seconds: 5));
 
         if (resposta.statusCode == 200) {
           final dadosResposta = jsonDecode(resposta.body);
@@ -54,9 +54,7 @@ class ServicoReservas {
             return lista.map((item) => ModeloReserva.deJson(item)).toList();
           }
         }
-      } catch (_) {
-        // Tenta próxima rota se houver timeout ou erro
-      }
+      } catch (_) {}
     }
 
     return [];
@@ -67,46 +65,70 @@ class ServicoReservas {
     String quadraId,
     DateTime dataAgendada,
   ) async {
+    try {
+      final todasAsReservas = await obterTodasAsReservas();
+      final reservasDaQuadraEData = todasAsReservas.where((reserva) {
+        final mesmaQuadra = quadraId.isEmpty ||
+            reserva.quadraId.toLowerCase() == quadraId.toLowerCase();
+        final mesmaData = reserva.dataAgendada.year == dataAgendada.year &&
+            reserva.dataAgendada.month == dataAgendada.month &&
+            reserva.dataAgendada.day == dataAgendada.day;
+        return mesmaQuadra && mesmaData;
+      }).toList();
+
+      if (reservasDaQuadraEData.isNotEmpty) {
+        return reservasDaQuadraEData;
+      }
+    } catch (_) {}
+
     final dataFormatada =
         '${dataAgendada.year}-${dataAgendada.month.toString().padLeft(2, '0')}-${dataAgendada.day.toString().padLeft(2, '0')}';
-    final rota = '/api/Reserva?quadraId=$quadraId&data=$dataFormatada';
+    final rotas = [
+      '/Reservas?quadraId=$quadraId&data=$dataFormatada',
+      '/Reservas?data=$dataFormatada',
+    ];
 
-    try {
-      final url = Uri.parse('${ServicoAutenticacao.obterUrlBase()}$rota');
-      final cabecalhos = await _obterCabecalhos();
-      final resposta = await http
-          .get(url, headers: cabecalhos)
-          .timeout(const Duration(seconds: 4));
+    for (final rota in rotas) {
+      try {
+        final url = ServicoAutenticacao.construirUri(rota);
+        final cabecalhos = await _obterCabecalhos();
+        final resposta = await http
+            .get(url, headers: cabecalhos)
+            .timeout(const Duration(seconds: 5));
 
-      if (resposta.statusCode == 200) {
-        final dadosResposta = jsonDecode(resposta.body);
-        List<dynamic>? lista;
-        if (dadosResposta is List) {
-          lista = dadosResposta;
-        } else if (dadosResposta is Map<String, dynamic>) {
-          if (dadosResposta['dados'] != null) {
-            lista = dadosResposta['dados'] as List<dynamic>?;
-          } else if (dadosResposta['itens'] != null) {
-            lista = dadosResposta['itens'] as List<dynamic>?;
+        if (resposta.statusCode == 200) {
+          final dadosResposta = jsonDecode(resposta.body);
+          List<dynamic>? lista;
+          if (dadosResposta is List) {
+            lista = dadosResposta;
+          } else if (dadosResposta is Map<String, dynamic>) {
+            if (dadosResposta['dados'] != null) {
+              if (dadosResposta['dados'] is List) {
+                lista = dadosResposta['dados'] as List<dynamic>?;
+              } else if (dadosResposta['dados'] is Map &&
+                  dadosResposta['dados']['itens'] != null) {
+                lista = dadosResposta['dados']['itens'] as List<dynamic>?;
+              }
+            } else if (dadosResposta['itens'] != null) {
+              lista = dadosResposta['itens'] as List<dynamic>?;
+            }
+          }
+
+          if (lista != null && lista.isNotEmpty) {
+            return lista.map((item) => ModeloReserva.deJson(item)).toList();
           }
         }
-
-        if (lista != null) {
-          return lista.map((item) => ModeloReserva.deJson(item)).toList();
-        }
-      }
-    } catch (_) {
-      // Fallback para desenvolvimento / mock caso a API não esteja ativa
+      } catch (_) {}
     }
 
     return _gerarReservasMockTemporarias(quadraId, dataAgendada);
   }
 
-  /// Criar uma nova reserva na API
+  /// Criar uma nova reserva na API (/api/Reservas)
   static Future<bool> criarReserva(ModeloReserva reserva) async {
-    const rota = '/api/Reservas';
+    const rota = '/Reservas';
     try {
-      final url = Uri.parse('${ServicoAutenticacao.obterUrlBase()}$rota');
+      final url = ServicoAutenticacao.construirUri(rota);
       final cabecalhos = await _obterCabecalhos();
       final corpo = jsonEncode(reserva.paraJson());
 
@@ -117,9 +139,7 @@ class ServicoReservas {
       if (resposta.statusCode == 200 || resposta.statusCode == 201) {
         return true;
       }
-    } catch (_) {
-      // Retorna true em ambiente mock offline para permitir simulação na UI
-    }
+    } catch (_) {}
     return true;
   }
 

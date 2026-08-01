@@ -30,24 +30,31 @@ class QuadraEsportiva {
   });
 
   factory QuadraEsportiva.deJson(Map<String, dynamic> json) {
-    final id = json['id']?.toString() ?? '';
-    final nome = json['nome'] ?? 'Sem Nome';
-    final modalidade = json['modalidade'] ?? 'Poliesportiva';
-    final localizacao = json['localizacao'] ?? json['localidade'] ?? 'Centro';
-    final capacidade = json['capacidade'] ?? 10;
-    final descricao = json['descricao'] ?? 'Quadra esportiva para jogos e treinos.';
-    final imagemUrl = json['imagemUrl'];
-    final statusRaw = json['status'] ?? 'Ativa';
+    final id = (json['id'] ?? json['Id'])?.toString() ?? '';
+    final nome = (json['nome'] ?? json['Nome'])?.toString() ?? 'Quadra Poliesportiva';
+    final modalidade = (json['modalidade'] ?? json['Modalidade'])?.toString() ?? 'Futebol';
+    final localizacao =
+        (json['localizacao'] ?? json['Localizacao'] ?? json['localidade'])
+            ?.toString() ??
+        'Centro';
+
+    final capRaw = json['capacidade'] ?? json['Capacidade'];
+    final int capacidade = capRaw is int
+        ? capRaw
+        : (int.tryParse(capRaw?.toString() ?? '') ?? 10);
+
+    final descricao = (json['descricao'] ?? json['Descricao'])?.toString() ??
+        'Quadra poliesportiva oficial para treinos e jogos.';
+    final imagemUrl = (json['imagemUrl'] ?? json['ImagemUrl'])?.toString();
+    final status = (json['status'] ?? json['Status'])?.toString() ?? 'Ativa';
 
     final bairro = _extrairBairro(localizacao);
     final endereco = localizacao;
-    
     final precoPorHora = capacidade > 0 ? (capacidade * 15.0) : 150.0;
 
     final hash = id.hashCode.abs();
     final distanciaEmKm = 1.0 + (hash % 40) / 10.0;
     final avaliacaoCalculada = 4.2 + (hash % 8) / 10.0;
-
     final caminhoImagem = _obterImagemEsporte(imagemUrl, modalidade);
 
     return QuadraEsportiva(
@@ -59,8 +66,10 @@ class QuadraEsportiva {
       capacidade: capacidade,
       descricao: descricao,
       precoPorHora: precoPorHora,
-      estaDisponivel: statusRaw.toString().toLowerCase() != 'indisponível' && statusRaw.toString().toLowerCase() != 'indisponivel',
-      status: statusRaw.toString(),
+      estaDisponivel: status.toLowerCase() != 'inativa' &&
+          status.toLowerCase() != 'indisponivel' &&
+          status.toLowerCase() != 'indisponível',
+      status: status,
       avaliacao: double.parse(avaliacaoCalculada.toStringAsFixed(1)),
       distanciaEmKm: distanciaEmKm,
       caminhoImagem: caminhoImagem,
@@ -94,14 +103,26 @@ class QuadraEsportiva {
   }
 
   static String _obterImagemEsporte(String? imagemUrl, String modalidade) {
-    if (imagemUrl != null && imagemUrl.isNotEmpty) return imagemUrl;
+    if (imagemUrl != null &&
+        imagemUrl.trim().isNotEmpty &&
+        (imagemUrl.startsWith('http://') || imagemUrl.startsWith('https://')) &&
+        !imagemUrl.contains('exemplo.com') &&
+        !imagemUrl.contains('example.com') &&
+        !imagemUrl.contains('localhost')) {
+      return imagemUrl.trim();
+    }
     final mod = modalidade.toLowerCase();
     if (mod.contains('tenis') || mod.contains('tênis')) {
       return 'https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?q=80&w=600&auto=format&fit=crop';
-    } else if (mod.contains('futebol') || mod.contains('soccer') || mod.contains('society')) {
+    } else if (mod.contains('futebol') ||
+        mod.contains('soccer') ||
+        mod.contains('society') ||
+        mod.contains('futsal')) {
       return 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=600&auto=format&fit=crop';
     } else if (mod.contains('basquete') || mod.contains('basketball')) {
       return 'https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=600&auto=format&fit=crop';
+    } else if (mod.contains('volei') || mod.contains('vôlei')) {
+      return 'https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?q=80&w=600&auto=format&fit=crop';
     }
     return 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=600&auto=format&fit=crop';
   }

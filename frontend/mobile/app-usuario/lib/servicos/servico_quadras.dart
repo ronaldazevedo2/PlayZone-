@@ -23,7 +23,7 @@ class ServicoQuadras {
     String rota,
     dynamic corpo,
   ) async {
-    final url1 = Uri.parse('${ServicoAutenticacao.obterUrlBase()}$rota');
+    final url1 = ServicoAutenticacao.construirUri(rota);
     final corpoString = corpo != null ? jsonEncode(corpo) : null;
     final cabecalhos = await _obterCabecalhos();
 
@@ -31,41 +31,41 @@ class ServicoQuadras {
       if (metodo == 'GET') {
         return await http
             .get(url1, headers: cabecalhos)
-            .timeout(const Duration(seconds: 4));
+            .timeout(const Duration(seconds: 5));
       } else if (metodo == 'POST') {
         return await http
             .post(url1, headers: cabecalhos, body: corpoString)
-            .timeout(const Duration(seconds: 4));
+            .timeout(const Duration(seconds: 5));
       } else if (metodo == 'PUT') {
         return await http
             .put(url1, headers: cabecalhos, body: corpoString)
-            .timeout(const Duration(seconds: 4));
+            .timeout(const Duration(seconds: 5));
       } else if (metodo == 'DELETE') {
         return await http
             .delete(url1, headers: cabecalhos)
-            .timeout(const Duration(seconds: 4));
+            .timeout(const Duration(seconds: 5));
       }
       throw Exception('Método HTTP não suportado: $metodo');
     } catch (_) {
       try {
         ServicoAutenticacao.alternarUrlBase();
-        final urlNova = Uri.parse('${ServicoAutenticacao.obterUrlBase()}$rota');
+        final urlNova = ServicoAutenticacao.construirUri(rota);
         if (metodo == 'GET') {
           return await http
               .get(urlNova, headers: cabecalhos)
-              .timeout(const Duration(seconds: 4));
+              .timeout(const Duration(seconds: 5));
         } else if (metodo == 'POST') {
           return await http
               .post(urlNova, headers: cabecalhos, body: corpoString)
-              .timeout(const Duration(seconds: 4));
+              .timeout(const Duration(seconds: 5));
         } else if (metodo == 'PUT') {
           return await http
               .put(urlNova, headers: cabecalhos, body: corpoString)
-              .timeout(const Duration(seconds: 4));
+              .timeout(const Duration(seconds: 5));
         } else if (metodo == 'DELETE') {
           return await http
               .delete(urlNova, headers: cabecalhos)
-              .timeout(const Duration(seconds: 4));
+              .timeout(const Duration(seconds: 5));
         }
         throw Exception('Método HTTP não suportado: $metodo');
       } catch (erroConexao) {
@@ -76,21 +76,27 @@ class ServicoQuadras {
     }
   }
 
-  /// Busca a lista completa de quadras
+  /// Busca a lista completa de quadras via ListaQuadraHandler do C# backend (/api/Quadra)
   static Future<List<QuadraEsportiva>> obterQuadras() async {
     try {
       final resposta = await _fazerRequisicao(
         'GET',
-        '/api/Quadra?pagina=1&tamanhoPagina=100',
+        '/Quadra?pagina=1&tamanhoPagina=100',
         null,
       );
 
       if (resposta.statusCode == 200) {
         final dadosResposta = jsonDecode(resposta.body);
         if (dadosResposta is Map<String, dynamic>) {
-          final bool ok = dadosResposta['ok'] ?? false;
+          final bool ok = dadosResposta['ok'] ?? true;
           if (ok && dadosResposta['dados'] != null) {
-            final itens = dadosResposta['dados']['itens'] as List<dynamic>?;
+            final dados = dadosResposta['dados'];
+            List<dynamic>? itens;
+            if (dados is Map) {
+              itens = (dados['itens'] ?? dados['Itens']) as List<dynamic>?;
+            } else if (dados is List) {
+              itens = dados;
+            }
             if (itens != null) {
               return itens.map((item) => QuadraEsportiva.deJson(item)).toList();
             }
@@ -99,9 +105,7 @@ class ServicoQuadras {
           return dadosResposta.map((item) => QuadraEsportiva.deJson(item)).toList();
         }
       }
-    } catch (_) {
-      // Retorna quadras de fallback em ambiente local/offline
-    }
+    } catch (_) {}
 
     return [
       QuadraEsportiva(
