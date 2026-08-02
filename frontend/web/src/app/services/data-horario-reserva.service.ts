@@ -61,19 +61,6 @@ export class DataHorarioReservaService {
   }
 
   /**
-   * Envia especificamente para POST /api/DataHorarioReserva/quadra/{quadraId}
-   */
-  criarPorQuadra(quadraId: string, command: CriarDataHorarioReservaCommand): Observable<RespostaApi<DataHorarioReservaDto>> {
-    return this.http
-      .post<RespostaApi<DataHorarioReservaDto>>(
-        `${this.BASE_URL}`,
-        command,
-        { headers: this.getHeaders() }
-      )
-      .pipe(catchError(this.handleError));
-  }
-
-  /**
    * Lista horários cadastrados, com filtro opcional por quadraId e/ou data.
    * GET /api/DataHorarioReserva?quadraId=xxx&data=yyyy-MM-dd
    */
@@ -105,13 +92,6 @@ export class DataHorarioReservaService {
         { headers: this.getHeaders() }
       )
       .pipe(catchError(this.handleError));
-  }
-
-  /**
-   * Lista horários de uma quadra e data.
-   */
-  listarPorQuadraEData(quadraId: string, data: string): Observable<RespostaApi<DataHorarioReservaDto[]>> {
-    return this.listar(quadraId, data);
   }
 
   /**

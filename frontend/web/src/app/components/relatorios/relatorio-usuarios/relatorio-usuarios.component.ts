@@ -193,16 +193,4 @@ export class RelatorioUsuariosComponent implements OnInit {
     }));
     this.exportService.exportarUsuariosPdf(usuariosParaExport, this.filtroStatus, this.termoBusca);
   }
-
-  exportarWord(): void {
-    const colunasAtivas = this.getColunasAtivas().map(c => ({ key: c.key, label: c.label }));
-    const dadosMapeados = this.usuariosFiltrados.map(u => {
-      const row: any = {};
-      colunasAtivas.forEach(c => {
-        row[c.key] = this.getValorCampo(u, c.key);
-      });
-      return row;
-    });
-    this.exportService.exportarUsuariosWord(dadosMapeados, colunasAtivas, 'relatorio_usuarios');
-  }
 }

@@ -25,8 +25,8 @@ export class QuadrasComponent implements OnInit {
   // Filtros e busca da listagem
   buscaTexto = '';
   termoBusca = '';
-  filtroStatus: 'Todas' | 'Ativas' | 'Manutenção' | 'Inativas' = 'Todas';
-  abaAtiva: 'Todas' | 'Ativas' | 'Manutenção' | 'Inativas' = 'Todas';
+  filtroStatus: 'Todas' | 'Ativas' | 'Agendadas' | 'Manutenção' | 'Inativas' = 'Todas';
+  abaAtiva: 'Todas' | 'Ativas' | 'Agendadas' | 'Manutenção' | 'Inativas' = 'Todas';
   ordenacao: 'nome-asc' | 'nome-desc' | 'capacidade-asc' | 'capacidade-desc' = 'nome-asc';
 
   // Paginação
@@ -38,6 +38,7 @@ export class QuadrasComponent implements OnInit {
   // Estatísticas
   totalQuadrasCount = 0;
   ativasCount = 0;
+  agendadasCount = 0;
   manutencaoCount = 0;
   horariosCount = 0;
 
@@ -68,9 +69,7 @@ export class QuadrasComponent implements OnInit {
 
   ngOnInit(): void {
     this.carregarQuadras();
-
   }
-
 
   mostrarToast(titulo: string, mensagem: string, tipo: 'erro' | 'aviso' | 'sucesso' = 'erro', duracaoMs = 6000): void {
     if (this.toastTimer) clearTimeout(this.toastTimer);
@@ -130,10 +129,19 @@ export class QuadrasComponent implements OnInit {
     });
   }
 
+  isAgendada(q: ReservaQuadraDto): boolean {
+    if (!q || !q.dataLiberacao) return false;
+    const hojeStr = new Date().toISOString().split('T')[0];
+    const dataLibStr = q.dataLiberacao.split('T')[0];
+    return dataLibStr > hojeStr;
+  }
+
   aplicarFiltrosLocais(): void {
     let resultado = [...this.quadras];
     if (this.abaAtiva === 'Ativas') {
-      resultado = resultado.filter(q => q.status === 'Ativa');
+      resultado = resultado.filter(q => q.status === 'Ativa' && !this.isAgendada(q));
+    } else if (this.abaAtiva === 'Agendadas') {
+      resultado = resultado.filter(q => this.isAgendada(q));
     } else if (this.abaAtiva === 'Manutenção') {
       resultado = resultado.filter(q => q.status === 'Manutenção');
     } else if (this.abaAtiva === 'Inativas') {
@@ -157,7 +165,9 @@ export class QuadrasComponent implements OnInit {
     let resultado = [...this.quadras];
 
     if (this.filtroStatus === 'Ativas') {
-      resultado = resultado.filter(q => q.status === 'Ativa');
+      resultado = resultado.filter(q => q.status === 'Ativa' && !this.isAgendada(q));
+    } else if (this.filtroStatus === 'Agendadas') {
+      resultado = resultado.filter(q => this.isAgendada(q));
     } else if (this.filtroStatus === 'Manutenção') {
       resultado = resultado.filter(q => q.status === 'Manutenção');
     } else if (this.filtroStatus === 'Inativas') {
@@ -178,12 +188,14 @@ export class QuadrasComponent implements OnInit {
 
   atualizarEstatisticas(): void {
     this.totalQuadrasCount = this.totalItens;
-    this.ativasCount = Math.max(0, this.quadras.filter(q => q.status === 'Ativa').length);
+    this.ativasCount = Math.max(0, this.quadras.filter(q => q.status === 'Ativa' && !this.isAgendada(q)).length);
+    this.agendadasCount = Math.max(0, this.quadras.filter(q => this.isAgendada(q)).length);
     this.manutencaoCount = Math.max(0, this.quadras.filter(q => q.status === 'Manutenção').length);
 
     if (this.totalItens > this.quadras.length) {
       const proporcao = this.totalItens / this.quadras.length;
       this.ativasCount = Math.round(this.ativasCount * proporcao);
+      this.agendadasCount = Math.round(this.agendadasCount * proporcao);
       this.manutencaoCount = Math.round(this.manutencaoCount * proporcao);
     }
 
@@ -195,7 +207,7 @@ export class QuadrasComponent implements OnInit {
     }
   }
 
-  selecionarAba(aba: 'Todas' | 'Ativas' | 'Manutenção' | 'Inativas'): void {
+  selecionarAba(aba: 'Todas' | 'Ativas' | 'Agendadas' | 'Manutenção' | 'Inativas'): void {
     this.abaAtiva = aba;
     this.paginaAtual = 1;
     this.carregarQuadras();

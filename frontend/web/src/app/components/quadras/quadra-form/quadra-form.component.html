@@ -139,6 +139,25 @@
             placeholder="Ex.: Quadra de grama sintética premium de alta performance, ideal para jogos de futebol 7."
             [(ngModel)]="novaQuadra.descricao" rows="3"></textarea>
         </div>
+
+        <!-- Agendamento e Liberação Mensal aos Usuários -->
+        <div class="form-fields-row" style="margin-top: 16px;">
+          <div class="form-field-group full-width">
+            <label style="display: flex; align-items: center; gap: 8px;">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#28a745" stroke-width="2" width="18" height="18">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              Data de Liberação aos Usuários (Agendamento Mensal)
+            </label>
+            <input type="date" [(ngModel)]="novaQuadra.dataLiberacao" class="form-select">
+            <p class="field-hint" style="font-size: 0.8rem; color: #64748b; margin-top: 4px;">
+              💡 <strong>Lançamento Antecipado:</strong> Escolha a data em que esta quadra e seus horários ficarão visíveis para reservas dos clientes (ex: no dia 01 do próximo mês). Deixe em branco para liberar imediatamente.
+            </p>
+          </div>
+        </div>
       </div>
 
       <!-- 2. Fotos da Quadra Card -->
@@ -211,111 +230,90 @@
     </ng-container>
 
     <!-- ──────────────────────────────────────── -->
-    <!-- ABA 2: HORÁRIOS DISPONÍVEIS -->
+    <!-- ABA 2: HORÁRIOS DISPONÍVEIS (Por Dia da Semana) -->
     <!-- ──────────────────────────────────────── -->
     <ng-container *ngIf="abaAtivaForm === 'horarios'">
-      <!-- Card Interativo de Horários -->
       <div class="form-card">
         <div class="form-card-header">
-          <h3>Horários disponíveis</h3>
-          <p>Selecione uma data no calendário e marque os horários disponíveis para reserva.</p>
+          <h3>Configurador Semanal de Horários</h3>
+          <p>Defina os horários de atendimento para cada dia da semana. O sistema aplicará os horários automaticamente em todas as datas do mês selecionado.</p>
         </div>
 
-        <div class="disponibilidade-calendar-container">
-          <!-- LADO ESQUERDO: Calendário Mensal -->
-          <div class="calendar-box">
-            <div class="calendar-header">
-              <button type="button" class="btn-cal-nav" (click)="mesAnterior()" title="Mês anterior">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <polyline points="15 18 9 12 15 6"></polyline>
-                </svg>
-              </button>
+        <!-- Seletor do Mês Alvo e Ações Globais -->
+        <div class="month-selector-bar">
+          <div class="month-field-group">
+            <label style="font-weight: 700; color: #1e293b;">📅 Mês de Vigência:</label>
+            <select [(ngModel)]="mesAlvo" class="form-select month-select">
+              <option *ngFor="let m of opcoesMesesAlvo" [value]="m.valor">{{ m.rotulo }}</option>
+            </select>
+          </div>
 
-              <span class="calendar-month-title">{{ getTituloMesAno() }}</span>
+          <div class="quick-copy-actions">
+            <button type="button" class="btn-action-outline" (click)="copiarParaDiasUteis()">
+              📋 Copiar para Seg-Sex
+            </button>
+            <button type="button" class="btn-action-navy" (click)="copiarParaTodosDiasSemana()">
+              ✨ Copiar para toda a semana
+            </button>
+          </div>
+        </div>
 
-              <button type="button" class="btn-cal-nav" (click)="proximoMes()" title="Próximo mês">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <polyline points="9 18 15 12 9 6"></polyline>
-                </svg>
-              </button>
+        <!-- Abas dos Dias da Semana (SEG, TER, QUA, QUI, SEX, SÁB, DOM) -->
+        <div class="weekdays-tab-bar">
+          <button type="button" *ngFor="let dia of diasSemana" class="weekday-tab-btn"
+            [class.active]="diaSemanaAtivo === dia.id"
+            (click)="selecionarDiaSemana(dia.id)">
+            <span class="weekday-short">{{ dia.sigla }}</span>
+            <span class="weekday-full">{{ dia.rotuloCurto }}</span>
+            <span class="weekday-hours-badge" [class.has-badge]="getQuantidadeHorariosDia(dia.id) > 0">
+              {{ getQuantidadeHorariosDia(dia.id) }}h
+            </span>
+          </button>
+        </div>
+
+        <!-- Painel de Horários do Dia Ativo -->
+        <div class="slots-config-panel day-config-box">
+          <div class="slots-panel-header">
+            <div class="date-info-title">
+              <h4>Horários de Atendimento para <strong>{{ getNomeDiaAtivo() }}</strong></h4>
+              <span class="slots-count-subtitle">{{ getQuantidadeHorariosDia(diaSemanaAtivo) }} horários selecionados</span>
             </div>
 
-            <!-- Cabeçalho dos dias da semana -->
-            <div class="calendar-weekdays-grid">
-              <span *ngFor="let diaSem of cabecalhoDiasSemana" class="weekday-col-header">{{ diaSem }}</span>
-            </div>
-
-            <!-- Grid dos dias do mês -->
-            <div class="calendar-days-grid">
-              <button type="button" *ngFor="let dia of diasDoCalendario" class="cal-day-btn"
-                [class.outside-month]="!dia.mesAtual"
-                [class.selected-day]="dia.selecionado"
-                [class.has-hours]="dia.temHorarios"
-                (click)="selecionarData(dia.dataISO)">
-                <span class="day-number">{{ dia.numeroDia }}</span>
+            <div class="slots-actions-group">
+              <button type="button" class="btn-action-outline" (click)="selecionarTodosHorariosDiaAtivo()">
+                Selecionar todos
+              </button>
+              <button type="button" class="btn-action-danger" (click)="limparHorariosDiaAtivo()">
+                Limpar
               </button>
             </div>
           </div>
 
-          <!-- LADO DIREITO: Horários Disponíveis da Data Selecionada -->
-          <div class="slots-config-panel">
-            <div class="slots-panel-header">
-              <div class="date-info-title">
-                <div class="date-header-left">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="calendar-icon-sm">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                  </svg>
-                  <h4>{{ getTituloDataExtenso() }}</h4>
-                </div>
-                <span class="slots-count-subtitle">{{ getTotalHorariosDataSelecionada() }} horários disponíveis</span>
-              </div>
-
-              <div class="slots-actions-group">
-                <button type="button" class="btn-action-outline" (click)="selecionarTodosHorariosData()">
-                  Selecionar todos
-                </button>
-                <button type="button" class="btn-action-danger" (click)="limparHorariosData()">
-                  Limpar
-                </button>
-                <button type="button" class="btn-action-navy" (click)="copiarParaTodosDiasDoMes()">
-                  Copiar para todos os dias
-                </button>
-              </div>
-            </div>
-
-            <!-- Legenda de Status dos Horários -->
-            <div class="slots-legend-bar">
-              <span class="legend-item"><span class="legend-dot green"></span> Cadastrado / Selecionado</span>
-              <span class="legend-item"><span class="legend-dot normal"></span> Não cadastrado</span>
-            </div>
-
-            <!-- Grade de Checkboxes de Horários -->
-            <div class="slots-checkbox-grid">
-              <label *ngFor="let slot of slotsHorariosDisponiveis" class="slot-checkbox-card"
-                [class.checked]="horarioSlotSelecionado(slot)">
-                <input type="checkbox" [checked]="horarioSlotSelecionado(slot)" (change)="alternarHorarioSlot(slot)" class="slot-checkbox-input">
-                <span class="custom-checkbox-box">
-                  <svg *ngIf="horarioSlotSelecionado(slot)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                  </svg>
-                </span>
-                <span class="slot-time-text">{{ slot }}</span>
-              </label>
-            </div>
+          <!-- Grade de Horários -->
+          <div class="slots-checkbox-grid">
+            <label *ngFor="let slot of slotsHorariosDisponiveis" class="slot-checkbox-card"
+              [class.checked]="horarioSlotSelecionadoNoDiaAtivo(slot)">
+              <input type="checkbox" [checked]="horarioSlotSelecionadoNoDiaAtivo(slot)" (change)="alternarHorarioSlotDia(slot)" class="slot-checkbox-input">
+              <span class="custom-checkbox-box">
+                <svg *ngIf="horarioSlotSelecionadoNoDiaAtivo(slot)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </span>
+              <span class="slot-time-text">{{ slot }}</span>
+            </label>
           </div>
         </div>
 
-        <!-- Info Alert Box -->
+        <!-- Resumo do Cálculo Mensal -->
         <div class="info-alert-box margin-top-20">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="info-icon">
             <circle cx="12" cy="12" r="10"></circle>
             <line x1="12" y1="16" x2="12" y2="12"></line>
             <line x1="12" y1="8" x2="12.01" y2="8"></line>
           </svg>
-          <span>Os horários exibidos ao lado são referentes ao dia selecionado no calendário.</span>
+          <span>
+            <strong>Resumo de Geração Automática:</strong> Ao salvar, aproximadamente <strong>{{ getTotalHorariosMesCalculado() }} horários</strong> serão cadastrados automaticamente no banco de dados para todas as datas do mês selecionado.
+          </span>
         </div>
       </div>
 

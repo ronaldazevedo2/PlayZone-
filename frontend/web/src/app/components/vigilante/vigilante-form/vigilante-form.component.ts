@@ -211,6 +211,17 @@ export class VigilanteFormComponent implements OnInit {
     return '';
   }
 
+  getInicials(nome: string): string {
+    if (!nome || !nome.trim()) return 'VI';
+    const partes = nome.trim().split(/\s+/);
+    if (partes.length === 1) {
+      return partes[0].charAt(0).toUpperCase();
+    }
+    const primeiraLetra = partes[0].charAt(0).toUpperCase();
+    const ultimaLetra = partes[partes.length - 1].charAt(0).toUpperCase();
+    return primeiraLetra + ultimaLetra;
+  }
+
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
@@ -221,6 +232,10 @@ export class VigilanteFormComponent implements OnInit {
       };
       reader.readAsDataURL(file);
     }
+  }
+
+  removerFoto(): void {
+    this.fotoPerfil = '';
   }
 
   salvarVigilante(): void {

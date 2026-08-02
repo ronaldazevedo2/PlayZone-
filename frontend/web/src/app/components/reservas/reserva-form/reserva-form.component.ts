@@ -89,7 +89,7 @@ export class ReservaFormComponent implements OnInit {
     this.quadraService.listar(1, 100).subscribe({
       next: (res: RespostaApi<ResultadoPaginado<ReservaQuadraDto>>) => {
         if (res && res.ok && res.dados && res.dados.itens) {
-          this.quadras = res.dados.itens;
+          this.quadras = res.dados.itens.filter(q => this.quadraService.isLiberada(q));
         }
       },
       error: () => {}

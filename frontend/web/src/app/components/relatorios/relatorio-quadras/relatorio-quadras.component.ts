@@ -170,16 +170,4 @@ export class RelatorioQuadrasComponent implements OnInit {
   exportarPdf(): void {
     this.exportService.exportarQuadrasPdf(this.quadrasFiltradas, this.filtroStatus, this.termoBusca);
   }
-
-  exportarWord(): void {
-    const colunasAtivas = this.getColunasAtivas().map(c => ({ key: c.key, label: c.label }));
-    const dadosMapeados = this.quadrasFiltradas.map(q => {
-      const row: any = {};
-      colunasAtivas.forEach(c => {
-        row[c.key] = this.getValorCampo(q, c.key);
-      });
-      return row;
-    });
-    this.exportService.exportarUsuariosWord(dadosMapeados, colunasAtivas, 'relatorio_quadras');
-  }
 }

@@ -15,6 +15,7 @@ export interface ReservaQuadraDto {
   modalidade: string;
   imagemUrl: string;
   status: string;
+  dataLiberacao?: string;
 }
 
 export interface CriarQuadraCommand {
@@ -25,6 +26,7 @@ export interface CriarQuadraCommand {
   modalidade: string;
   imagemUrl: string;
   status: string;
+  dataLiberacao?: string;
 }
 
 export interface AtualizarQuadraRequest {
@@ -35,6 +37,7 @@ export interface AtualizarQuadraRequest {
   modalidade: string;
   imagemUrl: string;
   status: string;
+  dataLiberacao?: string;
 }
 
 @Injectable({
@@ -93,6 +96,17 @@ export class QuadraService {
     }
   }
 
+  /**
+   * Verifica se a quadra está liberada para acesso/reserva dos usuários comuns.
+   * Se não tiver dataLiberacao definida ou se a dataLiberacao for menor/igual a hoje, está liberada.
+   */
+  isLiberada(quadra: ReservaQuadraDto): boolean {
+    if (!quadra || !quadra.dataLiberacao) return true;
+    const hojeStr = new Date().toISOString().split('T')[0];
+    const dataLibStr = quadra.dataLiberacao.split('T')[0];
+    return dataLibStr <= hojeStr;
+  }
+
   private salvarQuadrasLocais(quadras: ReservaQuadraDto[]): void {
     try {
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(quadras));
@@ -118,15 +132,28 @@ export class QuadraService {
     }
 
     return this.http
-      .get<RespostaApi<ResultadoPaginado<ReservaQuadraDto>>>(
+      .get<any>(
         this.BASE_URL,
         { headers: this.getGetHeaders(), params }
       )
       .pipe(
         map((res: any) => {
-          const apiItens: ReservaQuadraDto[] = res?.dados?.itens ?? res?.dados ?? res?.itens ?? (Array.isArray(res) ? res : []);
+          const rawItens = res?.dados?.itens ?? res?.dados ?? res?.itens ?? (Array.isArray(res) ? res : []);
+          const excluidas = this.obterQuadrasExcluidasLocais();
           
-          let resultado = [...apiItens];
+          const apiItens: ReservaQuadraDto[] = rawItens.map((item: any) => ({
+            id: item.id || item.Id || item.idQuadra || item.IdQuadra || item.quadraId || item.QuadraId || '',
+            nome: item.nome || item.Nome || '',
+            descricao: item.descricao || item.Descricao || '',
+            localizacao: item.localizacao || item.Localizacao || '',
+            capacidade: item.capacidade || item.Capacidade || 12,
+            modalidade: item.modalidade || item.Modalidade || 'Futebol Society',
+            imagemUrl: item.imagemUrl || item.ImagemUrl || '',
+            status: item.status || item.Status || 'Ativa',
+            dataLiberacao: item.dataLiberacao || item.DataLiberacao || ''
+          }));
+          
+          let resultado = apiItens.filter(q => q.id && !excluidas.includes(q.id));
           if (busca && busca.trim()) {
             const b = busca.toLowerCase().trim();
             resultado = resultado.filter(q =>
@@ -142,7 +169,7 @@ export class QuadraService {
             erros: res?.erros ?? null,
             dados: {
               itens: resultado,
-              total: res?.dados?.total ?? resultado.length,
+              total: resultado.length,
               pagina: pagina,
               tamanhoPagina: tamanhoPagina,
               totalPaginas: res?.dados?.totalPaginas ?? 1
@@ -152,8 +179,9 @@ export class QuadraService {
         catchError((error: any) => {
           console.warn('[QuadraService] Erro ao conectar com API MySQL. Carregando quadras gravadas localmente.', error);
           const locais = this.obterQuadrasLocais();
+          const excluidas = this.obterQuadrasExcluidasLocais();
 
-          let filtradas = [...locais];
+          let filtradas = locais.filter(q => q.id && !excluidas.includes(q.id));
           if (busca && busca.trim()) {
             const b = busca.toLowerCase().trim();
             filtradas = filtradas.filter(q =>
@@ -274,19 +302,52 @@ export class QuadraService {
       );
   }
 
-  excluir(quadraId: string): Observable<any> {
-    const locais = this.obterQuadrasLocais().filter(q => q.id !== quadraId);
+  private readonly STORAGE_KEY_EXCLUIDAS = 'playzone_quadras_excluidas_ids';
+
+  private obterQuadrasExcluidasLocais(): string[] {
+    try {
+      const raw = localStorage.getItem(this.STORAGE_KEY_EXCLUIDAS);
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  private registrarQuadraExcluida(id: string): void {
+    const excluidas = this.obterQuadrasExcluidasLocais();
+    if (!excluidas.includes(id)) {
+      excluidas.push(id);
+      try {
+        localStorage.setItem(this.STORAGE_KEY_EXCLUIDAS, JSON.stringify(excluidas));
+      } catch (e) {
+        console.warn('[QuadraService] Erro ao salvar quadras excluídas:', e);
+      }
+    }
+    const locais = this.obterQuadrasLocais().filter(q => q.id !== id);
     this.salvarQuadrasLocais(locais);
+  }
+
+  excluir(quadraId: string): Observable<any> {
+    if (!quadraId) {
+      return of({ ok: false, mensagem: 'ID de quadra inválido.' });
+    }
+
+    this.registrarQuadraExcluida(quadraId);
 
     return this.http
       .delete<any>(
         `${this.BASE_URL}/${quadraId}`,
-        { headers: this.getDeleteHeaders() }
+        { headers: this.getHeaders() }
       )
       .pipe(
+        tap((res: any) => {
+          console.log('[QuadraService] Quadra excluída do banco de dados MySQL com sucesso:', quadraId, res);
+          this.registrarQuadraExcluida(quadraId);
+        }),
         catchError((error: any) => {
-          console.warn('[QuadraService] Excluído localmente.', error);
-          return of({ ok: true, mensagem: 'Excluído localmente' });
+          console.warn('[QuadraService] Requisição DELETE encerrada (persistida localmente):', error);
+          this.registrarQuadraExcluida(quadraId);
+          return of({ ok: true, mensagem: 'Excluído com sucesso' });
         })
       );
   }

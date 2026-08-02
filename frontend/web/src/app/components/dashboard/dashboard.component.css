@@ -261,6 +261,10 @@
 }
 
 /* Quick Actions */
+.actions-card {
+  margin-top: 30px;
+}
+
 .actions-card h3 {
   font-size: 1.1rem;
   font-weight: 700;
@@ -269,8 +273,12 @@
 
 .actions-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.bookings-section {
+  margin-top: 24px;
 }
 
 .action-btn {

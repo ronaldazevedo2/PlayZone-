@@ -457,6 +457,11 @@ textarea {
   color: #1e7e34;
 }
 
+.status-agendado {
+  background-color: rgba(13, 110, 253, 0.12);
+  color: #0d6efd;
+}
+
 .status-warning {
   background-color: rgba(253, 126, 20, 0.12);
   color: #c05e00;

@@ -44,6 +44,7 @@ export const routes: Routes = [
       { path: 'relatorios', redirectTo: 'relatorios/usuarios', pathMatch: 'full' },
       { path: 'relatorios/usuarios', loadComponent: () => import('./components/relatorios/relatorio-usuarios/relatorio-usuarios.component').then(m => m.RelatorioUsuariosComponent) },
       { path: 'relatorios/quadras', loadComponent: () => import('./components/relatorios/relatorio-quadras/relatorio-quadras.component').then(m => m.RelatorioQuadrasComponent) },
+      { path: 'relatorios/vigilantes', loadComponent: () => import('./components/relatorios/relatorio-vigilantes/relatorio-vigilantes.component').then(m => m.RelatorioVigilantesComponent) },
 
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]

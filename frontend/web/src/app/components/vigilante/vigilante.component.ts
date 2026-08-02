@@ -318,6 +318,21 @@ export class VigilanteComponent implements OnInit {
     return guard.fotoPerfil || guard.FotoPerfil || guard.fotoperfil || guard.foto || '';
   }
 
+  getInicials(nome: string): string {
+    if (!nome || !nome.trim()) return 'VI';
+    const partes = nome.trim().split(/\s+/);
+    if (partes.length === 1) {
+      return partes[0].charAt(0).toUpperCase();
+    }
+    const primeiraLetra = partes[0].charAt(0).toUpperCase();
+    const ultimaLetra = partes[partes.length - 1].charAt(0).toUpperCase();
+    return primeiraLetra + ultimaLetra;
+  }
+
+  removerFoto(): void {
+    this.fotoPerfil = '';
+  }
+
   formatDateForInput(dateVal: any): string {
     if (!dateVal) return '';
     const str = String(dateVal).trim();
