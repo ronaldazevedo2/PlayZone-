@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'servicos/servico_armazenamento.dart';
 import 'servicos/servico_banco_dados.dart';
+import 'servicos/servico_autenticacao_api.dart';
 
 enum TipoStatusAcesso {
   liberado,
@@ -14,12 +15,14 @@ class Vigilante {
   final String email;
   final String matricula;
   final String senha;
+  final String? tokenJwt;
 
   Vigilante({
     required this.nome,
     required this.email,
     required this.matricula,
     required this.senha,
+    this.tokenJwt,
   });
 }
 
@@ -125,6 +128,7 @@ class EstadoCentral extends ChangeNotifier {
 
   final ServicoArmazenamento _armazenamento = ServicoArmazenamento();
   final ServicoBancoDados _bancoDados = ServicoBancoDados();
+  final ServicoAutenticacaoApi _apiAutenticacao = ServicoAutenticacaoApi();
 
   // Sessão e Usuários
   final List<Vigilante> _vigilantes = [];
@@ -367,6 +371,36 @@ class EstadoCentral extends ChangeNotifier {
 
   // Métodos de Autenticação
   Future<bool> cadastrarVigilante(String nome, String email, String matricula, String senha) async {
+    // 1. Tenta realizar o cadastro na API REST
+    try {
+      final sucessoApi = await _apiAutenticacao.cadastrarUsuario(
+        nome: nome,
+        email: email,
+        matricula: matricula,
+        senha: senha,
+      );
+      if (sucessoApi) {
+        final novoRegistro = VigilanteRegistro(
+          nome: nome.trim(),
+          email: email.trim(),
+          matricula: matricula.trim(),
+          senha: senha,
+        );
+        await _bancoDados.salvarVigilante(novoRegistro);
+        _vigilantes.add(Vigilante(
+          nome: novoRegistro.nome,
+          email: novoRegistro.email,
+          matricula: novoRegistro.matricula,
+          senha: novoRegistro.senha,
+        ));
+        notifyListeners();
+        return true;
+      }
+    } catch (_) {
+      // Caso a API falhe/esteja indisponível, cai no modo offline/fallback local
+    }
+
+    // 2. Fallback para verificação no banco local
     final vigilanteExistente = await _bancoDados.buscarVigilantePorEmail(email);
     if (vigilanteExistente != null || _vigilantes.any((v) => v.email.toLowerCase() == email.trim().toLowerCase())) {
       return false;
@@ -392,7 +426,47 @@ class EstadoCentral extends ChangeNotifier {
     return true;
   }
 
-  String? autenticarVigilante(String email, String senha) {
+  Future<String?> autenticarVigilante(String email, String senha) async {
+    // 1. Tenta autenticar via API Backend ASP.NET Core
+    try {
+      final respostaApi = await _apiAutenticacao.realizarLogin(
+        email: email,
+        senha: senha,
+      );
+
+      final tokenClaims = respostaApi.decodificarToken();
+      final nomeToken = tokenClaims['unique_name'] ?? tokenClaims['name'] ?? tokenClaims['given_name'] ?? email.split('@').first;
+      final matriculaToken = tokenClaims['matricula'] ?? tokenClaims['sub'] ?? '0000';
+
+      _vigilanteLogado = Vigilante(
+        nome: nomeToken,
+        email: email.trim(),
+        matricula: matriculaToken,
+        senha: senha,
+        tokenJwt: respostaApi.token,
+      );
+
+      // Salva no banco de dados local para manter sincronizado
+      await _bancoDados.salvarVigilante(VigilanteRegistro(
+        nome: _vigilanteLogado!.nome,
+        email: _vigilanteLogado!.email,
+        matricula: _vigilanteLogado!.matricula,
+        senha: senha,
+      ));
+
+      notifyListeners();
+      return null; // Sucesso na API
+    } on ExcecaoAutenticacao catch (e) {
+      // Se a resposta for erro de credenciais da API, repassa
+      if (e.mensagem.contains('incorreta') || e.mensagem.contains('inválida')) {
+        return e.mensagem;
+      }
+      // Se for erro de conexão, tenta fallback local abaixo
+    } catch (_) {
+      // Erro desconhecido de rede, prossegue para fallback local
+    }
+
+    // 2. Fallback local (banco de dados/mock local)
     final vigilante = _vigilantes.firstWhere(
       (v) => v.email.toLowerCase() == email.trim().toLowerCase(),
       orElse: () => Vigilante(nome: '', email: '', matricula: '', senha: ''),
@@ -408,7 +482,7 @@ class EstadoCentral extends ChangeNotifier {
 
     _vigilanteLogado = vigilante;
     notifyListeners();
-    return null; // Sucesso
+    return null; // Sucesso local
   }
 
   /// Tenta restaurar a sessão salva a partir do email armazenado.

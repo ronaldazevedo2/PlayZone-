@@ -43,6 +43,8 @@ dependencies:
 
   # Abrir links/e-mail no dispositivo
   url_launcher: ^6.3.1
+  http: ^1.6.0
+  jwt_decoder: ^2.0.1
 
 dev_dependencies:
   flutter_test:

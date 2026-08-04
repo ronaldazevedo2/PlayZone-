@@ -59,8 +59,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         modelBuilder.Entity<Usuario>().HasData(new Usuario
         {
             UsuariosId = Guid.Parse("00000000-0000-0000-0000-000000000001"),
-            NomeCompleto = "Administrador do Sistema",
-            Email = "admin@baseapi.com",
+            NomeCompleto = "Ana Carolina Ferreira Ribeiro",
+            Email = "ana@gmail.com",
             SenhaHash = BCrypt.Net.BCrypt.HashPassword("Admin@123"),
             PerfilId = 1,
             Ativo = true,
@@ -75,10 +75,10 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             new Usuario
             {
                 UsuariosId = Guid.Parse("77777777-7777-7777-7777-777777777777"),
-                NomeCompleto = "Administrador",
-                Email = "admin@playzone.com",
-                Cpf = "11111111111",
-                Telefone = "27999990001",
+                NomeCompleto = "Ronald Azevedo",
+                Email = "ronald@gmail.com",
+                Cpf = "20314556729",
+                Telefone = "27997904554",
                 SenhaHash = BCrypt.Net.BCrypt.HashPassword("Admin@123"),
                 PerfilId = 1,
                 Ativo = true,
@@ -88,10 +88,10 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             new Usuario
             {
                 UsuariosId = Guid.Parse("88888888-8888-8888-8888-888888888888"),
-                NomeCompleto = "João Silva",
-                Email = "joao@playzone.com",
-                Cpf = "22222222222",
-                Telefone = "27999990002",
+                NomeCompleto = "Julia Tolentino",
+                Email = "julia7@gmail.com",
+                Cpf = "14578925689",
+                Telefone = "27995107361",
                 SenhaHash = BCrypt.Net.BCrypt.HashPassword("123456"),
                 PerfilId = 2,
                 Ativo = true,
@@ -101,10 +101,10 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             new Usuario
             {
                 UsuariosId = Guid.Parse("99999999-9999-9999-9999-999999999999"),
-                NomeCompleto = "Maria Souza",
-                Email = "maria@playzone.com",
-                Cpf = "33333333333",
-                Telefone = "27999990003",
+                NomeCompleto = "Amanda Soares",
+                Email = "amanda@gmail.com",
+                Cpf = "05522890789",
+                Telefone = "27996108515",
                 SenhaHash = BCrypt.Net.BCrypt.HashPassword("123456"),
                 PerfilId = 3,
                 Ativo = true,
@@ -120,27 +120,16 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             new DadosSecretaria
             {
                 SecretariaId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
-                Nome = "Secretaria Municipal de Esportes",
-                Email = "esportes@prefeitura.com",
-                Contato = "(11) 99999-9999",
-                Cep = "01001000",
-                Endereço = "Rua das Flores",
-                Numero = "100",
+                Nome = "Secretaria Municipal de Esportes e lazer",
+                Email = "semel.linhares@gmail.com",
+                Contato = " (27) 3372-6800",
+                Cep = "29.900-192",
+                Endereço = "Avenida Augusto Pestana",
+                Numero = "790",
                 Bairro = "Centro",
-                Cidade = "São Paulo"
-            },
-            new DadosSecretaria
-            {
-                SecretariaId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                Nome = "Secretaria Municipal de Educação",
-                Email = "educacao@prefeitura.com",
-                Contato = "(11) 98888-8888",
-                Cep = "02002000",
-                Endereço = "Av. Brasil",
-                Numero = "250",
-                Bairro = "Jardim América",
-                Cidade = "São Paulo"
+                Cidade = "Linhares"
             }
+           
         );
     }
 
@@ -167,7 +156,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             Capacidade = 20,
             Localizacao = "Aviso",
             Modalidade = "Futebol",
-            ImagemUrl = "https://www.newquadras.com.br/images/Projetos/Fotos/ESCOLA%20IPSG%20(2).jpg"
+            ImagemUrl = "https://www.aecweb.com.br/revista/materias/projetando-areas-esportivas-conheca-os-materiais-mais-indicados/6698"
         },
 
         new Quadra
@@ -178,7 +167,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             Capacidade = 20,
             Localizacao = "Interlagos",
             Modalidade = "Futebol",
-            ImagemUrl = "https://exemplo.com/imagens/interlagos.jpg"
+            ImagemUrl = "https://www.aecweb.com.br/revista/materias/projetando-areas-esportivas-conheca-os-materiais-mais-indicados/6698"
         },
 
         new Quadra
@@ -189,7 +178,18 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             Capacidade = 20,
             Localizacao = "Araçá",
             Modalidade = "Futebol",
-            ImagemUrl = "https://exemplo.com/imagens/araca.jpg"
+            ImagemUrl = "https://www.aecweb.com.br/revista/materias/projetando-areas-esportivas-conheca-os-materiais-mais-indicados/6698"
+        },
+
+        new Quadra
+        {
+            Id = Guid.Parse("33333333-3333-3333-3333-333333333333"),
+            Nome = "GINÁSIO POLIESPORTIVO \"EURICO GUILHERME SCHULZ\"",
+            Descricao = "Ginásio Poliesportivo localizado no bairro São José.",
+            Capacidade = 20,
+            Localizacao = "São José",
+            Modalidade = "Futebol",
+            ImagemUrl = "https://www.aecweb.com.br/revista/materias/projetando-areas-esportivas-conheca-os-materiais-mais-indicados/6698"
         }
 
     );
@@ -262,11 +262,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             new Vigilantes
             {
                 Id = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
-                NomeCompleto = "Carlos Eduardo Silva",
-                Cpf = "12345678901",
-                Email = "carlos.silva@playzone.com",
-                Telefone = "(11) 99999-1111",
-                DataNascimento = new DateTime(1988, 5, 15),
+                NomeCompleto = "Davi Soares",
+                Cpf = "13836508702",
+                Email = "davisoares@gmail.com",
+                Telefone = "(27) 999872638",
+                DataNascimento = new DateTime(2000, 6, 12),
                 FotoPerfil = "https://exemplo.com/fotos/carlos.jpg",
                 Ativo = true,
                 CriadoEm = new DateTime(2026, 1, 1),
@@ -277,11 +277,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             new Vigilantes
             {
                 Id = Guid.Parse("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
-                NomeCompleto = "Marcos Antônio Souza",
-                Cpf = "98765432100",
-                Email = "marcos.souza@playzone.com",
-                Telefone = "(11) 99999-2222",
-                DataNascimento = new DateTime(1992, 8, 20),
+                NomeCompleto = "Ana Alice Ferreira",
+                Cpf = "98765878456",
+                Email = "anaalice@gmail.com",
+                Telefone = "(27) 995162604",
+                DataNascimento = new DateTime(1983, 2, 24),
                 FotoPerfil = "https://exemplo.com/fotos/marcos.jpg",
                 Ativo = true,
                 CriadoEm = new DateTime(2026, 1, 1),
@@ -292,9 +292,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             new Vigilantes
             {
                 Id = Guid.Parse("cccccccc-cccc-cccc-cccc-cccccccccccc"),
-                NomeCompleto = "Fernanda Oliveira",
-                Cpf = "45678912345",
-                Email = "fernanda.oliveira@playzone.com",
+                NomeCompleto = "Jailson Conceição",
+                Cpf = "90778965823",
+                Email = "jailsonconceicao@gmail.com",
                 Telefone = "(11) 99999-3333",
                 DataNascimento = new DateTime(1995, 2, 10),
                 FotoPerfil = "https://exemplo.com/fotos/fernanda.jpg",

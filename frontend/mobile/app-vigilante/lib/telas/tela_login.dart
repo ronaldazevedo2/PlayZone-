@@ -75,7 +75,7 @@ class _TelaLoginEstado extends State<TelaLogin> {
 
     if (!mounted) return;
 
-    final erro = _estadoCentral.autenticarVigilante(
+    final erro = await _estadoCentral.autenticarVigilante(
       _controladorEmail.text.trim(),
       _controladorSenha.text,
     );
@@ -93,6 +93,8 @@ class _TelaLoginEstado extends State<TelaLogin> {
                 ? 'Contraseña incorrecta'
                 : 'Senha incorreta';
       }
+
+      if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
