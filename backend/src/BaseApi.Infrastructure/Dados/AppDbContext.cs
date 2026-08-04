@@ -50,7 +50,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     {
         modelBuilder.Entity<Perfil>().HasData(
             new Perfil { Id = 1, Nome = "Admin", Descricao = "Acesso total ao sistema" },
-            new Perfil { Id = 2, Nome = "Gerente", Descricao = "Acesso intermediário ao sistema" },
+            new Perfil { Id = 2, Nome = "Vigilante", Descricao = "Acesso de vigilante ao sistema" },
             new Perfil { Id = 3, Nome = "Usuário", Descricao = "Acesso básico ao sistema" }
         );
     }

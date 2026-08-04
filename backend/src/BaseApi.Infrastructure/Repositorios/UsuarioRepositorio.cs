@@ -17,9 +17,12 @@ public class UsuarioRepositorio(AppDbContext contexto) : IUsuarioRepositorio
             .FirstOrDefaultAsync(u => u.UsuariosId == id, ct);
 
     public async Task<Usuario?> ObterPorEmailAsync(string email, CancellationToken ct = default)
-        => await contexto.Usuarios
+    {
+        var emailLimpo = email.Trim().ToLower();
+        return await contexto.Usuarios
             .Include(u => u.Perfil)
-            .FirstOrDefaultAsync(u => u.Email == email, ct);
+            .FirstOrDefaultAsync(u => u.Email.ToLower() == emailLimpo, ct);
+    }
 
     public async Task<Usuario?> ObterPorCpfAsync(string cpf, CancellationToken ct = default)
         => await contexto.Usuarios

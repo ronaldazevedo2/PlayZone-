@@ -6,6 +6,7 @@ import { Observable, tap, catchError, throwError } from 'rxjs';
 export interface LoginRequest {
   email: string;
   senha: string;
+  perfil?: number;
 }
 
 export interface LoginResponse {
@@ -33,8 +34,8 @@ export class AuthService {
 
   constructor(private http: HttpClient, private router: Router) { }
 
-  login(email: string, senha: string): Observable<LoginResponse> {
-    const body: LoginRequest = { email, senha };
+  login(email: string, senha: string, perfil: number = 1): Observable<LoginResponse> {
+    const body: LoginRequest = { email, senha, perfil };
     return this.http.post<LoginResponse>(`${this.API_URL}/Autenticacao/login`, body).pipe(
       tap((response: any) => {
         // The API returns { ok: true, mensagem: "...", dados: { accessToken: "...", ... } }
