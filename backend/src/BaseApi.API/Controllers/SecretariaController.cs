@@ -1,4 +1,4 @@
-﻿using BaseApi.Application.Comum.Modelos;
+using BaseApi.Application.Comum.Modelos;
 using BaseApi.Application.Secretaria.Commands.AtualizarSecretaria;
 using BaseApi.Application.Secretaria.Commands.ExcluirSecretaria;
 using BaseApi.Application.Secretaria.Queries.ListarSecretaria;
@@ -18,7 +18,7 @@ namespace BaseApi.API.Controllers;
 public class SecretariaController(IMediator mediator) : ControllerBase
 {
     [HttpGet]
-    [Authorize(Roles = $"{NomePerfil.Admin},{NomePerfil.Gerente}")]
+    [Authorize(Roles = $"{NomePerfil.Admin},{NomePerfil.Vigilante}")]
     [ProducesResponseType(typeof(RespostaApi<ResultadoPaginado<SecretariaListaDto>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Listar(
         [FromQuery] int pagina = 1,
@@ -37,7 +37,7 @@ public class SecretariaController(IMediator mediator) : ControllerBase
 
     // GET /api/secretaria/{secretariaId}
     [HttpGet("{secretariaId:guid}")]
-    [Authorize(Roles = $"{NomePerfil.Admin},{NomePerfil.Gerente}")]
+    [Authorize(Roles = $"{NomePerfil.Admin},{NomePerfil.Vigilante}")]
     [ProducesResponseType(typeof(RespostaApi<SecretariaDetalheDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(RespostaApi), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ObterPorId(

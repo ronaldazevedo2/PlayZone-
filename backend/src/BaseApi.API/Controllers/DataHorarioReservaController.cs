@@ -59,7 +59,7 @@ public class DataHorarioReservaController(IMediator mediator) : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = $"{NomePerfil.Admin},{NomePerfil.Gerente}")]
+    [Authorize(Roles = $"{NomePerfil.Admin},{NomePerfil.Vigilante}")]
     public async Task<IActionResult> Criar(
         [FromBody] CriarDataHorarioReservaCommand command,
         CancellationToken ct)
@@ -77,7 +77,7 @@ public class DataHorarioReservaController(IMediator mediator) : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    [Authorize(Roles = $"{NomePerfil.Admin},{NomePerfil.Gerente}")]
+    [Authorize(Roles = $"{NomePerfil.Admin},{NomePerfil.Vigilante}")]
     public async Task<IActionResult> Atualizar(
         Guid id,
         [FromBody] AtualizarDataHorarioReservaRequest request,

@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { QuadraService, ReservaQuadraDto } from '../../services/quadra.service';
 import { ReservaService, ReservaDto, CriarReservaCommand } from '../../services/reserva.service';
+import { DataHorarioReservaService } from '../../services/data-horario-reserva.service';
 import { AuthService } from '../../services/auth.service';
 import { RespostaApi } from '../../wrappers/api-response.wrapper';
 import { ResultadoPaginado } from '../../services/secretaria.service';
@@ -82,9 +83,11 @@ export class ReservasComponent implements OnInit {
   constructor(
     private quadraService: QuadraService,
     private reservaService: ReservaService,
+    private dataHorarioService: DataHorarioReservaService,
     private authService: AuthService,
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) { }
 
   ngOnInit(): void {
@@ -130,14 +133,43 @@ export class ReservasComponent implements OnInit {
       next: (res: RespostaApi<ResultadoPaginado<ReservaDto>>) => {
         this.isLoading = false;
         if (res && res.ok && res.dados && res.dados.itens) {
-          this.todasReservas = res.dados.itens;
+          const itens = res.dados.itens;
+          this.todasReservas = itens.map((item: any) => {
+            const qId = item.quadraId || item.QuadraId || '';
+            const quadra = this.quadras.find(q => q.id === qId);
+
+            const rawHorario = item.horarioAgendado || item.horario || '';
+            const shortHorario = this.formatHorarioShort(rawHorario);
+            const rangeHorario = this.formatHorarioRange(shortHorario);
+            const dataValida = item.dataAgendada || item.data || '';
+
+            const statusCalculado = this.calcularStatusReserva(dataValida, rawHorario, item.status);
+
+            return {
+              id: item.reservasId || item.reservaId || item.id || '',
+              quadraId: qId,
+              nomeQuadra: item.nomeQuadra || quadra?.nome || 'Quadra',
+              modalidade: item.modalidade || quadra?.modalidade || 'Futebol Society',
+              usuarioId: item.usuariosId || item.usuarioId || '',
+              nomeUsuario: item.nomeUsuario || item.usuarioNome || 'Administrador do Sistema',
+              emailUsuario: item.emailUsuario || '',
+              telefoneUsuario: item.telefoneUsuario || '',
+              data: dataValida,
+              horario: rangeHorario || shortHorario,
+              status: statusCalculado
+            };
+          });
+
+          this.verificarQueryParamQuadra();
         } else {
           this.usarReservasMockadas();
+          this.verificarQueryParamQuadra();
         }
       },
       error: () => {
         this.isLoading = false;
         this.usarReservasMockadas();
+        this.verificarQueryParamQuadra();
       }
     });
   }
@@ -145,7 +177,7 @@ export class ReservasComponent implements OnInit {
   private usarReservasMockadas(): void {
     const hoje = new Date();
     const d = (offset: number) => { const dt = new Date(hoje); dt.setDate(dt.getDate() + offset); return dt.toISOString(); };
-    this.todasReservas = [
+    const lista = [
       { id: 'RES-2026-010', nomeQuadra: 'Society 1', modalidade: 'Futebol Society', nomeUsuario: 'Lucas Ferreira', emailUsuario: 'lucas.ferreira@email.com', telefoneUsuario: '(11) 98765-4321', data: d(0), horario: '19:00 - 20:00', status: 'Ativa', observacoes: 'Reserva para jogo amador.' },
       { id: 'RES-2026-009', nomeQuadra: 'Beach Tennis Arena 1', modalidade: 'Beach Tennis', nomeUsuario: 'Mariana Costa', emailUsuario: 'mariana.costa@email.com', telefoneUsuario: '(11) 97654-3210', data: d(0), horario: '18:00 - 19:00', status: 'Ativa', observacoes: 'Treino de dupla.' },
       { id: 'RES-2026-008', nomeQuadra: 'Futsal 1', modalidade: 'Futsal', nomeUsuario: 'Gabriel Santos', emailUsuario: 'gabriel.santos@email.com', telefoneUsuario: '(11) 91234-5678', data: d(-1), horario: '20:00 - 21:00', status: 'Finalizada', observacoes: 'Partida finalizada.' },
@@ -154,6 +186,44 @@ export class ReservasComponent implements OnInit {
       { id: 'RES-2026-005', nomeQuadra: 'Society 2', modalidade: 'Futebol Society', nomeUsuario: 'Rodrigo Alves', emailUsuario: 'rodrigo.alves@email.com', telefoneUsuario: '(11) 94455-6677', data: d(-4), horario: '21:00 - 22:00', status: 'Finalizada', observacoes: 'Jogo noturno.' },
       { id: 'RES-2026-004', nomeQuadra: 'Society 1', modalidade: 'Futebol Society', nomeUsuario: 'Fernando Rocha', emailUsuario: 'fernando.rocha@email.com', telefoneUsuario: '(11) 95566-7788', data: d(-5), horario: '18:00 - 19:00', status: 'Finalizada', observacoes: 'Racha semanal.' }
     ];
+
+    this.todasReservas = lista.map(r => ({
+      ...r,
+      status: this.calcularStatusReserva(r.data, r.horario, r.status)
+    }));
+  }
+
+  private calcularStatusReserva(dataIsoStr: string, horarioStr: string, statusOriginal?: string): 'Ativa' | 'Cancelada' | 'Finalizada' {
+    if (statusOriginal === 'Cancelada') {
+      return 'Cancelada';
+    }
+
+    if (!dataIsoStr) return (statusOriginal as any) || 'Ativa';
+
+    const dataApenas = dataIsoStr.split('T')[0];
+    let hora = 0;
+    let min = 0;
+
+    if (horarioStr) {
+      const parteInicial = horarioStr.split('-')[0].trim();
+      const tempo = parteInicial.split(':');
+      if (tempo.length >= 2) {
+        hora = parseInt(tempo[0], 10) || 0;
+        min = parseInt(tempo[1], 10) || 0;
+      }
+    }
+
+    const [ano, mes, dia] = dataApenas.split('-').map(Number);
+    if (!ano || !mes || !dia) return (statusOriginal as any) || 'Ativa';
+
+    const dataHorarioReserva = new Date(ano, mes - 1, dia, hora, min);
+    const agora = new Date();
+
+    if (dataHorarioReserva < agora) {
+      return 'Finalizada';
+    }
+
+    return (statusOriginal as any) || 'Ativa';
   }
 
   // ────────────────────────────────────────
@@ -196,8 +266,53 @@ export class ReservasComponent implements OnInit {
   verReservasDaQuadra(quadra: ReservaQuadraDto): void {
     this.quadraSelecionada = quadra;
     this.reservasQuadraSelecionada = this.todasReservas
-      .filter(r => r.nomeQuadra.toLowerCase().trim() === quadra.nome.toLowerCase().trim())
+      .filter(r =>
+        (r.quadraId && r.quadraId === quadra.id) ||
+        (r.nomeQuadra && quadra.nome && r.nomeQuadra.toLowerCase().trim() === quadra.nome.toLowerCase().trim())
+      )
       .sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime());
+  }
+
+  private verificarQueryParamQuadra(): void {
+    const quadraIdParam = this.route.snapshot.queryParamMap.get('quadraId');
+    const quadraNomeParam = this.route.snapshot.queryParamMap.get('quadra');
+
+    if (quadraIdParam) {
+      const q = this.quadras.find(item => item.id === quadraIdParam);
+      if (q) {
+        this.verReservasDaQuadra(q);
+      }
+    } else if (quadraNomeParam) {
+      const q = this.quadras.find(item => item.nome.toLowerCase().trim() === quadraNomeParam.toLowerCase().trim());
+      if (q) {
+        this.verReservasDaQuadra(q);
+      }
+    } else if (this.quadraSelecionada) {
+      this.verReservasDaQuadra(this.quadraSelecionada);
+    }
+  }
+
+  private formatHorarioShort(horarioRaw: string): string {
+    if (!horarioRaw) return '';
+    const parts = horarioRaw.split(':');
+    if (parts.length >= 2) {
+      return `${parts[0].padStart(2, '0')}:${parts[1].padStart(2, '0')}`;
+    }
+    return horarioRaw;
+  }
+
+  private formatHorarioRange(shortTime: string): string {
+    if (!shortTime) return '';
+    const parts = shortTime.split(':').map(Number);
+    if (parts.length >= 2 && !isNaN(parts[0])) {
+      const startHour = parts[0];
+      const startMin = parts[1];
+      const endHour = (startHour + 1) % 24;
+      const startStr = `${String(startHour).padStart(2, '0')}:${String(startMin).padStart(2, '0')}`;
+      const endStr = `${String(endHour).padStart(2, '0')}:${String(startMin).padStart(2, '0')}`;
+      return `${startStr} - ${endStr}`;
+    }
+    return shortTime;
   }
 
   voltarParaQuadras(): void {
@@ -230,20 +345,29 @@ export class ReservasComponent implements OnInit {
       this.disponibilidadeMap.clear();
       return;
     }
-    this.quadraService.obterDisponibilidade(this.formQuadraId).subscribe({
+    this.dataHorarioService.listarPorQuadra(this.formQuadraId).subscribe({
       next: (res: any) => {
-        if (res && res.ok && res.dados) {
-          // Assume res.dados is an array of { data: string, horarios: string[] }
-          this.availableDates = res.dados.map((d: any) => d.data);
-          this.disponibilidadeMap.clear();
-          res.dados.forEach((d: any) => {
-            this.disponibilidadeMap.set(d.data, d.horarios);
+        const dados = res?.dados ?? res;
+        if (Array.isArray(dados) && dados.length > 0) {
+          const mapData = new Map<string, string[]>();
+          dados.forEach((d: any) => {
+            const dataIso = d.data ? d.data.split('T')[0] : '';
+            const horarioShort = d.horario ? d.horario.substring(0, 5) : '';
+            if (dataIso) {
+              if (!mapData.has(dataIso)) {
+                mapData.set(dataIso, []);
+              }
+              if (horarioShort && !mapData.get(dataIso)!.includes(horarioShort)) {
+                mapData.get(dataIso)!.push(horarioShort);
+              }
+            }
           });
+          this.availableDates = Array.from(mapData.keys());
+          this.disponibilidadeMap = mapData;
         } else {
           this.availableDates = [];
           this.disponibilidadeMap.clear();
         }
-        // Reset date and time selections
         this.formData = '';
         this.formHorario = '';
         this.availableTimes = [];

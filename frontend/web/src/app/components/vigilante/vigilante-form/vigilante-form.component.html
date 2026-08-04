@@ -66,6 +66,30 @@
         <p>Preencha as informações do vigilante responsável pelas arenas.</p>
       </div>
 
+      <!-- Seção de Foto de Perfil / Iniciais -->
+      <div class="photo-upload-section">
+        <div class="avatar-preview-box">
+          <img *ngIf="fotoPerfil" [src]="fotoPerfil" alt="Foto de perfil" class="avatar-preview-img">
+          <div *ngIf="!fotoPerfil" class="avatar-preview-initials">
+            {{ getInicials(nomeCompleto) }}
+          </div>
+        </div>
+        <div class="photo-upload-info">
+          <label class="btn-upload-photo">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+              <circle cx="12" cy="13" r="4"></circle>
+            </svg>
+            {{ fotoPerfil ? 'Alterar foto de perfil' : 'Selecionar foto de perfil' }}
+            <input type="file" (change)="onFileSelected($event)" accept="image/*" class="file-input-hidden">
+          </label>
+          <button type="button" class="btn-remove-photo" *ngIf="fotoPerfil" (click)="removerFoto()">
+            Remover foto
+          </button>
+          <p class="upload-hint">Sem foto selecionada? As iniciais serão geradas automaticamente (ex: {{ getInicials(nomeCompleto) }}).</p>
+        </div>
+      </div>
+
       <div class="form-fields-row">
         <div class="form-field-group">
           <label>Nome Completo <span class="required">*</span></label>
@@ -104,8 +128,11 @@
 
       <div class="form-fields-row">
         <div class="form-field-group">
-          <label>Arena / Quadra Alocada</label>
-          <input type="text" placeholder="Ex.: Arena Principal" [(ngModel)]="arena">
+          <label>Arena / Quadra Alocada <span class="required">*</span></label>
+          <select [(ngModel)]="arena" class="form-select">
+            <option value="" disabled>-- Selecione uma Arena / Quadra --</option>
+            <option *ngFor="let q of quadras" [value]="q.nome">{{ q.nome }}</option>
+          </select>
         </div>
 
         <div class="form-field-group">

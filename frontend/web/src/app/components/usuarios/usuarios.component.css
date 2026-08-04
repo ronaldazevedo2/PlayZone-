@@ -39,6 +39,10 @@
   width: 300px;
 }
 
+.data-table {
+  min-width: 800px;
+}
+
 /* Larguras das colunas — 6 colunas (Usuários) */
 .data-table th:nth-child(1) {
   width: 22%;

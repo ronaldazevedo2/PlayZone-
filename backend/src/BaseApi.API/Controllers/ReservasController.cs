@@ -1,4 +1,4 @@
-﻿using BaseApi.Application.Comum.Modelos;
+using BaseApi.Application.Comum.Modelos;
 using BaseApi.Application.Reserva.Commands.AtualizarReserva;
 using BaseApi.Application.Reserva.Commands.CriarReserva;
 using BaseApi.Application.Telefones.Commands.ExcluirTelefone;
@@ -38,7 +38,7 @@ public class ReservasController(IMediator mediator) : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = $"{NomePerfil.Admin},{NomePerfil.Gerente}")]
+    [Authorize(Roles = $"{NomePerfil.Admin},{NomePerfil.Vigilante}")]
     public async Task<IActionResult> Criar(
         [FromBody] CriarReservaCommand command,
         CancellationToken ct)
@@ -56,7 +56,7 @@ public class ReservasController(IMediator mediator) : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    [Authorize(Roles = $"{NomePerfil.Admin},{NomePerfil.Gerente}")]
+    [Authorize(Roles = $"{NomePerfil.Admin},{NomePerfil.Vigilante}")]
     public async Task<IActionResult> Atualizar(
         Guid id,
         [FromBody] AtualizarReservaRequest request,

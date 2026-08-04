@@ -428,3 +428,14 @@
   border: none;
   cursor: pointer;
 }
+
+.field-helper {
+  font-size: 0.78rem;
+  color: #64748b;
+  margin-top: 4px;
+}
+
+.field-helper.text-amber {
+  color: #d97706;
+  font-weight: 600;
+}

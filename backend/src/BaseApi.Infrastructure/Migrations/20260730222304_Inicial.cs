@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BaseApi.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class AlteraClasses : Migration
+    public partial class Inicial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -173,6 +173,27 @@ namespace BaseApi.Infrastructure.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "data_horario_reservas",
+                columns: table => new
+                {
+                    DataHorarioReservaId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    QuadraId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    Data = table.Column<DateTime>(type: "date", nullable: false),
+                    Horario = table.Column<TimeSpan>(type: "time", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_data_horario_reservas", x => x.DataHorarioReservaId);
+                    table.ForeignKey(
+                        name: "FK_data_horario_reservas_quadras_QuadraId",
+                        column: x => x.QuadraId,
+                        principalTable: "quadras",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "reservas",
                 columns: table => new
                 {
@@ -180,7 +201,9 @@ namespace BaseApi.Infrastructure.Migrations
                     QuadraId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     UsuarioId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     DataAgendada = table.Column<DateTime>(type: "date", nullable: false),
-                    HorarioAgendado = table.Column<TimeSpan>(type: "time", nullable: false)
+                    HorarioAgendado = table.Column<TimeSpan>(type: "time", nullable: false),
+                    Status = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
@@ -245,24 +268,30 @@ namespace BaseApi.Infrastructure.Migrations
                 columns: new[] { "UsuariosId", "Ativo", "AtualizadoEm", "Cpf", "CriadoEm", "Email", "NomeCompleto", "PerfilId", "SenhaHash", "Telefone", "TokenExpiracao", "TokenRedefinicaoSenha" },
                 values: new object[,]
                 {
-                    { new Guid("00000000-0000-0000-0000-000000000001"), true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "admin@baseapi.com", "Administrador do Sistema", 1, "$2a$11$bjOZS9jbyjuZid5ndiwLMuOIK8FXR2Uf4wLR49wnJtrp3q11pqxJ6", "", null, null },
-                    { new Guid("77777777-7777-7777-7777-777777777777"), true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "11111111111", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin@playzone.com", "Administrador", 1, "$2a$11$6rWgTFzHybq2vV2LgRpUk.8Hw0fi18a7/Y6CSCkn4Oj3.jhPuuRRG", "27999990001", null, null },
-                    { new Guid("88888888-8888-8888-8888-888888888888"), true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "22222222222", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "joao@playzone.com", "João Silva", 2, "$2a$11$82cfZKLF3eqSfUD08n/jL.YCcZok3716RMEdbz4Gy83YaKXGE/Bh6", "27999990002", null, null },
-                    { new Guid("99999999-9999-9999-9999-999999999999"), true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "33333333333", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "maria@playzone.com", "Maria Souza", 3, "$2a$11$g0q6QhcPLiLEICnHQ7Dohu8JRyf.GgC9LqMZ01jpKntQGFf14MCV6", "27999990003", null, null }
+                    { new Guid("00000000-0000-0000-0000-000000000001"), true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "admin@baseapi.com", "Administrador do Sistema", 1, "$2a$11$QKTluLzEcfS0b50jOLM.r.piziEI5ZfPTzFWhC0fLPmzsNpb7D48G", "", null, null },
+                    { new Guid("77777777-7777-7777-7777-777777777777"), true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "11111111111", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin@playzone.com", "Administrador", 1, "$2a$11$EgHzwS.oNyIAvG5iQGBBReTnLRjEEnvw8FGTYTQWiJnl/1oGvnfNW", "27999990001", null, null },
+                    { new Guid("88888888-8888-8888-8888-888888888888"), true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "22222222222", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "joao@playzone.com", "João Silva", 2, "$2a$11$vJ/pYLvBr/bhiwB0WjHLG.coohdfVu/1QnPOlXpBBy3qmyIDBxBSy", "27999990002", null, null },
+                    { new Guid("99999999-9999-9999-9999-999999999999"), true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "33333333333", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "maria@playzone.com", "Maria Souza", 3, "$2a$11$UfQYilz/5bUCJjkEPX0bwuDnvkiqWNDSUqLA5GQsN0uvDy3br6k1S", "27999990003", null, null }
                 });
 
             migrationBuilder.InsertData(
                 table: "reservas",
-                columns: new[] { "ReservasId", "DataAgendada", "HorarioAgendado", "QuadraId", "UsuarioId" },
+                columns: new[] { "ReservasId", "DataAgendada", "HorarioAgendado", "QuadraId", "Status", "UsuarioId" },
                 values: new object[,]
                 {
-                    { new Guid("70000000-0000-0000-0000-000000000001"), new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 8, 0, 0, 0), new Guid("33333333-3333-3333-3333-333333333333"), new Guid("88888888-8888-8888-8888-888888888888") },
-                    { new Guid("70000000-0000-0000-0000-000000000002"), new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 9, 0, 0, 0), new Guid("33333333-3333-3333-3333-333333333333"), new Guid("88888888-8888-8888-8888-888888888888") },
-                    { new Guid("70000000-0000-0000-0000-000000000003"), new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 10, 0, 0, 0), new Guid("44444444-4444-4444-4444-444444444444"), new Guid("88888888-8888-8888-8888-888888888888") },
-                    { new Guid("70000000-0000-0000-0000-000000000004"), new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 11, 0, 0, 0), new Guid("44444444-4444-4444-4444-444444444444"), new Guid("88888888-8888-8888-8888-888888888888") },
-                    { new Guid("70000000-0000-0000-0000-000000000005"), new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 14, 0, 0, 0), new Guid("55555555-5555-5555-5555-555555555555"), new Guid("88888888-8888-8888-8888-888888888888") },
-                    { new Guid("70000000-0000-0000-0000-000000000006"), new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 16, 0, 0, 0), new Guid("66666666-6666-6666-6666-666666666666"), new Guid("88888888-8888-8888-8888-888888888888") }
+                    { new Guid("70000000-0000-0000-0000-000000000001"), new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 8, 0, 0, 0), new Guid("33333333-3333-3333-3333-333333333333"), "Ativa", new Guid("88888888-8888-8888-8888-888888888888") },
+                    { new Guid("70000000-0000-0000-0000-000000000002"), new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 9, 0, 0, 0), new Guid("33333333-3333-3333-3333-333333333333"), "Ativa", new Guid("88888888-8888-8888-8888-888888888888") },
+                    { new Guid("70000000-0000-0000-0000-000000000003"), new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 10, 0, 0, 0), new Guid("44444444-4444-4444-4444-444444444444"), "Ativa", new Guid("88888888-8888-8888-8888-888888888888") },
+                    { new Guid("70000000-0000-0000-0000-000000000004"), new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 11, 0, 0, 0), new Guid("44444444-4444-4444-4444-444444444444"), "Ativa", new Guid("88888888-8888-8888-8888-888888888888") },
+                    { new Guid("70000000-0000-0000-0000-000000000005"), new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 14, 0, 0, 0), new Guid("55555555-5555-5555-5555-555555555555"), "Ativa", new Guid("88888888-8888-8888-8888-888888888888") },
+                    { new Guid("70000000-0000-0000-0000-000000000006"), new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 16, 0, 0, 0), new Guid("66666666-6666-6666-6666-666666666666"), "Ativa", new Guid("88888888-8888-8888-8888-888888888888") }
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_data_horario_reservas_QuadraId_Data_Horario",
+                table: "data_horario_reservas",
+                columns: new[] { "QuadraId", "Data", "Horario" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_perfis_Nome",
@@ -316,6 +345,9 @@ namespace BaseApi.Infrastructure.Migrations
         {
             migrationBuilder.DropTable(
                 name: "dados_secretaria");
+
+            migrationBuilder.DropTable(
+                name: "data_horario_reservas");
 
             migrationBuilder.DropTable(
                 name: "notificacoes");

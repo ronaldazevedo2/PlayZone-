@@ -99,6 +99,29 @@ namespace BaseApi.Infrastructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("BaseApi.Domain.Entidades.DataHorarioReserva", b =>
+                {
+                    b.Property<Guid>("DataHorarioReservaId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("Data")
+                        .HasColumnType("date");
+
+                    b.Property<TimeSpan>("Horario")
+                        .HasColumnType("time");
+
+                    b.Property<Guid>("QuadraId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("DataHorarioReservaId");
+
+                    b.HasIndex("QuadraId", "Data", "Horario")
+                        .IsUnique();
+
+                    b.ToTable("data_horario_reservas", (string)null);
+                });
+
             modelBuilder.Entity("BaseApi.Domain.Entidades.Notificacao", b =>
                 {
                     b.Property<int>("Id")
@@ -283,6 +306,10 @@ namespace BaseApi.Infrastructure.Migrations
                     b.Property<Guid>("QuadraId")
                         .HasColumnType("char(36)");
 
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<Guid>("UsuarioId")
                         .HasColumnType("char(36)");
 
@@ -302,6 +329,7 @@ namespace BaseApi.Infrastructure.Migrations
                             DataAgendada = new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             HorarioAgendado = new TimeSpan(0, 8, 0, 0, 0),
                             QuadraId = new Guid("33333333-3333-3333-3333-333333333333"),
+                            Status = "Ativa",
                             UsuarioId = new Guid("88888888-8888-8888-8888-888888888888")
                         },
                         new
@@ -310,6 +338,7 @@ namespace BaseApi.Infrastructure.Migrations
                             DataAgendada = new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             HorarioAgendado = new TimeSpan(0, 9, 0, 0, 0),
                             QuadraId = new Guid("33333333-3333-3333-3333-333333333333"),
+                            Status = "Ativa",
                             UsuarioId = new Guid("88888888-8888-8888-8888-888888888888")
                         },
                         new
@@ -318,6 +347,7 @@ namespace BaseApi.Infrastructure.Migrations
                             DataAgendada = new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             HorarioAgendado = new TimeSpan(0, 10, 0, 0, 0),
                             QuadraId = new Guid("44444444-4444-4444-4444-444444444444"),
+                            Status = "Ativa",
                             UsuarioId = new Guid("88888888-8888-8888-8888-888888888888")
                         },
                         new
@@ -326,6 +356,7 @@ namespace BaseApi.Infrastructure.Migrations
                             DataAgendada = new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             HorarioAgendado = new TimeSpan(0, 11, 0, 0, 0),
                             QuadraId = new Guid("44444444-4444-4444-4444-444444444444"),
+                            Status = "Ativa",
                             UsuarioId = new Guid("88888888-8888-8888-8888-888888888888")
                         },
                         new
@@ -334,6 +365,7 @@ namespace BaseApi.Infrastructure.Migrations
                             DataAgendada = new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             HorarioAgendado = new TimeSpan(0, 14, 0, 0, 0),
                             QuadraId = new Guid("55555555-5555-5555-5555-555555555555"),
+                            Status = "Ativa",
                             UsuarioId = new Guid("88888888-8888-8888-8888-888888888888")
                         },
                         new
@@ -342,6 +374,7 @@ namespace BaseApi.Infrastructure.Migrations
                             DataAgendada = new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             HorarioAgendado = new TimeSpan(0, 16, 0, 0, 0),
                             QuadraId = new Guid("66666666-6666-6666-6666-666666666666"),
+                            Status = "Ativa",
                             UsuarioId = new Guid("88888888-8888-8888-8888-888888888888")
                         });
                 });
@@ -418,7 +451,7 @@ namespace BaseApi.Infrastructure.Migrations
                             Email = "admin@baseapi.com",
                             NomeCompleto = "Administrador do Sistema",
                             PerfilId = 1,
-                            SenhaHash = "$2a$11$bjOZS9jbyjuZid5ndiwLMuOIK8FXR2Uf4wLR49wnJtrp3q11pqxJ6",
+                            SenhaHash = "$2a$11$QKTluLzEcfS0b50jOLM.r.piziEI5ZfPTzFWhC0fLPmzsNpb7D48G",
                             Telefone = ""
                         },
                         new
@@ -431,7 +464,7 @@ namespace BaseApi.Infrastructure.Migrations
                             Email = "admin@playzone.com",
                             NomeCompleto = "Administrador",
                             PerfilId = 1,
-                            SenhaHash = "$2a$11$6rWgTFzHybq2vV2LgRpUk.8Hw0fi18a7/Y6CSCkn4Oj3.jhPuuRRG",
+                            SenhaHash = "$2a$11$EgHzwS.oNyIAvG5iQGBBReTnLRjEEnvw8FGTYTQWiJnl/1oGvnfNW",
                             Telefone = "27999990001"
                         },
                         new
@@ -444,7 +477,7 @@ namespace BaseApi.Infrastructure.Migrations
                             Email = "joao@playzone.com",
                             NomeCompleto = "João Silva",
                             PerfilId = 2,
-                            SenhaHash = "$2a$11$82cfZKLF3eqSfUD08n/jL.YCcZok3716RMEdbz4Gy83YaKXGE/Bh6",
+                            SenhaHash = "$2a$11$vJ/pYLvBr/bhiwB0WjHLG.coohdfVu/1QnPOlXpBBy3qmyIDBxBSy",
                             Telefone = "27999990002"
                         },
                         new
@@ -457,7 +490,7 @@ namespace BaseApi.Infrastructure.Migrations
                             Email = "maria@playzone.com",
                             NomeCompleto = "Maria Souza",
                             PerfilId = 3,
-                            SenhaHash = "$2a$11$g0q6QhcPLiLEICnHQ7Dohu8JRyf.GgC9LqMZ01jpKntQGFf14MCV6",
+                            SenhaHash = "$2a$11$UfQYilz/5bUCJjkEPX0bwuDnvkiqWNDSUqLA5GQsN0uvDy3br6k1S",
                             Telefone = "27999990003"
                         });
                 });
@@ -568,6 +601,15 @@ namespace BaseApi.Infrastructure.Migrations
                             NomeCompleto = "Fernanda Oliveira",
                             Telefone = "(11) 99999-3333"
                         });
+                });
+
+            modelBuilder.Entity("BaseApi.Domain.Entidades.DataHorarioReserva", b =>
+                {
+                    b.HasOne("BaseApi.Domain.Entidades.Quadra", null)
+                        .WithMany()
+                        .HasForeignKey("QuadraId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("BaseApi.Domain.Entidades.Reserva", b =>

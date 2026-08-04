@@ -247,9 +247,117 @@
   transition: all 0.15s ease;
 }
 
-.btn-cal-nav:hover {
+/* Month Selector & Quick Copy Actions */
+.month-selector-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  background-color: #f8fafc;
+  padding: 16px 20px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 20px;
+}
+
+.month-field-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.month-select {
+  padding: 8px 14px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  border: 1.5px solid #cbd5e1;
+  background-color: #ffffff;
+  cursor: pointer;
+}
+
+.quick-copy-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Weekdays Tab Bar */
+.weekdays-tab-bar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+  .weekdays-tab-bar {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .weekdays-tab-bar {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.weekday-tab-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 12px 8px;
+  background-color: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.weekday-tab-btn:hover {
   background-color: #f1f5f9;
-  color: #0f172a;
+  border-color: #cbd5e1;
+}
+
+.weekday-tab-btn.active {
+  background-color: #1e2248;
+  border-color: #1e2248;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(30, 34, 72, 0.2);
+}
+
+.weekday-short {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.weekday-full {
+  font-size: 0.72rem;
+  opacity: 0.8;
+}
+
+.weekday-hours-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background-color: #f1f5f9;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.weekday-tab-btn.active .weekday-hours-badge {
+  background-color: #28a745;
+  color: #ffffff;
+}
+
+.day-config-box {
+  border-radius: 12px;
 }
 
 .btn-cal-nav svg {
@@ -312,8 +420,17 @@
   box-shadow: 0 4px 12px rgba(30, 34, 72, 0.25);
 }
 
+.cal-day-btn.has-hours::after {
+  display: none !important;
+}
+
+.cal-day-btn.selected-day.has-hours::after {
+  display: none !important;
+}
+
 .slots-config-panel {
   flex: 1;
+  min-width: 0;
   background-color: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 16px;
@@ -322,6 +439,7 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+  box-sizing: border-box;
 }
 
 .slots-panel-header {
@@ -426,43 +544,66 @@
 
 .slots-checkbox-grid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
   gap: 12px;
+  width: 100%;
 }
 
-@media (max-width: 1200px) {
-  .slots-checkbox-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
+/* Legenda de Status dos Horários */
+.slots-legend-bar {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  font-size: 0.82rem;
+  color: #64748b;
+  margin-bottom: 6px;
 }
 
-@media (max-width: 768px) {
-  .slots-checkbox-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.legend-dot.green {
+  background-color: #22c55e;
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+}
+
+.legend-dot.normal {
+  background-color: #ffffff;
+  border: 1.5px solid #cbd5e1;
 }
 
 .slot-checkbox-card {
   background-color: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 10px;
-  padding: 14px 16px;
+  padding: 12px 14px;
   display: flex;
   align-items: center;
   gap: 10px;
   cursor: pointer;
   user-select: none;
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
 }
 
 .slot-checkbox-card:hover {
   border-color: #cbd5e1;
-  background-color: #fafbfc;
+  background-color: #f8fafc;
 }
 
 .slot-checkbox-card.checked {
-  border-color: #86efac;
-  background-color: #f0fdf4;
+  border-color: #22c55e;
+  background-color: #ffffff;
 }
 
 .slot-checkbox-input {
@@ -483,8 +624,8 @@
 }
 
 .slot-checkbox-card.checked .custom-checkbox-box {
-  border-color: #28a745;
-  background-color: #28a745;
+  border-color: #22c55e;
+  background-color: #22c55e;
   color: #ffffff;
 }
 
@@ -696,4 +837,79 @@
 
 .margin-top-20 {
   margin-top: 20px;
+}
+
+/* --- Tabs Navigation Styling --- */
+.form-tabs-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #ffffff;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.form-tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  border-radius: 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.form-tab-btn svg {
+  width: 18px;
+  height: 18px;
+  color: #94a3b8;
+  transition: color 0.2s ease;
+}
+
+.form-tab-btn:hover {
+  background-color: #f8fafc;
+  color: #1e293b;
+}
+
+.form-tab-btn:hover svg {
+  color: #1e293b;
+}
+
+.form-tab-btn.active {
+  background-color: #1e2248;
+  color: #ffffff;
+  border-color: #1e2248;
+  box-shadow: 0 2px 8px rgba(30, 34, 72, 0.25);
+}
+
+.form-tab-btn.active svg {
+  color: #ffffff;
+}
+
+/* --- Success Banner Styling --- */
+.success-banner {
+  background-color: #ecfdf5;
+  border-left: 4px solid #10b981;
+  padding: 14px 18px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #065f46;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.success-banner svg {
+  width: 20px;
+  height: 20px;
+  color: #10b981;
+  flex-shrink: 0;
 }

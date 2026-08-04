@@ -83,20 +83,46 @@ export class UsuarioFormComponent implements OnInit {
       'Authorization': `Bearer ${token}`
     });
 
-    this.http.get<ApiResponse<PaginatedResult<Usuario>>>(this.API_URL, { headers }).subscribe({
+    // Try GET /api/Usuarios/{id} first
+    this.http.get<any>(`${this.API_URL}/${id}`, { headers }).subscribe({
       next: (res) => {
         this.carregando = false;
-        if (res.ok && res.dados && res.dados.itens) {
-          const user = res.dados.itens.find(u => u.id === id);
+        const u = res?.dados || res;
+        if (u && (u.nomeCompleto || u.email)) {
+          this.nomeCompleto = u.nomeCompleto || u.nome || '';
+          this.email = u.email || '';
+          this.cpf = this.formatarCpf(u.cpf || '');
+          this.telefone = this.formatarTelefone(u.telefone || '');
+          this.ativo = u.ativo !== false;
+        } else {
+          this.carregarUsuarioPelaLista(id, headers);
+        }
+      },
+      error: () => {
+        this.carregarUsuarioPelaLista(id, headers);
+      }
+    });
+  }
+
+  private carregarUsuarioPelaLista(id: string, headers: HttpHeaders): void {
+    this.http.get<ApiResponse<PaginatedResult<any>>>(this.API_URL, { headers }).subscribe({
+      next: (res) => {
+        this.carregando = false;
+        if (res && res.ok && res.dados && res.dados.itens) {
+          const user = res.dados.itens.find((u: any) =>
+            u.usuariosId === id || u.id === id || u.usuarioId === id
+          );
           if (user) {
-            this.nomeCompleto = user.nomeCompleto;
-            this.email = user.email;
+            this.nomeCompleto = user.nomeCompleto || user.nome || '';
+            this.email = user.email || '';
             this.cpf = this.formatarCpf(user.cpf || '');
             this.telefone = this.formatarTelefone(user.telefone || '');
-            this.ativo = user.ativo;
+            this.ativo = user.ativo !== false;
           } else {
             this.errorMessages = ['Usuário não encontrado.'];
           }
+        } else {
+          this.errorMessages = ['Usuário não encontrado.'];
         }
       },
       error: (err) => {

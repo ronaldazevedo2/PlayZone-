@@ -155,7 +155,7 @@
           <tr *ngFor="let guard of guardsFiltrados" (click)="openVigilanteDetails(guard)" class="clickable-row">
             <td>
               <div class="user-cell">
-                <div class="user-avatar" *ngIf="!getFoto(guard)">{{ guard.nomeCompleto.charAt(0) | uppercase }}</div>
+                <div class="user-avatar" *ngIf="!getFoto(guard)">{{ getInicials(guard.nomeCompleto) }}</div>
                 <img [src]="getFoto(guard)" alt="Avatar" class="user-avatar-img" *ngIf="getFoto(guard)">
                 <div class="user-info">
                   <span class="user-name">{{ guard.nomeCompleto }}</span>
@@ -253,8 +253,7 @@
 
       <div class="modal-body" *ngIf="selectedVigilante">
         <div class="user-profile-header">
-          <div class="user-avatar large" *ngIf="!getFoto(selectedVigilante)">{{ selectedVigilante.nomeCompleto.charAt(0)
-            | uppercase }}</div>
+          <div class="user-avatar large" *ngIf="!getFoto(selectedVigilante)">{{ getInicials(selectedVigilante.nomeCompleto) }}</div>
           <img [src]="getFoto(selectedVigilante)" alt="Avatar" class="user-avatar-img large"
             *ngIf="getFoto(selectedVigilante)">
 
@@ -367,9 +366,29 @@
             </select>
           </div>
 
-          <div class="form-group">
-            <label for="fotoPerfil">Foto de Perfil</label>
-            <input type="file" id="fotoPerfil" (change)="onFileSelected($event)" accept="image/*" class="form-control">
+          <div class="form-group photo-upload-group">
+            <label>Foto de Perfil</label>
+            <div class="modal-photo-preview-container">
+              <div class="modal-avatar-preview">
+                <img *ngIf="fotoPerfil" [src]="fotoPerfil" alt="Foto de perfil" class="avatar-preview-img">
+                <div *ngIf="!fotoPerfil" class="avatar-preview-initials">
+                  {{ getInicials(nomeCompleto) }}
+                </div>
+              </div>
+              <div class="modal-photo-actions">
+                <label for="modalFotoInput" class="btn-upload-photo-sm">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                    <circle cx="12" cy="13" r="4"></circle>
+                  </svg>
+                  {{ fotoPerfil ? 'Alterar foto' : 'Selecionar foto' }}
+                  <input type="file" id="modalFotoInput" (change)="onFileSelected($event)" accept="image/*" class="file-input-hidden">
+                </label>
+                <button type="button" class="btn-remove-photo-sm" *ngIf="fotoPerfil" (click)="removerFoto()">
+                  Remover foto
+                </button>
+              </div>
+            </div>
           </div>
 
           <div class="form-group">
