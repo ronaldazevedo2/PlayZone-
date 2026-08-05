@@ -42,7 +42,8 @@
 
     <div class="actions-group" style="display: flex; gap: 12px; flex-wrap: wrap;">
       <button class="btn-secondary" (click)="adicionarQuadra()" style="display: flex; align-items: center; gap: 8px;">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          width="16" height="16">
           <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
           <line x1="16" y1="2" x2="16" y2="6"></line>
           <line x1="8" y1="2" x2="8" y2="6"></line>
@@ -227,7 +228,8 @@
                 'status-warning': quadra.status === 'Manutenção',
                 'status-inactive': quadra.status === 'Inativa'
               }">
-                  {{ isAgendada(quadra) ? ('Agendada (' + (quadra.dataLiberacao | date:'dd/MM/yyyy') + ')') : quadra.status }}
+                  {{ isAgendada(quadra) ? ('Agendada (' + (quadra.dataLiberacao | date:'dd/MM/yyyy') + ')') :
+                  quadra.status }}
                 </span>
               </div>
             </td>
@@ -276,12 +278,6 @@
 
       <!-- Pagination -->
       <div class="pagination-footer" *ngIf="!carregando && !erro && totalItens > 0">
-        <div class="pagination-info">
-          Mostrando <strong>{{ (paginaAtual - 1) * tamanhoPagina + 1 }}</strong> a <strong>{{ paginaAtual *
-            tamanhoPagina
-            > totalItens ? totalItens : paginaAtual * tamanhoPagina }}</strong> de <strong>{{ totalItens }}</strong>
-          quadras
-        </div>
         <div class="pagination-controls">
           <button class="page-arrow" [disabled]="paginaAtual === 1" (click)="mudarPagina(paginaAtual - 1)">
             &lt;

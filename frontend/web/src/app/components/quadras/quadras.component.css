@@ -1321,7 +1321,7 @@ input:checked+.switch-slider:before {
    ========================================================= */
 .pagination-footer {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   margin-top: 24px;
   border-top: 1px solid var(--border-color);
@@ -1623,7 +1623,8 @@ input:checked+.switch-slider:before {
 }
 
 .cal-day-btn.selected-day {
-  background-color: #1e2248; /* Azul marinho escuro */
+  background-color: #1e2248;
+  /* Azul marinho escuro */
   color: #ffffff;
   font-weight: 700;
   box-shadow: 0 4px 12px rgba(30, 34, 72, 0.25);
@@ -1725,7 +1726,8 @@ input:checked+.switch-slider:before {
 }
 
 .btn-action-navy {
-  background-color: #1e2248; /* Botão escuro de ação rápida azul */
+  background-color: #1e2248;
+  /* Botão escuro de ação rápida azul */
   border: 1px solid #1e2248;
   color: #ffffff;
   font-size: 0.84rem;
