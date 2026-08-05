@@ -97,6 +97,16 @@ export class ReservaService {
       .pipe(catchError(this.handleError));
   }
 
+  atualizar(reservaId: string, command: any): Observable<RespostaApi<ReservaDto>> {
+    return this.http
+      .put<RespostaApi<ReservaDto>>(
+        `${this.BASE_URL}/${reservaId}`,
+        command,
+        { headers: this.getHeaders() }
+      )
+      .pipe(catchError(this.handleError));
+  }
+
   private handleError = (error: any): Observable<never> => {
     console.error('[ReservaService] Erro na requisição:', error);
     return throwError(() => error);

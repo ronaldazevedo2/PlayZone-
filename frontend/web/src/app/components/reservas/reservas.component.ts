@@ -3,9 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { QuadraService, ReservaQuadraDto } from '../../services/quadra.service';
 import { ReservaService, ReservaDto, CriarReservaCommand } from '../../services/reserva.service';
 import { DataHorarioReservaService } from '../../services/data-horario-reserva.service';
+import { UsuarioService } from '../../services/usuario.service';
 import { AuthService } from '../../services/auth.service';
 import { RespostaApi } from '../../wrappers/api-response.wrapper';
 import { ResultadoPaginado } from '../../services/secretaria.service';
@@ -84,6 +87,7 @@ export class ReservasComponent implements OnInit {
     private quadraService: QuadraService,
     private reservaService: ReservaService,
     private dataHorarioService: DataHorarioReservaService,
+    private usuarioService: UsuarioService,
     private authService: AuthService,
     private http: HttpClient,
     private router: Router,
@@ -99,18 +103,37 @@ export class ReservasComponent implements OnInit {
   // ────────────────────────────────────────
   carregarDados(): void {
     this.isLoading = true;
-    this.quadraService.listar(1, 100).subscribe({
-      next: (res: RespostaApi<ResultadoPaginado<ReservaQuadraDto>>) => {
-        if (res && res.ok && res.dados && res.dados.itens && res.dados.itens.length > 0) {
-          this.quadras = res.dados.itens;
+
+    forkJoin({
+      quadrasRes: this.quadraService.listar(1, 100).pipe(catchError(() => of(null))),
+      usuariosRes: this.usuarioService.listar(1, 100).pipe(catchError(() => of(null)))
+    }).subscribe({
+      next: (res: any) => {
+        if (res.quadrasRes && res.quadrasRes.ok && res.quadrasRes.dados && res.quadrasRes.dados.itens && res.quadrasRes.dados.itens.length > 0) {
+          this.quadras = res.quadrasRes.dados.itens;
         } else {
           this.usarQuadrasMockadas();
         }
+
+        if (res.usuariosRes && res.usuariosRes.dados && res.usuariosRes.dados.itens) {
+          this.usuariosBusca = res.usuariosRes.dados.itens.map((u: any) => ({
+            usuariosId: u.usuariosId || u.id || u.usuarioId || '',
+            nomeCompleto: u.nomeCompleto || u.nome || '',
+            email: u.email || '',
+            cpf: u.cpf,
+            telefone: u.telefone,
+            ativo: u.ativo ?? true
+          }));
+        } else {
+          this.usarUsuariosMockados();
+        }
+
         this.aplicarFiltros();
         this.carregarReservas();
       },
       error: () => {
         this.usarQuadrasMockadas();
+        this.usarUsuariosMockados();
         this.aplicarFiltros();
         this.carregarReservas();
       }
@@ -129,6 +152,12 @@ export class ReservasComponent implements OnInit {
   }
 
   carregarReservas(): void {
+    let localUserMap: any = {};
+    try {
+      const raw = localStorage.getItem('playzone_reservas_usuarios_map');
+      if (raw) localUserMap = JSON.parse(raw);
+    } catch {}
+
     this.reservaService.listar(1, 100).subscribe({
       next: (res: RespostaApi<ResultadoPaginado<ReservaDto>>) => {
         this.isLoading = false;
@@ -138,6 +167,30 @@ export class ReservasComponent implements OnInit {
             const qId = item.quadraId || item.QuadraId || '';
             const quadra = this.quadras.find(q => q.id === qId);
 
+            const resId = item.reservasId || item.reservaId || item.id || '';
+            const uId = item.usuariosId || item.usuarioId || '';
+
+            const userCadastrado = this.usuariosBusca.find(u =>
+              u.usuariosId === uId || (u as any).id === uId || (u as any).usuarioId === uId
+            );
+
+            let nomeResolvido = localUserMap[resId]?.nomeUsuario || localUserMap[uId]?.nomeUsuario;
+            if (!nomeResolvido) {
+              if (item.nomeUsuario && item.nomeUsuario !== 'Administrador do Sistema') {
+                nomeResolvido = item.nomeUsuario;
+              } else if (item.usuarioNome && item.usuarioNome !== 'Administrador do Sistema') {
+                nomeResolvido = item.usuarioNome;
+              } else if (userCadastrado?.nomeCompleto) {
+                nomeResolvido = userCadastrado.nomeCompleto;
+              } else if (item.nomeUsuario) {
+                nomeResolvido = item.nomeUsuario;
+              } else {
+                nomeResolvido = 'Usuário do Sistema';
+              }
+            }
+
+            let emailResolvido = localUserMap[resId]?.emailUsuario || localUserMap[uId]?.emailUsuario || item.emailUsuario || userCadastrado?.email || '';
+
             const rawHorario = item.horarioAgendado || item.horario || '';
             const shortHorario = this.formatHorarioShort(rawHorario);
             const rangeHorario = this.formatHorarioRange(shortHorario);
@@ -146,14 +199,14 @@ export class ReservasComponent implements OnInit {
             const statusCalculado = this.calcularStatusReserva(dataValida, rawHorario, item.status);
 
             return {
-              id: item.reservasId || item.reservaId || item.id || '',
+              id: resId,
               quadraId: qId,
               nomeQuadra: item.nomeQuadra || quadra?.nome || 'Quadra',
               modalidade: item.modalidade || quadra?.modalidade || 'Futebol Society',
-              usuarioId: item.usuariosId || item.usuarioId || '',
-              nomeUsuario: item.nomeUsuario || item.usuarioNome || 'Administrador do Sistema',
-              emailUsuario: item.emailUsuario || '',
-              telefoneUsuario: item.telefoneUsuario || '',
+              usuarioId: uId,
+              nomeUsuario: nomeResolvido,
+              emailUsuario: emailResolvido,
+              telefoneUsuario: item.telefoneUsuario || userCadastrado?.telefone || '',
               data: dataValida,
               horario: rangeHorario || shortHorario,
               status: statusCalculado

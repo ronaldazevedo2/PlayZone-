@@ -92,6 +92,15 @@ export class UsuarioService {
       );
   }
 
+  obterPorId(id: string): Observable<RespostaApi<UsuarioDto>> {
+    return this.http
+      .get<RespostaApi<UsuarioDto>>(
+        `${this.BASE_URL}/${id}`,
+        { headers: this.getGetHeaders() }
+      )
+      .pipe(catchError(this.handleError));
+  }
+
   private handleError = (error: any): Observable<never> => {
     console.error('[UsuarioService] Erro ao buscar usuários no banco de dados:', error);
     return throwError(() => error);
