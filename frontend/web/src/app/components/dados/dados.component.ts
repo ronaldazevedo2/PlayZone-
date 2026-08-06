@@ -1,15 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { SecretariaService, SecretariaListaDto } from '../../services/secretaria.service';
-
-
 
 @Component({
   selector: 'app-dados',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './dados.component.html',
   styleUrl: './dados.component.css'
 })
@@ -29,12 +28,16 @@ export class DadosComponent implements OnInit {
   // Flag indicating if the edit mode is active
   isEditing: boolean = false;
 
-  private secretariaId: string = '';
-  constructor(private secretariaService: SecretariaService, private authService: AuthService) { }
+  secretariaId: string = '';
+  constructor(
+    private secretariaService: SecretariaService,
+    private authService: AuthService,
+    private router: Router
+  ) { }
 
   toggleEdit(): void {
-    if (!this.isAdmin) return;
-    this.isEditing = !this.isEditing;
+    const id = this.secretariaId || 'perfil';
+    this.router.navigate(['/dados/editar', id]);
   }
 
   /** Decode JWT token payload */

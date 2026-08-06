@@ -63,17 +63,6 @@
         <span>Usuários</span>
       </a>
 
-      <a routerLink="/mensagens" routerLinkActive="active" class="menu-item">
-        <span class="menu-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-          </svg>
-        </span>
-        <span>Mensagens</span>
-        <span class="menu-badge">{{ mensagensPendentesCount }}</span>
-      </a>
-
       <a routerLink="/avaliacoes" routerLinkActive="active" class="menu-item">
         <span class="menu-icon">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -86,17 +75,44 @@
         <span>Avaliações</span>
       </a>
 
-      <a routerLink="/relatorios" routerLinkActive="active" class="menu-item">
-        <span class="menu-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2">
-            <line x1="18" y1="20" x2="18" y2="10"></line>
-            <line x1="12" y1="20" x2="12" y2="4"></line>
-            <line x1="6" y1="20" x2="6" y2="14"></line>
-          </svg>
-        </span>
-        <span>Relatórios</span>
-      </a>
+      <!-- Relatórios Accordion Menu -->
+      <div class="menu-accordion-item">
+        <a class="menu-item menu-accordion-header" (click)="toggleRelatoriosMenu($event)" [class.active]="router.url.includes('/relatorios')">
+          <span class="menu-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+          </span>
+          <span>Relatórios</span>
+          <span class="accordion-chevron" [class.open]="relatoriosMenuOpen">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </span>
+        </a>
+
+        <div class="submenu-list" *ngIf="relatoriosMenuOpen">
+          <a routerLink="/relatorios/usuarios" routerLinkActive="active" class="submenu-item">
+            <span class="submenu-dot"></span>
+            <span>Usuários</span>
+          </a>
+          <a routerLink="/relatorios/quadras" routerLinkActive="active" class="submenu-item">
+            <span class="submenu-dot"></span>
+            <span>Quadras</span>
+          </a>
+          <a routerLink="/relatorios/reservas" routerLinkActive="active" class="submenu-item">
+            <span class="submenu-dot"></span>
+            <span>Reservas</span>
+          </a>
+          <a routerLink="/relatorios/vigilantes" routerLinkActive="active" class="submenu-item">
+            <span class="submenu-dot"></span>
+            <span>Vigilantes</span>
+          </a>
+        </div>
+      </div>
 
       <!-- Vigilante Menu Option -->
       <a routerLink="/vigilante" routerLinkActive="active" class="menu-item vigilante-option">

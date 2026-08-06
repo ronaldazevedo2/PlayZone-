@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,13 +8,15 @@ namespace BaseApi.Domain.Entidades
 {
    public class Reserva
     {
-        public Guid Id { get; set; }
+        public Guid ReservasId { get; set; }
 
         public Guid QuadraId { get; set; }
+        public Guid UsuarioId { get; set; }
 
         public DateTime DataAgendada { get; set; }
 
         public TimeSpan HorarioAgendado { get; set; }
 
+        public string Status { get; set; } = "Ativa";
     }
 }

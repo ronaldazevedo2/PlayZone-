@@ -17,14 +17,19 @@ export class AdminLayoutComponent implements OnInit {
   mensagensPendentesCount = 7;
   userMenuOpen = false;
   sidebarOpen = false;
+  relatoriosMenuOpen = false;
 
-  constructor(private router: Router, private authService: AuthService) {}
+  constructor(public router: Router, private authService: AuthService) {}
 
   ngOnInit(): void {
     const session = this.authService.getSession();
     if (!session) {
       this.router.navigate(['/login']);
       return;
+    }
+
+    if (this.router.url.includes('/relatorios')) {
+      this.relatoriosMenuOpen = true;
     }
 
     this.adminName = session.nome || 'Admin';
@@ -39,6 +44,14 @@ export class AdminLayoutComponent implements OnInit {
     const today = new Date();
     const rawDate = today.toLocaleDateString('pt-BR', options);
     this.currentDate = rawDate.charAt(0).toUpperCase() + rawDate.slice(1);
+  }
+
+  toggleRelatoriosMenu(event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    this.relatoriosMenuOpen = !this.relatoriosMenuOpen;
   }
 
   logout(): void {

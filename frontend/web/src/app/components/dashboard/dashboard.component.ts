@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
 import { SecretariaService, SecretariaListaDto } from '../../services/secretaria.service';
 
 interface Booking {
@@ -21,7 +22,7 @@ interface Message {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
@@ -53,7 +54,8 @@ export class DashboardComponent implements OnInit {
   erro = '';
 
   constructor(
-    private secretariaService: SecretariaService
+    private secretariaService: SecretariaService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -75,7 +77,24 @@ export class DashboardComponent implements OnInit {
       }
     });
   }
+
+  navTo(path: string): void {
+    this.router.navigate([path]);
+  }
+
   triggerAction(actionName: string): void {
-    alert(`Ação executada: ${actionName} (MOCK)`);
+    if (actionName === 'Nova Quadra') {
+      this.router.navigate(['/quadras/nova']);
+    } else if (actionName === 'Nova Reserva') {
+      this.router.navigate(['/reservas/nova']);
+    } else if (actionName === 'Novo Usuário') {
+      this.router.navigate(['/usuarios/novo']);
+    } else if (actionName === 'Novo Vigilante') {
+      this.router.navigate(['/vigilante/novo']);
+    } else if (actionName === 'Ver todas as reservas') {
+      this.router.navigate(['/reservas']);
+    } else {
+      alert(`Ação executada: ${actionName}`);
+    }
   }
 }

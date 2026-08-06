@@ -46,6 +46,26 @@ namespace BaseApi.Infrastructure.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "notificacoes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Titulo = table.Column<string>(type: "varchar(150)", maxLength: 150, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Mensagem = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    DataEnvio = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    Lida = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: false),
+                    UsuarioId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_notificacoes", x => x.Id);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "perfis",
                 columns: table => new
                 {
@@ -76,7 +96,9 @@ namespace BaseApi.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Modalidade = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    ImagemUrl = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: false)
+                    ImagemUrl = table.Column<string>(type: "longtext", maxLength: 1000000, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Status = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
@@ -99,7 +121,7 @@ namespace BaseApi.Infrastructure.Migrations
                     Telefone = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     DataNascimento = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    FotoPerfil = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: false)
+                    FotoPerfil = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Ativo = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     CriadoEm = table.Column<DateTime>(type: "datetime(6)", nullable: false),
@@ -119,10 +141,14 @@ namespace BaseApi.Infrastructure.Migrations
                 name: "usuarios",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    UsuariosId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     NomeCompleto = table.Column<string>(type: "varchar(150)", maxLength: 150, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Email = table.Column<string>(type: "varchar(200)", maxLength: 200, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Cpf = table.Column<string>(type: "varchar(11)", maxLength: 11, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Telefone = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     SenhaHash = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -136,7 +162,7 @@ namespace BaseApi.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_usuarios", x => x.Id);
+                    table.PrimaryKey("PK_usuarios", x => x.UsuariosId);
                     table.ForeignKey(
                         name: "FK_usuarios_perfis_PerfilId",
                         column: x => x.PerfilId,
@@ -147,22 +173,52 @@ namespace BaseApi.Infrastructure.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "reservas",
+                name: "data_horario_reservas",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    DataHorarioReservaId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     QuadraId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    DataAgendada = table.Column<DateTime>(type: "date", nullable: false),
-                    HorarioAgendado = table.Column<TimeSpan>(type: "time", nullable: false)
+                    Data = table.Column<DateTime>(type: "date", nullable: false),
+                    Horario = table.Column<TimeSpan>(type: "time", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_reservas", x => x.Id);
+                    table.PrimaryKey("PK_data_horario_reservas", x => x.DataHorarioReservaId);
+                    table.ForeignKey(
+                        name: "FK_data_horario_reservas_quadras_QuadraId",
+                        column: x => x.QuadraId,
+                        principalTable: "quadras",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "reservas",
+                columns: table => new
+                {
+                    ReservasId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    QuadraId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    UsuarioId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    DataAgendada = table.Column<DateTime>(type: "date", nullable: false),
+                    HorarioAgendado = table.Column<TimeSpan>(type: "time", nullable: false),
+                    Status = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_reservas", x => x.ReservasId);
                     table.ForeignKey(
                         name: "FK_reservas_quadras_QuadraId",
                         column: x => x.QuadraId,
                         principalTable: "quadras",
                         principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_reservas_usuarios_UsuarioId",
+                        column: x => x.UsuarioId,
+                        principalTable: "usuarios",
+                        principalColumn: "UsuariosId",
                         onDelete: ReferentialAction.Restrict);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
@@ -188,13 +244,13 @@ namespace BaseApi.Infrastructure.Migrations
 
             migrationBuilder.InsertData(
                 table: "quadras",
-                columns: new[] { "Id", "Capacidade", "Descricao", "ImagemUrl", "Localizacao", "Modalidade", "Nome" },
+                columns: new[] { "Id", "Capacidade", "Descricao", "ImagemUrl", "Localizacao", "Modalidade", "Nome", "Status" },
                 values: new object[,]
                 {
-                    { new Guid("33333333-3333-3333-3333-333333333333"), 20, "Ginásio Poliesportivo localizado no bairro São José.", "https://www.aecweb.com.br/revista/materias/projetando-areas-esportivas-conheca-os-materiais-mais-indicados/6698", "São José", "Futebol", "GINÁSIO POLIESPORTIVO \"EURICO GUILHERME SCHULZ\"" },
-                    { new Guid("44444444-4444-4444-4444-444444444444"), 20, "Ginásio Poliesportivo localizado no bairro Aviso.", "https://www.newquadras.com.br/images/Projetos/Fotos/ESCOLA%20IPSG%20(2).jpg", "Aviso", "Futebol", "GINÁSIO POLIESPORTIVO BAIRRO AVISO" },
-                    { new Guid("55555555-5555-5555-5555-555555555555"), 20, "Ginásio Poliesportivo localizado no bairro Interlagos.", "https://exemplo.com/imagens/interlagos.jpg", "Interlagos", "Futebol", "GINÁSIO POLIESPORTIVO \"LEANDRO SILVA DOS REIS\"" },
-                    { new Guid("66666666-6666-6666-6666-666666666666"), 20, "Ginásio Poliesportivo localizado no bairro Araçá.", "https://exemplo.com/imagens/araca.jpg", "Araçá", "Futebol", "GINÁSIO POLIESPORTIVO BAIRRO ARAÇÁ" }
+                    { new Guid("33333333-3333-3333-3333-333333333333"), 20, "Ginásio Poliesportivo localizado no bairro São José.", "https://www.aecweb.com.br/revista/materias/projetando-areas-esportivas-conheca-os-materiais-mais-indicados/6698", "São José", "Futebol", "GINÁSIO POLIESPORTIVO \"EURICO GUILHERME SCHULZ\"", "Ativa" },
+                    { new Guid("44444444-4444-4444-4444-444444444444"), 20, "Ginásio Poliesportivo localizado no bairro Aviso.", "https://www.newquadras.com.br/images/Projetos/Fotos/ESCOLA%20IPSG%20(2).jpg", "Aviso", "Futebol", "GINÁSIO POLIESPORTIVO BAIRRO AVISO", "Ativa" },
+                    { new Guid("55555555-5555-5555-5555-555555555555"), 20, "Ginásio Poliesportivo localizado no bairro Interlagos.", "https://exemplo.com/imagens/interlagos.jpg", "Interlagos", "Futebol", "GINÁSIO POLIESPORTIVO \"LEANDRO SILVA DOS REIS\"", "Ativa" },
+                    { new Guid("66666666-6666-6666-6666-666666666666"), 20, "Ginásio Poliesportivo localizado no bairro Araçá.", "https://exemplo.com/imagens/araca.jpg", "Araçá", "Futebol", "GINÁSIO POLIESPORTIVO BAIRRO ARAÇÁ", "Ativa" }
                 });
 
             migrationBuilder.InsertData(
@@ -208,28 +264,34 @@ namespace BaseApi.Infrastructure.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "reservas",
-                columns: new[] { "Id", "DataAgendada", "HorarioAgendado", "QuadraId" },
+                table: "usuarios",
+                columns: new[] { "UsuariosId", "Ativo", "AtualizadoEm", "Cpf", "CriadoEm", "Email", "NomeCompleto", "PerfilId", "SenhaHash", "Telefone", "TokenExpiracao", "TokenRedefinicaoSenha" },
                 values: new object[,]
                 {
-                    { new Guid("70000000-0000-0000-0000-000000000001"), new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 8, 0, 0, 0), new Guid("33333333-3333-3333-3333-333333333333") },
-                    { new Guid("70000000-0000-0000-0000-000000000002"), new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 9, 0, 0, 0), new Guid("33333333-3333-3333-3333-333333333333") },
-                    { new Guid("70000000-0000-0000-0000-000000000003"), new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 10, 0, 0, 0), new Guid("44444444-4444-4444-4444-444444444444") },
-                    { new Guid("70000000-0000-0000-0000-000000000004"), new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 11, 0, 0, 0), new Guid("44444444-4444-4444-4444-444444444444") },
-                    { new Guid("70000000-0000-0000-0000-000000000005"), new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 14, 0, 0, 0), new Guid("55555555-5555-5555-5555-555555555555") },
-                    { new Guid("70000000-0000-0000-0000-000000000006"), new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 16, 0, 0, 0), new Guid("66666666-6666-6666-6666-666666666666") }
+                    { new Guid("00000000-0000-0000-0000-000000000001"), true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "admin@baseapi.com", "Administrador do Sistema", 1, "$2a$11$QKTluLzEcfS0b50jOLM.r.piziEI5ZfPTzFWhC0fLPmzsNpb7D48G", "", null, null },
+                    { new Guid("77777777-7777-7777-7777-777777777777"), true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "11111111111", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin@playzone.com", "Administrador", 1, "$2a$11$EgHzwS.oNyIAvG5iQGBBReTnLRjEEnvw8FGTYTQWiJnl/1oGvnfNW", "27999990001", null, null },
+                    { new Guid("88888888-8888-8888-8888-888888888888"), true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "22222222222", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "joao@playzone.com", "João Silva", 2, "$2a$11$vJ/pYLvBr/bhiwB0WjHLG.coohdfVu/1QnPOlXpBBy3qmyIDBxBSy", "27999990002", null, null },
+                    { new Guid("99999999-9999-9999-9999-999999999999"), true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "33333333333", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "maria@playzone.com", "Maria Souza", 3, "$2a$11$UfQYilz/5bUCJjkEPX0bwuDnvkiqWNDSUqLA5GQsN0uvDy3br6k1S", "27999990003", null, null }
                 });
 
             migrationBuilder.InsertData(
-                table: "usuarios",
-                columns: new[] { "Id", "Ativo", "AtualizadoEm", "CriadoEm", "Email", "NomeCompleto", "PerfilId", "SenhaHash", "TokenExpiracao", "TokenRedefinicaoSenha" },
+                table: "reservas",
+                columns: new[] { "ReservasId", "DataAgendada", "HorarioAgendado", "QuadraId", "Status", "UsuarioId" },
                 values: new object[,]
                 {
-                    { new Guid("00000000-0000-0000-0000-000000000001"), true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "admin@baseapi.com", "Administrador do Sistema", 1, "$2a$11$yfmBIKkUChsjPwknL47JduYQ4aPPA8viSgHF3TdQHaZ116zYesSHe", null, null },
-                    { new Guid("77777777-7777-7777-7777-777777777777"), true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin@playzone.com", "Administrador", 1, "$2a$11$lcLGRcapQKBxc3J8OHvZN.495l/bacBCuWXXINMW417DsuZQgYNAO", null, null },
-                    { new Guid("88888888-8888-8888-8888-888888888888"), true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "joao@playzone.com", "João Silva", 2, "$2a$11$eTEmNg23MDla.OT8sPAlc.s7s6Cv3R4vVtxMFbpUgE8y/0cMI5pYa", null, null },
-                    { new Guid("99999999-9999-9999-9999-999999999999"), true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "maria@playzone.com", "Maria Souza", 3, "$2a$11$vP2OQjyizrexH1IaY65OveQ2mgFAn2TjbOr6gka9hQ52srUDwmzZy", null, null }
+                    { new Guid("70000000-0000-0000-0000-000000000001"), new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 8, 0, 0, 0), new Guid("33333333-3333-3333-3333-333333333333"), "Ativa", new Guid("88888888-8888-8888-8888-888888888888") },
+                    { new Guid("70000000-0000-0000-0000-000000000002"), new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 9, 0, 0, 0), new Guid("33333333-3333-3333-3333-333333333333"), "Ativa", new Guid("88888888-8888-8888-8888-888888888888") },
+                    { new Guid("70000000-0000-0000-0000-000000000003"), new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 10, 0, 0, 0), new Guid("44444444-4444-4444-4444-444444444444"), "Ativa", new Guid("88888888-8888-8888-8888-888888888888") },
+                    { new Guid("70000000-0000-0000-0000-000000000004"), new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 11, 0, 0, 0), new Guid("44444444-4444-4444-4444-444444444444"), "Ativa", new Guid("88888888-8888-8888-8888-888888888888") },
+                    { new Guid("70000000-0000-0000-0000-000000000005"), new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 14, 0, 0, 0), new Guid("55555555-5555-5555-5555-555555555555"), "Ativa", new Guid("88888888-8888-8888-8888-888888888888") },
+                    { new Guid("70000000-0000-0000-0000-000000000006"), new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 16, 0, 0, 0), new Guid("66666666-6666-6666-6666-666666666666"), "Ativa", new Guid("88888888-8888-8888-8888-888888888888") }
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_data_horario_reservas_QuadraId_Data_Horario",
+                table: "data_horario_reservas",
+                columns: new[] { "QuadraId", "Data", "Horario" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_perfis_Nome",
@@ -241,6 +303,17 @@ namespace BaseApi.Infrastructure.Migrations
                 name: "IX_reservas_QuadraId_DataAgendada_HorarioAgendado",
                 table: "reservas",
                 columns: new[] { "QuadraId", "DataAgendada", "HorarioAgendado" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_reservas_UsuarioId",
+                table: "reservas",
+                column: "UsuarioId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_usuarios_Cpf",
+                table: "usuarios",
+                column: "Cpf",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -274,16 +347,22 @@ namespace BaseApi.Infrastructure.Migrations
                 name: "dados_secretaria");
 
             migrationBuilder.DropTable(
-                name: "reservas");
+                name: "data_horario_reservas");
 
             migrationBuilder.DropTable(
-                name: "usuarios");
+                name: "notificacoes");
+
+            migrationBuilder.DropTable(
+                name: "reservas");
 
             migrationBuilder.DropTable(
                 name: "vigilantes");
 
             migrationBuilder.DropTable(
                 name: "quadras");
+
+            migrationBuilder.DropTable(
+                name: "usuarios");
 
             migrationBuilder.DropTable(
                 name: "perfis");

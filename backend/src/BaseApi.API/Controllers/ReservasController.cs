@@ -1,4 +1,4 @@
-﻿using BaseApi.Application.Comum.Modelos;
+using BaseApi.Application.Comum.Modelos;
 using BaseApi.Application.Reserva.Commands.AtualizarReserva;
 using BaseApi.Application.Reserva.Commands.CriarReserva;
 using BaseApi.Application.Telefones.Commands.ExcluirTelefone;
@@ -38,7 +38,7 @@ public class ReservasController(IMediator mediator) : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = $"{NomePerfil.Admin},{NomePerfil.Gerente}")]
+    [Authorize(Roles = $"{NomePerfil.Admin},{NomePerfil.Vigilante}")]
     public async Task<IActionResult> Criar(
         [FromBody] CriarReservaCommand command,
         CancellationToken ct)
@@ -47,7 +47,7 @@ public class ReservasController(IMediator mediator) : ControllerBase
 
         return CreatedAtAction(
             nameof(ObterPorId),
-            new { id = resultado.Id },
+            new { id = resultado.ReservasId },
             RespostaApi<CriarReservaResposta>.Sucesso(
                 resultado,
                 "Reserva cadastrada com sucesso!"
@@ -56,7 +56,7 @@ public class ReservasController(IMediator mediator) : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    [Authorize(Roles = $"{NomePerfil.Admin},{NomePerfil.Gerente}")]
+    [Authorize(Roles = $"{NomePerfil.Admin},{NomePerfil.Vigilante}")]
     public async Task<IActionResult> Atualizar(
         Guid id,
         [FromBody] AtualizarReservaRequest request,
@@ -65,6 +65,7 @@ public class ReservasController(IMediator mediator) : ControllerBase
         var command = new AtualizarReservaCommand(
             id,
             request.QuadraId,
+            request.UsuarioId, 
             request.DataAgendada,
             request.HorarioAgendado
         );
@@ -86,6 +87,7 @@ public class ReservasController(IMediator mediator) : ControllerBase
 
 public record AtualizarReservaRequest(
     Guid QuadraId,
+    Guid UsuarioId,
     DateTime DataAgendada,
     TimeSpan HorarioAgendado
 );

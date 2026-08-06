@@ -14,12 +14,15 @@ public class UsuarioRepositorio(AppDbContext contexto) : IUsuarioRepositorio
     public async Task<Usuario?> ObterPorIdAsync(Guid id, CancellationToken ct = default)
         => await contexto.Usuarios
             .Include(u => u.Perfil)
-            .FirstOrDefaultAsync(u => u.Id == id, ct);
+            .FirstOrDefaultAsync(u => u.UsuariosId == id, ct);
 
     public async Task<Usuario?> ObterPorEmailAsync(string email, CancellationToken ct = default)
-        => await contexto.Usuarios
+    {
+        var emailLimpo = email.Trim().ToLower();
+        return await contexto.Usuarios
             .Include(u => u.Perfil)
-            .FirstOrDefaultAsync(u => u.Email == email, ct);
+            .FirstOrDefaultAsync(u => u.Email.ToLower() == emailLimpo, ct);
+    }
 
     public async Task<Usuario?> ObterPorCpfAsync(string cpf, CancellationToken ct = default)
         => await contexto.Usuarios
@@ -67,7 +70,7 @@ public class UsuarioRepositorio(AppDbContext contexto) : IUsuarioRepositorio
         CancellationToken ct = default)
         => await contexto.Usuarios.AnyAsync(
             u => u.Email == email &&
-            (ignorarId == null || u.Id != ignorarId),
+            (ignorarId == null || u.UsuariosId != ignorarId),
             ct);
 
     public async Task<bool> CpfExisteAsync(
@@ -76,7 +79,7 @@ public class UsuarioRepositorio(AppDbContext contexto) : IUsuarioRepositorio
         CancellationToken ct = default)
         => await contexto.Usuarios.AnyAsync(
             u => u.Cpf == cpf &&
-            (ignorarId == null || u.Id != ignorarId),
+            (ignorarId == null || u.UsuariosId != ignorarId),
             ct);
 
     public async Task AdicionarAsync(Usuario usuario, CancellationToken ct = default)

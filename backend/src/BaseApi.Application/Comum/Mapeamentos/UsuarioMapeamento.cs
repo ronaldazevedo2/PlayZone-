@@ -34,7 +34,7 @@ public class UsuarioMapeamento : IRegister
             .Map(dest => dest.Cpf, src => src.Cpf)
             .Map(dest => dest.Telefone, src => src.Telefone)
             .Ignore(dest => dest.SenhaHash)
-            .Ignore(dest => dest.Id)
+            .Ignore(dest => dest.UsuariosId)
             .Ignore(dest => dest.CriadoEm)
             .Ignore(dest => dest.AtualizadoEm)
             .Ignore(dest => dest.Perfil!)

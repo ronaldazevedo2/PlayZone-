@@ -6,12 +6,13 @@ namespace BaseApi.Application.Telefones.Queries.ObterTelefonePorId;
 /// Query para buscar um único telefone pelo Id.
 /// Queries NUNCA alteram dados — apenas leem.
 /// </summary>
-public record ObterReservaPorIdQuery(Guid Id) : IRequest<ReservaDetalheDto>;
+public record ObterReservaPorIdQuery(Guid ReservasId) : IRequest<ReservaDetalheDto>;
 
 /// <summary>DTO com todos os dados do telefone para exibição</summary>
 public record ReservaDetalheDto(
-    Guid Id,
+    Guid ReservasId,
     Guid QuadraId,
+    Guid UsuariosId,
     DateTime DataAgendada,
     TimeSpan HorarioAgendado
 );

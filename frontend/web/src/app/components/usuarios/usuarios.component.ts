@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';
 import { ExportService } from '../../services/export.service';
@@ -36,7 +37,7 @@ interface PaginatedResult<T> {
 @Component({
   selector: 'app-usuarios',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './usuarios.component.html',
   styleUrl: './usuarios.component.css'
 })
@@ -70,7 +71,8 @@ export class UsuariosComponent implements OnInit {
   constructor(
     private http: HttpClient,
     private authService: AuthService,
-    private exportService: ExportService
+    private exportService: ExportService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -95,10 +97,11 @@ export class UsuariosComponent implements OnInit {
       next: (res) => {
         this.isLoading = false;
         if (res.ok && res.dados) {
-          this.usuarios = res.dados.itens.map(u => ({
+          this.usuarios = res.dados.itens.map((u: any) => ({
             ...u,
+            id: u.id || u.usuariosId || u.usuarioId || '',
             avaliacao: Math.round((Math.random() * 2 + 3) * 10) / 10,
-            dataCriacao: (u as any).dataCriacao || (u as any).createdAt || (u as any).criadoEm || new Date(Date.now() - Math.random() * 31536000000).toISOString()
+            dataCriacao: u.dataCriacao || u.createdAt || u.criadoEm || new Date(Date.now() - Math.random() * 31536000000).toISOString()
           }));
           this.filtrarUsuarios();
         } else if (res.erros && res.erros.length > 0) {
@@ -192,25 +195,14 @@ export class UsuariosComponent implements OnInit {
   }
 
   openAddModal(): void {
-    this.isEditMode = false;
-    this.editingUserId = null;
-    this.resetForm();
-    this.showAddModal = true;
+    this.router.navigate(['/usuarios/novo']);
   }
 
   abrirModalEdicao(usuario: Usuario): void {
-    this.isEditMode = true;
-    this.editingUserId = usuario.id || null;
-    this.nomeCompleto = usuario.nomeCompleto;
-    this.email = usuario.email;
-    // Formatar CPF e telefone para exibição com máscara
-    this.cpf = this.formatarCpf(usuario.cpf || '');
-    this.telefone = this.formatarTelefone(usuario.telefone || '');
-    this.ativo = usuario.ativo;
-    this.senha = ''; // Senha não é enviada na edição
-    this.errorMessages = [];
-    this.successMessage = '';
-    this.showAddModal = true;
+    const id = usuario.id || (usuario as any).usuariosId || (usuario as any).usuarioId;
+    if (id) {
+      this.router.navigate(['/usuarios/editar', id]);
+    }
   }
 
   closeAddModal(): void {

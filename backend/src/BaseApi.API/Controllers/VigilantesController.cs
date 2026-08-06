@@ -36,7 +36,7 @@ public class VigilantesController(IMediator mediator) : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = $"{NomePerfil.Admin},{NomePerfil.Gerente}")]
+    [Authorize(Roles = $"{NomePerfil.Admin},{NomePerfil.Vigilante}")]
     public async Task<IActionResult> Criar([FromBody] CriarVigilanteCommand command, CancellationToken ct)
     {
         var resultado = await mediator.Send(command, ct);
@@ -49,7 +49,7 @@ public class VigilantesController(IMediator mediator) : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    [Authorize(Roles = $"{NomePerfil.Admin},{NomePerfil.Gerente}")]
+    [Authorize(Roles = $"{NomePerfil.Admin},{NomePerfil.Vigilante}")]
     public async Task<IActionResult> Atualizar(
         Guid id,
         [FromBody] AtualizarVigilanteRequest request,

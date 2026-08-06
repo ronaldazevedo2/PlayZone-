@@ -99,6 +99,63 @@ namespace BaseApi.Infrastructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("BaseApi.Domain.Entidades.DataHorarioReserva", b =>
+                {
+                    b.Property<Guid>("DataHorarioReservaId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("Data")
+                        .HasColumnType("date");
+
+                    b.Property<TimeSpan>("Horario")
+                        .HasColumnType("time");
+
+                    b.Property<Guid>("QuadraId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("DataHorarioReservaId");
+
+                    b.HasIndex("QuadraId", "Data", "Horario")
+                        .IsUnique();
+
+                    b.ToTable("data_horario_reservas", (string)null);
+                });
+
+            modelBuilder.Entity("BaseApi.Domain.Entidades.Notificacao", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("DataEnvio")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("Lida")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Mensagem")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<string>("Titulo")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("varchar(150)");
+
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("notificacoes", (string)null);
+                });
+
             modelBuilder.Entity("BaseApi.Domain.Entidades.Perfil", b =>
                 {
                     b.Property<int>("Id")
@@ -236,7 +293,7 @@ namespace BaseApi.Infrastructure.Migrations
 
             modelBuilder.Entity("BaseApi.Domain.Entidades.Reserva", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("ReservasId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
@@ -249,7 +306,16 @@ namespace BaseApi.Infrastructure.Migrations
                     b.Property<Guid>("QuadraId")
                         .HasColumnType("char(36)");
 
-                    b.HasKey("Id");
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<Guid>("UsuarioId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("ReservasId");
+
+                    b.HasIndex("UsuarioId");
 
                     b.HasIndex("QuadraId", "DataAgendada", "HorarioAgendado")
                         .IsUnique();
@@ -259,51 +325,63 @@ namespace BaseApi.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("70000000-0000-0000-0000-000000000001"),
+                            ReservasId = new Guid("70000000-0000-0000-0000-000000000001"),
                             DataAgendada = new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             HorarioAgendado = new TimeSpan(0, 8, 0, 0, 0),
-                            QuadraId = new Guid("33333333-3333-3333-3333-333333333333")
+                            QuadraId = new Guid("33333333-3333-3333-3333-333333333333"),
+                            Status = "Ativa",
+                            UsuarioId = new Guid("88888888-8888-8888-8888-888888888888")
                         },
                         new
                         {
-                            Id = new Guid("70000000-0000-0000-0000-000000000002"),
+                            ReservasId = new Guid("70000000-0000-0000-0000-000000000002"),
                             DataAgendada = new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             HorarioAgendado = new TimeSpan(0, 9, 0, 0, 0),
-                            QuadraId = new Guid("33333333-3333-3333-3333-333333333333")
+                            QuadraId = new Guid("33333333-3333-3333-3333-333333333333"),
+                            Status = "Ativa",
+                            UsuarioId = new Guid("88888888-8888-8888-8888-888888888888")
                         },
                         new
                         {
-                            Id = new Guid("70000000-0000-0000-0000-000000000003"),
+                            ReservasId = new Guid("70000000-0000-0000-0000-000000000003"),
                             DataAgendada = new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             HorarioAgendado = new TimeSpan(0, 10, 0, 0, 0),
-                            QuadraId = new Guid("44444444-4444-4444-4444-444444444444")
+                            QuadraId = new Guid("44444444-4444-4444-4444-444444444444"),
+                            Status = "Ativa",
+                            UsuarioId = new Guid("88888888-8888-8888-8888-888888888888")
                         },
                         new
                         {
-                            Id = new Guid("70000000-0000-0000-0000-000000000004"),
+                            ReservasId = new Guid("70000000-0000-0000-0000-000000000004"),
                             DataAgendada = new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             HorarioAgendado = new TimeSpan(0, 11, 0, 0, 0),
-                            QuadraId = new Guid("44444444-4444-4444-4444-444444444444")
+                            QuadraId = new Guid("44444444-4444-4444-4444-444444444444"),
+                            Status = "Ativa",
+                            UsuarioId = new Guid("88888888-8888-8888-8888-888888888888")
                         },
                         new
                         {
-                            Id = new Guid("70000000-0000-0000-0000-000000000005"),
+                            ReservasId = new Guid("70000000-0000-0000-0000-000000000005"),
                             DataAgendada = new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             HorarioAgendado = new TimeSpan(0, 14, 0, 0, 0),
-                            QuadraId = new Guid("55555555-5555-5555-5555-555555555555")
+                            QuadraId = new Guid("55555555-5555-5555-5555-555555555555"),
+                            Status = "Ativa",
+                            UsuarioId = new Guid("88888888-8888-8888-8888-888888888888")
                         },
                         new
                         {
-                            Id = new Guid("70000000-0000-0000-0000-000000000006"),
+                            ReservasId = new Guid("70000000-0000-0000-0000-000000000006"),
                             DataAgendada = new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             HorarioAgendado = new TimeSpan(0, 16, 0, 0, 0),
-                            QuadraId = new Guid("66666666-6666-6666-6666-666666666666")
+                            QuadraId = new Guid("66666666-6666-6666-6666-666666666666"),
+                            Status = "Ativa",
+                            UsuarioId = new Guid("88888888-8888-8888-8888-888888888888")
                         });
                 });
 
             modelBuilder.Entity("BaseApi.Domain.Entidades.Usuario", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("UsuariosId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
@@ -350,7 +428,7 @@ namespace BaseApi.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
-                    b.HasKey("Id");
+                    b.HasKey("UsuariosId");
 
                     b.HasIndex("Cpf")
                         .IsUnique();
@@ -365,7 +443,7 @@ namespace BaseApi.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("00000000-0000-0000-0000-000000000001"),
+                            UsuariosId = new Guid("00000000-0000-0000-0000-000000000001"),
                             Ativo = true,
                             AtualizadoEm = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Cpf = "",
@@ -373,12 +451,12 @@ namespace BaseApi.Infrastructure.Migrations
                             Email = "admin@baseapi.com",
                             NomeCompleto = "Administrador do Sistema",
                             PerfilId = 1,
-                            SenhaHash = "$2a$11$/hgAEt/yMPj1m7Uj18KZy.AFFecvKxaduRnbAPJshXhdShEN4KjKK",
+                            SenhaHash = "$2a$11$QKTluLzEcfS0b50jOLM.r.piziEI5ZfPTzFWhC0fLPmzsNpb7D48G",
                             Telefone = ""
                         },
                         new
                         {
-                            Id = new Guid("77777777-7777-7777-7777-777777777777"),
+                            UsuariosId = new Guid("77777777-7777-7777-7777-777777777777"),
                             Ativo = true,
                             AtualizadoEm = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Cpf = "11111111111",
@@ -386,12 +464,12 @@ namespace BaseApi.Infrastructure.Migrations
                             Email = "admin@playzone.com",
                             NomeCompleto = "Administrador",
                             PerfilId = 1,
-                            SenhaHash = "$2a$11$xTLtFnCfyZxpWzu2zM2dnO3uh7IN6AhEat5VMTs69mbz5g/re0r3q",
+                            SenhaHash = "$2a$11$EgHzwS.oNyIAvG5iQGBBReTnLRjEEnvw8FGTYTQWiJnl/1oGvnfNW",
                             Telefone = "27999990001"
                         },
                         new
                         {
-                            Id = new Guid("88888888-8888-8888-8888-888888888888"),
+                            UsuariosId = new Guid("88888888-8888-8888-8888-888888888888"),
                             Ativo = true,
                             AtualizadoEm = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Cpf = "22222222222",
@@ -399,12 +477,12 @@ namespace BaseApi.Infrastructure.Migrations
                             Email = "joao@playzone.com",
                             NomeCompleto = "João Silva",
                             PerfilId = 2,
-                            SenhaHash = "$2a$11$a2AWxwk5HzuSdkXXx6CPQucPrL87VXkDLo5ZtGwEQMwBIIcOBEEGu",
+                            SenhaHash = "$2a$11$vJ/pYLvBr/bhiwB0WjHLG.coohdfVu/1QnPOlXpBBy3qmyIDBxBSy",
                             Telefone = "27999990002"
                         },
                         new
                         {
-                            Id = new Guid("99999999-9999-9999-9999-999999999999"),
+                            UsuariosId = new Guid("99999999-9999-9999-9999-999999999999"),
                             Ativo = true,
                             AtualizadoEm = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Cpf = "33333333333",
@@ -412,7 +490,7 @@ namespace BaseApi.Infrastructure.Migrations
                             Email = "maria@playzone.com",
                             NomeCompleto = "Maria Souza",
                             PerfilId = 3,
-                            SenhaHash = "$2a$11$d966b3Vl4/3EtJ2CAbD2JuS21U69qCbTNb0sOxOSUDup7od4CnBu6",
+                            SenhaHash = "$2a$11$UfQYilz/5bUCJjkEPX0bwuDnvkiqWNDSUqLA5GQsN0uvDy3br6k1S",
                             Telefone = "27999990003"
                         });
                 });
@@ -525,11 +603,26 @@ namespace BaseApi.Infrastructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("BaseApi.Domain.Entidades.DataHorarioReserva", b =>
+                {
+                    b.HasOne("BaseApi.Domain.Entidades.Quadra", null)
+                        .WithMany()
+                        .HasForeignKey("QuadraId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("BaseApi.Domain.Entidades.Reserva", b =>
                 {
                     b.HasOne("BaseApi.Domain.Entidades.Quadra", null)
                         .WithMany()
                         .HasForeignKey("QuadraId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("BaseApi.Domain.Entidades.Usuario", null)
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });

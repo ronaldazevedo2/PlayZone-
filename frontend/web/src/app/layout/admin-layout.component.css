@@ -139,6 +139,74 @@
   background-color: var(--primary-color);
 }
 
+/* Submenu Accordion */
+.menu-accordion-header {
+  cursor: pointer;
+}
+
+.accordion-chevron {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  transition: transform 0.25s ease;
+}
+
+.accordion-chevron svg {
+  width: 14px;
+  height: 14px;
+}
+
+.accordion-chevron.open {
+  transform: rotate(180deg);
+}
+
+.submenu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-left: 28px;
+  margin-top: 4px;
+  margin-bottom: 6px;
+}
+
+.submenu-item {
+  display: flex;
+  align-items: center;
+  padding: 9px 14px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.submenu-item:hover {
+  color: var(--white);
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.submenu-item.active {
+  color: var(--white);
+  background-color: rgba(40, 167, 69, 0.85);
+  font-weight: 600;
+}
+
+.submenu-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.4);
+  margin-right: 10px;
+  transition: background-color 0.2s;
+}
+
+.submenu-item:hover .submenu-dot,
+.submenu-item.active .submenu-dot {
+  background-color: #ffffff;
+}
+
 /* Vigilante */
 .vigilante-option .pulse-indicator {
   display: none;

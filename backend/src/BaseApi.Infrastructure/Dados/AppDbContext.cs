@@ -1,4 +1,5 @@
 using BaseApi.Domain.Entidades;
+using BaseApi.Infrastructure.Repositorios;
 using Microsoft.EntityFrameworkCore;
 
 namespace BaseApi.Infrastructure.Dados;
@@ -21,6 +22,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Vigilantes> Vigilantes => Set<Vigilantes>();
 
     public DbSet<Notificacao> Telefones => Set<Notificacao>();
+
+    public DbSet<DataHorarioReserva> DataHorarioReservas => Set<DataHorarioReserva>();
 
     public object Notificacoes { get; internal set; }
 
@@ -47,7 +50,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     {
         modelBuilder.Entity<Perfil>().HasData(
             new Perfil { Id = 1, Nome = "Admin", Descricao = "Acesso total ao sistema" },
-            new Perfil { Id = 2, Nome = "Gerente", Descricao = "Acesso intermediário ao sistema" },
+            new Perfil { Id = 2, Nome = "Vigilante", Descricao = "Acesso de vigilante ao sistema" },
             new Perfil { Id = 3, Nome = "Usuário", Descricao = "Acesso básico ao sistema" }
         );
     }
@@ -58,7 +61,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         // Hash gerado com BCrypt (work factor 12)
         modelBuilder.Entity<Usuario>().HasData(new Usuario
         {
-            Id = Guid.Parse("00000000-0000-0000-0000-000000000001"),
+            UsuariosId = Guid.Parse("00000000-0000-0000-0000-000000000001"),
             NomeCompleto = "Administrador do Sistema",
             Email = "admin@baseapi.com",
             SenhaHash = BCrypt.Net.BCrypt.HashPassword("Admin@123"),
@@ -74,7 +77,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         modelBuilder.Entity<Usuario>().HasData(
             new Usuario
             {
-                Id = Guid.Parse("77777777-7777-7777-7777-777777777777"),
+                UsuariosId = Guid.Parse("77777777-7777-7777-7777-777777777777"),
                 NomeCompleto = "Administrador",
                 Email = "admin@playzone.com",
                 Cpf = "11111111111",
@@ -87,7 +90,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             },
             new Usuario
             {
-                Id = Guid.Parse("88888888-8888-8888-8888-888888888888"),
+                UsuariosId = Guid.Parse("88888888-8888-8888-8888-888888888888"),
                 NomeCompleto = "João Silva",
                 Email = "joao@playzone.com",
                 Cpf = "22222222222",
@@ -100,7 +103,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             },
             new Usuario
             {
-                Id = Guid.Parse("99999999-9999-9999-9999-999999999999"),
+                UsuariosId = Guid.Parse("99999999-9999-9999-9999-999999999999"),
                 NomeCompleto = "Maria Souza",
                 Email = "maria@playzone.com",
                 Cpf = "33333333333",
@@ -201,15 +204,17 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             // Quadra Society
             new Reserva
             {
-                Id = Guid.Parse("70000000-0000-0000-0000-000000000001"),
+                ReservasId = Guid.Parse("70000000-0000-0000-0000-000000000001"),
                 QuadraId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
+                UsuarioId = Guid.Parse("88888888-8888-8888-8888-888888888888"),
                 DataAgendada = new DateTime(2026, 7, 10),
                 HorarioAgendado = new TimeSpan(8, 0, 0)
             },
             new Reserva
             {
-                Id = Guid.Parse("70000000-0000-0000-0000-000000000002"),
+                ReservasId = Guid.Parse("70000000-0000-0000-0000-000000000002"),
                 QuadraId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
+                UsuarioId = Guid.Parse("88888888-8888-8888-8888-888888888888"),
                 DataAgendada = new DateTime(2026, 7, 10),
                 HorarioAgendado = new TimeSpan(9, 0, 0)
             },
@@ -217,15 +222,17 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             // Quadra Futsal
             new Reserva
             {
-                Id = Guid.Parse("70000000-0000-0000-0000-000000000003"),
+                ReservasId = Guid.Parse("70000000-0000-0000-0000-000000000003"),
                 QuadraId = Guid.Parse("44444444-4444-4444-4444-444444444444"),
+                UsuarioId = Guid.Parse("88888888-8888-8888-8888-888888888888"),
                 DataAgendada = new DateTime(2026, 7, 10),
                 HorarioAgendado = new TimeSpan(10, 0, 0)
             },
             new Reserva
             {
-                Id = Guid.Parse("70000000-0000-0000-0000-000000000004"),
+                ReservasId = Guid.Parse("70000000-0000-0000-0000-000000000004"),
                 QuadraId = Guid.Parse("44444444-4444-4444-4444-444444444444"),
+                UsuarioId = Guid.Parse("88888888-8888-8888-8888-888888888888"),
                 DataAgendada = new DateTime(2026, 7, 10),
                 HorarioAgendado = new TimeSpan(11, 0, 0)
             },
@@ -233,8 +240,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             // Quadra Vôlei
             new Reserva
             {
-                Id = Guid.Parse("70000000-0000-0000-0000-000000000005"),
+                ReservasId = Guid.Parse("70000000-0000-0000-0000-000000000005"),
                 QuadraId = Guid.Parse("55555555-5555-5555-5555-555555555555"),
+                UsuarioId = Guid.Parse("88888888-8888-8888-8888-888888888888"),
                 DataAgendada = new DateTime(2026, 7, 10),
                 HorarioAgendado = new TimeSpan(14, 0, 0)
             },
@@ -242,8 +250,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             // Quadra Basquete
             new Reserva
             {
-                Id = Guid.Parse("70000000-0000-0000-0000-000000000006"),
+                ReservasId = Guid.Parse("70000000-0000-0000-0000-000000000006"),
                 QuadraId = Guid.Parse("66666666-6666-6666-6666-666666666666"),
+                UsuarioId = Guid.Parse("88888888-8888-8888-8888-888888888888"),
                 DataAgendada = new DateTime(2026, 7, 10),
                 HorarioAgendado = new TimeSpan(16, 0, 0)
             }

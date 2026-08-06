@@ -1,10 +1,97 @@
-.quadras-view-container,
-.cadastro-view-container {
-  animation: fadeIn 0.4s ease-out;
+.quadras-view-container {
   display: flex;
   flex-direction: column;
-  gap: 25px;
-  padding: 5px 10px;
+  gap: 20px;
+  padding: 0;
+}
+
+
+/* Bloco único: busca + tabela colados, sem o gap do container pai */
+.quadra-list-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.quadra-list-block .table-filters {
+  margin-bottom: 0;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.quadra-list-block .table-container {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-top: none;
+}
+
+/* Search box com largura própria (lista) */
+.search-box {
+  width: 420px;
+}
+
+.data-table {
+  min-width: 900px;
+}
+
+/* Larguras das colunas — 7 colunas (Quadras) */
+.data-table th:nth-child(1) {
+  width: 24%;
+}
+
+/* Quadra (foto + nome) */
+.data-table th:nth-child(2) {
+  width: 10%;
+}
+
+/* Tipo */
+.data-table th:nth-child(3) {
+  width: 10%;
+}
+
+/* Capacidade */
+.data-table th:nth-child(4) {
+  width: 24%;
+}
+
+/* Dias Disponíveis */
+.data-table th:nth-child(5) {
+  width: 14%;
+}
+
+/* Horários */
+.data-table th:nth-child(6) {
+  width: 10%;
+}
+
+/* Status */
+.data-table th:nth-child(7) {
+  width: 8%;
+  text-align: right;
+}
+
+/* Ações */
+.data-table td:nth-child(7) {
+  text-align: right;
+}
+
+.quadra-thumb {
+  width: 72px;
+  min-width: 72px;
+  height: 52px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  object-fit: cover;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  background-color: #e9ecef;
+}
+
+/* ATENÇÃO: .active-icon aqui é VERDE, mas no global.css (baseado em
+   Vigilante/Usuários) .active-icon é AZUL. Nomes de classe colidem —
+   se este CSS carregar depois do global, o verde vence; se carregar
+   antes, o azul vence. Recomendo renomear para evitar ambiguidade. */
+.active-icon {
+  background-color: rgba(40, 167, 69, 0.1);
+  color: #28a745;
 }
 
 /* =========================================================
@@ -122,7 +209,7 @@
 }
 
 /* =========================================================
-   HEADER SECTION & BREADCRUMBS
+   HEADER SECTION & BREADCRUMBS (tela de cadastro/edição)
    ========================================================= */
 .quadras-header {
   display: flex;
@@ -214,40 +301,7 @@
   height: 16px;
 }
 
-/* Search Box */
-.search-box {
-  position: relative;
-  width: 260px;
-}
-
-.search-icon {
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 18px;
-  height: 18px;
-  color: var(--text-muted);
-}
-
-.search-box input {
-  width: 100%;
-  padding: 12px 16px 12px 42px;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  background-color: var(--white);
-  font-size: 0.9rem;
-  color: var(--text-dark);
-  transition: all 0.2s ease;
-}
-
-.search-box input:focus {
-  outline: none;
-  border-color: var(--secondary-color);
-  box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.15);
-}
-
-/* Buttons */
+/* Buttons (variante local — sobrescreve .btn-primary/.btn-icon globais) */
 .btn-primary {
   background-color: var(--primary-color, #28a745);
   color: white;
@@ -293,7 +347,7 @@
   background-color: var(--bg-light);
 }
 
-.btn-icon {
+.btn-header-icon {
   width: 16px;
   height: 16px;
   color: var(--text-muted);
@@ -304,7 +358,7 @@
 }
 
 /* =========================================================
-   STATS GRID
+   STATS GRID (variante da tela de cadastro — 4 cards, cores próprias)
    ========================================================= */
 .stats-grid {
   display: grid;
@@ -471,7 +525,7 @@
 }
 
 /* =========================================================
-   FORM CONTENT GRID
+   FORM CONTENT GRID (cadastro/edição de quadra)
    ========================================================= */
 .form-content-grid {
   display: flex;
@@ -783,7 +837,7 @@
   margin-top: 15px;
 }
 
-/* Swithes / Toggles */
+/* Switches / Toggles */
 .settings-toggles {
   display: flex;
   flex-direction: column;
@@ -940,7 +994,7 @@ input:checked+.switch-slider:before {
 }
 
 /* =========================================================
-   TABLE STYLES
+   TABLE STYLES (tabela interna do cadastro/detalhe)
    ========================================================= */
 .table-responsive {
   width: 100%;
@@ -975,6 +1029,8 @@ input:checked+.switch-slider:before {
   gap: 16px;
 }
 
+/* Segunda versão de .quadra-thumb (80x60) — sobrescreve a de 72x52
+   de cima quando este bloco vem depois no arquivo compilado */
 .quadra-thumb {
   width: 80px;
   min-width: 80px;
@@ -1085,7 +1141,10 @@ input:checked+.switch-slider:before {
 /* Days Indicator */
 .days-indicator {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   gap: 4px;
+  max-width: 100%;
 }
 
 .day-badge {
@@ -1095,6 +1154,7 @@ input:checked+.switch-slider:before {
   border-radius: 4px;
   background-color: #f1f3f5;
   color: #adb5bd;
+  white-space: nowrap;
 }
 
 .day-badge.available {
@@ -1107,6 +1167,7 @@ input:checked+.switch-slider:before {
 .hours-info {
   display: flex;
   flex-direction: column;
+  white-space: nowrap;
 }
 
 .hours-range {
@@ -1260,7 +1321,7 @@ input:checked+.switch-slider:before {
    ========================================================= */
 .pagination-footer {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   margin-top: 24px;
   border-top: 1px solid var(--border-color);
@@ -1320,7 +1381,7 @@ input:checked+.switch-slider:before {
 }
 
 /* =========================================================
-   LOADING, ERROR & EMPTY STATES
+   LOADING, ERROR & EMPTY STATES (variante local com --vars)
    ========================================================= */
 .loading-state,
 .error-state,
@@ -1445,66 +1506,322 @@ input:checked+.switch-slider:before {
   background-color: rgba(220, 53, 69, 0.05) !important;
 }
 
-/* Slots Grid */
-.slots-grid-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 12px;
-  margin: 10px 0;
+/* =========================================================
+   CALENDÁRIO DE DISPONIBILIDADE MENSAL (NOVO DESIGN)
+   ========================================================= */
+.disponibilidade-calendar-container {
+  display: flex;
+  gap: 24px;
+  margin-top: 15px;
 }
 
-.slot-pula-btn {
-  background-color: var(--white);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 12px;
-  font-size: 0.88rem;
-  font-weight: 500;
-  color: var(--text-dark);
+@media (max-width: 992px) {
+  .disponibilidade-calendar-container {
+    flex-direction: column;
+  }
+}
+
+/* LADO ESQUERDO: Box do Calendário */
+.calendar-box {
+  width: 320px;
+  min-width: 320px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+}
+
+.calendar-month-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.btn-cal-nav {
+  background: none;
+  border: none;
   cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #475569;
+  transition: all 0.15s ease;
+}
+
+.btn-cal-nav:hover {
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
+
+.btn-cal-nav svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Weekday column headers */
+.calendar-weekdays-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+}
+
+.weekday-col-header {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #94a3b8;
+  letter-spacing: 0.5px;
+}
+
+/* Days Grid */
+.calendar-days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  row-gap: 8px;
+}
+
+.cal-day-btn {
+  aspect-ratio: 1;
+  background: none;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+
+.cal-day-btn:hover {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+.cal-day-btn.outside-month {
+  color: #cbd5e1;
+  font-weight: 400;
+}
+
+.cal-day-btn.selected-day {
+  background-color: #1e2248;
+  /* Azul marinho escuro */
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(30, 34, 72, 0.25);
+}
+
+/* LADO DIREITO: Painel de Configuração de Horários */
+.slots-config-panel {
+  flex: 1;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 20px 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.slots-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 16px;
+}
+
+.date-info-title {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.date-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.calendar-icon-sm {
+  width: 20px;
+  height: 20px;
+  color: #1e2248;
+}
+
+.date-header-left h4 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.slots-count-subtitle {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-left: 28px;
+}
+
+.slots-actions-group {
   display: flex;
   align-items: center;
   gap: 10px;
-  transition: all 0.2s ease;
-  text-align: left;
+  flex-wrap: wrap;
 }
 
-.slot-pula-btn:hover {
-  border-color: var(--accent-green);
+.btn-action-outline {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #334155;
+  font-size: 0.84rem;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-action-outline:hover {
+  background-color: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.btn-action-danger {
+  background-color: #ffffff;
+  border: 1px solid #fecaca;
+  color: #ef4444;
+  font-size: 0.84rem;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-action-danger:hover {
+  background-color: #fef2f2;
+  border-color: #fca5a5;
+}
+
+.btn-action-navy {
+  background-color: #1e2248;
+  /* Botão escuro de ação rápida azul */
+  border: 1px solid #1e2248;
+  color: #ffffff;
+  font-size: 0.84rem;
+  font-weight: 600;
+  padding: 8px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 2px 6px rgba(30, 34, 72, 0.15);
+}
+
+.btn-action-navy:hover {
+  background-color: #151836;
+  border-color: #151836;
+}
+
+/* Grid de Checkboxes de Horários (6 Colunas idênticas à imagem) */
+.slots-checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 1200px) {
+  .slots-checkbox-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .slots-checkbox-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.slot-checkbox-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.15s ease;
+}
+
+.slot-checkbox-card:hover {
+  border-color: #cbd5e1;
   background-color: #fafbfc;
 }
 
-.slot-pula-btn.selected {
-  background-color: rgba(40, 167, 69, 0.08);
-  border-color: var(--accent-green);
-  color: var(--accent-green);
-  font-weight: 600;
+.slot-checkbox-card.checked {
+  border-color: #86efac;
+  background-color: #f0fdf4;
 }
 
-.checkbox-indicator {
+.slot-checkbox-input {
+  display: none;
+}
+
+.custom-checkbox-box {
   width: 18px;
   height: 18px;
-  border: 2px solid #adb5bd;
+  border: 1.5px solid #cbd5e1;
   border-radius: 4px;
-  display: inline-block;
-  position: relative;
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
 }
 
-.slot-pula-btn.selected .checkbox-indicator {
-  border-color: var(--accent-green);
-  background-color: var(--accent-green);
+.slot-checkbox-card.checked .custom-checkbox-box {
+  border-color: #28a745;
+  background-color: #28a745;
+  color: #ffffff;
 }
 
-.slot-pula-btn.selected .checkbox-indicator::after {
-  content: '';
-  position: absolute;
-  left: 5px;
-  top: 2px;
-  width: 4px;
-  height: 8px;
-  border: solid white;
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
+.custom-checkbox-box svg {
+  width: 12px;
+  height: 12px;
+  stroke: #ffffff;
+}
+
+.slot-time-text {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+/* Alert Box spacing fix */
+.margin-top-20 {
+  margin-top: 20px;
 }
