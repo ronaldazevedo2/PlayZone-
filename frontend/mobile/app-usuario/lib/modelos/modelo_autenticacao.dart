@@ -42,16 +42,19 @@ class RespostaApiWrapper<T> {
 class ComandoLogin {
   final String email;
   final String senha;
+  final int perfil;
 
   const ComandoLogin({
     required this.email,
     required this.senha,
+    this.perfil = 3,
   });
 
   Map<String, dynamic> paraJson() {
     return {
       'email': email,
       'senha': senha,
+      'perfil': perfil,
     };
   }
 }

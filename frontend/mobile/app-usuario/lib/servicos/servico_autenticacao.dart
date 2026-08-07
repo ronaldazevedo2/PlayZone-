@@ -144,7 +144,38 @@ class ServicoAutenticacao {
     return cabecalhos;
   }
 
-  /// Método auxiliar para realizar requisições HTTP na API com suporte a fallback de URL
+  static Future<http.Response> _executarVerboHttp(
+    String metodo,
+    Uri uri,
+    Map<String, String> cabecalhos,
+    String? corpoString,
+  ) async {
+    switch (metodo.toUpperCase()) {
+      case 'POST':
+        return await http
+            .post(uri, headers: cabecalhos, body: corpoString)
+            .timeout(const Duration(seconds: 5));
+      case 'PUT':
+        return await http
+            .put(uri, headers: cabecalhos, body: corpoString)
+            .timeout(const Duration(seconds: 5));
+      case 'PATCH':
+        return await http
+            .patch(uri, headers: cabecalhos, body: corpoString)
+            .timeout(const Duration(seconds: 5));
+      case 'DELETE':
+        return await http
+            .delete(uri, headers: cabecalhos)
+            .timeout(const Duration(seconds: 5));
+      case 'GET':
+      default:
+        return await http
+            .get(uri, headers: cabecalhos)
+            .timeout(const Duration(seconds: 5));
+    }
+  }
+
+  /// Método auxiliar para realizar requisições HTTP na API com suporte a fallback de URL e verbos HTTP
   static Future<http.Response> _fazerRequisicao(
     String metodo,
     String rota,
@@ -155,28 +186,12 @@ class ServicoAutenticacao {
     final cabecalhos = await _obterCabecalhos();
 
     try {
-      if (metodo == 'POST') {
-        return await http
-            .post(uri1, headers: cabecalhos, body: corpoString)
-            .timeout(const Duration(seconds: 5));
-      } else {
-        return await http
-            .get(uri1, headers: cabecalhos)
-            .timeout(const Duration(seconds: 5));
-      }
+      return await _executarVerboHttp(metodo, uri1, cabecalhos, corpoString);
     } catch (_) {
       try {
         alternarUrlBase();
         final uriNova = construirUri(rota);
-        if (metodo == 'POST') {
-          return await http
-              .post(uriNova, headers: cabecalhos, body: corpoString)
-              .timeout(const Duration(seconds: 5));
-        } else {
-          return await http
-              .get(uriNova, headers: cabecalhos)
-              .timeout(const Duration(seconds: 5));
-        }
+        return await _executarVerboHttp(metodo, uriNova, cabecalhos, corpoString);
       } catch (erroConexao) {
         throw Exception(
           'Sem conexão com o servidor da PlayZone ($erroConexao).',
@@ -185,12 +200,30 @@ class ServicoAutenticacao {
     }
   }
 
+  /// Extrai o ID (Guid) do usuário contido nas claims do token JWT
+  static String extrairIdDoToken(String token) {
+    if (token.isEmpty) return '';
+    try {
+      final partes = token.split('.');
+      if (partes.length != 3) return '';
+      final payloadNormalizado = base64Url.normalize(partes[1]);
+      final payloadString = utf8.decode(base64Url.decode(payloadNormalizado));
+      final mapaPayload = jsonDecode(payloadString);
+      return mapaPayload['nameid'] ??
+          mapaPayload['sub'] ??
+          mapaPayload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'] ??
+          '';
+    } catch (_) {
+      return '';
+    }
+  }
+
   /// Realiza o login do usuário na API (/api/Autenticacao/login) e salva o Token JWT na sessão
   static Future<SessaoUsuario> realizarLogin({
     required String email,
     required String senha,
   }) async {
-    final comandoLogin = ComandoLogin(email: email, senha: senha);
+    final comandoLogin = ComandoLogin(email: email, senha: senha, perfil: 3);
 
     try {
       final resposta = await _fazerRequisicao(
@@ -215,7 +248,7 @@ class ServicoAutenticacao {
                 ? dadosLogin.nomeCompleto
                 : (email.contains('@') ? email.split('@').first : 'Usuário'),
             email: dadosLogin.email.isNotEmpty ? dadosLogin.email : email,
-            perfil: dadosLogin.perfil.isNotEmpty ? dadosLogin.perfil : 'Usuario',
+            perfil: dadosLogin.perfil.isNotEmpty ? dadosLogin.perfil : 'Cliente',
           );
 
           await salvarSessao(sessao);
@@ -229,7 +262,7 @@ class ServicoAutenticacao {
       } else {
         String msgErro = 'Usuário ou senha incorretos (${resposta.statusCode}).';
         if (mapaJson is Map<String, dynamic>) {
-          if (mapaJson['mensagem'] != null) {
+          if (mapaJson['mensagem'] != null && mapaJson['mensagem'].toString().isNotEmpty) {
             msgErro = mapaJson['mensagem'].toString();
           } else if (mapaJson['erros'] != null && mapaJson['erros'] is List) {
             msgErro = (mapaJson['erros'] as List).join('\n');
@@ -238,16 +271,15 @@ class ServicoAutenticacao {
         throw Exception(msgErro);
       }
     } catch (e) {
-      if (e.toString().contains('Usuário ou senha') ||
-          e.toString().contains('Credenciais')) {
+      if (!e.toString().contains('Sem conexão')) {
         rethrow;
       }
-      // Fallback em ambiente local para navegação direta se backend estiver iniciando
+      // Fallback em ambiente local se servidor não responder
       final sessaoLocal = SessaoUsuario(
         tokenAcesso: 'token-jwt-desenvolvimento',
         nomeCompleto: email.contains('@') ? email.split('@').first : 'Usuário',
         email: email.isNotEmpty ? email : 'usuario@playzone.com',
-        perfil: 'Usuario',
+        perfil: 'Cliente',
       );
       await salvarSessao(sessaoLocal);
       return sessaoLocal;
@@ -361,7 +393,7 @@ class ServicoAutenticacao {
     }
   }
 
-  /// Atualiza os dados do perfil do usuário na API e salva a sessão
+  /// Atualiza os dados do perfil do usuário na API C# (PUT /api/Usuarios/{id})
   static Future<SessaoUsuario> atualizarPerfilUsuario({
     required String nomeCompleto,
     required String email,
@@ -370,33 +402,86 @@ class ServicoAutenticacao {
     String? fotoPerfilUrl,
   }) async {
     final sessaoAtual = await obterSessao();
-    try {
-      final resposta = await _fazerRequisicao(
-        'POST',
-        '/Autenticacao/atualizar-perfil',
-        {
-          'nomeCompleto': nomeCompleto,
-          'email': email,
-          'telefone': telefone,
-          'cpf': cpf,
-          'fotoPerfilUrl': fotoPerfilUrl,
-        },
-      ).timeout(const Duration(seconds: 4));
+    final token = sessaoAtual?.tokenAcesso ?? '';
+    final idUsuario = extrairIdDoToken(token);
 
-      if (resposta.statusCode == 200) {
-        final dadosResposta = jsonDecode(resposta.body);
-        if (dadosResposta is Map<String, dynamic> && (dadosResposta['ok'] ?? true)) {}
+    final cpfLimpo = (cpf ?? sessaoAtual?.cpf ?? '').replaceAll(RegExp(r'\D'), '');
+    final telefoneLimpo = telefone.replaceAll(RegExp(r'\D'), '');
+
+    final dadosRequisicao = {
+      'nomeCompleto': nomeCompleto.trim(),
+      'email': email.trim(),
+      'cpf': cpfLimpo.isNotEmpty ? cpfLimpo : '00000000000',
+      'telefone': telefoneLimpo,
+      'perfilId': 3,
+      'ativo': true,
+    };
+
+    if (idUsuario.isNotEmpty) {
+      try {
+        final resposta = await _fazerRequisicao(
+          'PUT',
+          '/Usuarios/$idUsuario',
+          dadosRequisicao,
+        );
+
+        final statusSucesso =
+            resposta.statusCode >= 200 && resposta.statusCode < 300;
+        final corpoTexto = resposta.body.trim();
+
+        if (statusSucesso) {
+          // Se o status for de sucesso (200/204) e houver conteúdo, tenta interpretar
+          if (corpoTexto.isNotEmpty) {
+            try {
+              final mapaJson = jsonDecode(corpoTexto);
+              if (mapaJson is Map<String, dynamic> &&
+                  mapaJson.containsKey('ok') &&
+                  mapaJson['ok'] == false) {
+                final msg = mapaJson['mensagem'] ?? 'Erro ao atualizar perfil.';
+                throw Exception(msg);
+              }
+            } on FormatException {
+              // Resposta com texto não-JSON em status 200/204 é considerada sucesso
+            }
+          }
+        } else {
+          // Trata status de erro (400, 409, 500, etc)
+          String msgErro =
+              'Erro ao atualizar perfil (${resposta.statusCode}).';
+          if (corpoTexto.isNotEmpty) {
+            try {
+              final mapaJson = jsonDecode(corpoTexto);
+              if (mapaJson is Map<String, dynamic>) {
+                if (mapaJson['erros'] != null &&
+                    mapaJson['erros'] is List &&
+                    (mapaJson['erros'] as List).isNotEmpty) {
+                  msgErro = (mapaJson['erros'] as List).join('\n');
+                } else if (mapaJson['mensagem'] != null &&
+                    mapaJson['mensagem'].toString().isNotEmpty) {
+                  msgErro = mapaJson['mensagem'].toString();
+                }
+              }
+            } on FormatException {
+              msgErro =
+                  'Ocorreu um erro no servidor (${resposta.statusCode}). Tente novamente mais tarde.';
+            }
+          }
+          throw Exception(msgErro);
+        }
+      } on FormatException {
+        throw Exception(
+            'Erro ao processar a resposta do servidor. Tente novamente mais tarde.');
       }
-    } catch (_) {}
+    }
 
     final novaSessao = (sessaoAtual ?? SessaoUsuario(
       tokenAcesso: 'token-acesso-front',
       nomeCompleto: nomeCompleto,
       email: email,
-      perfil: 'Usuario',
+      perfil: 'Cliente',
     )).copiarCom(
-      nomeCompleto: nomeCompleto,
-      email: email,
+      nomeCompleto: nomeCompleto.trim(),
+      email: email.trim(),
       telefone: telefone,
       cpf: cpf != null && cpf.isNotEmpty ? cpf : sessaoAtual?.cpf,
       fotoPerfilUrl: fotoPerfilUrl ?? sessaoAtual?.fotoPerfilUrl,

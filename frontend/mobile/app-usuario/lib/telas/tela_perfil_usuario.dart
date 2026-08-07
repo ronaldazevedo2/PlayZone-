@@ -82,17 +82,61 @@ class _TelaPerfilUsuarioEstado extends State<TelaPerfilUsuario> {
   }
 
   Future<void> _salvarAlteracoesPerfil() async {
+    final nome = _controladorNome.text.trim();
+    final email = _controladorEmail.text.trim();
+    final telefone = _controladorTelefone.text.trim();
+
+    if (nome.isEmpty || nome.length < 3) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Informe um nome completo válido (mínimo 3 caracteres).'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
+
+    if (nome.length > 150) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('O nome deve ter no máximo 150 caracteres.'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
+
+    final expressaoEmail = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    if (email.isEmpty || !expressaoEmail.hasMatch(email)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Informe um e-mail válido.'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
+
+    final telefoneLimpo = telefone.replaceAll(RegExp(r'\D'), '');
+    if (telefoneLimpo.length < 10 || telefoneLimpo.length > 11) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Informe um telefone válido (10 ou 11 dígitos com DDD).'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
+
     setState(() {
       _estaCarregando = true;
     });
 
     try {
       final novaSessao = await ServicoAutenticacao.atualizarPerfilUsuario(
-        nomeCompleto: _controladorNome.text.trim().isNotEmpty
-            ? _controladorNome.text.trim()
-            : _sessaoAtual.nomeCompleto,
-        email: _controladorEmail.text.trim(),
-        telefone: _controladorTelefone.text.trim(),
+        nomeCompleto: nome,
+        email: email,
+        telefone: telefone,
         cpf: _sessaoAtual.cpf,
       );
 
@@ -117,10 +161,13 @@ class _TelaPerfilUsuarioEstado extends State<TelaPerfilUsuario> {
         _estaCarregando = false;
       });
 
+      final msgErro = erro.toString().replaceAll('Exception: ', '');
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Erro ao atualizar perfil: $erro'),
+          content: Text(msgErro),
           backgroundColor: Colors.redAccent,
+          duration: const Duration(seconds: 4),
         ),
       );
     }
