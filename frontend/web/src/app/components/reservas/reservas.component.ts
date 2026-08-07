@@ -55,7 +55,7 @@ export class ReservasComponent implements OnInit {
         if (res.quadrasRes && res.quadrasRes.ok && res.quadrasRes.dados && res.quadrasRes.dados.itens && res.quadrasRes.dados.itens.length > 0) {
           this.quadras = res.quadrasRes.dados.itens;
         } else {
-          this.usarQuadrasMockadas();
+          this.quadras = [];
         }
 
         // Reservas para os cards de estatísticas (Hoje, Semana, Mês)

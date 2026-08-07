@@ -17,7 +17,15 @@ public record ListarReservaQuery(
 public record ReservaListaDto(
     Guid ReservasId,
     Guid QuadraId,
+    Guid UsuarioId,
     Guid UsuariosId,
     DateTime DataAgendada,
-    TimeSpan HorarioAgendado
+    TimeSpan HorarioAgendado,
+    string? NomeUsuario = null,
+    string? EmailUsuario = null,
+    string? CpfUsuario = null,
+    string? TelefoneUsuario = null,
+    string? NomeQuadra = null,
+    string? Modalidade = null,
+    string? Status = "Ativa"
 );

@@ -1,4 +1,4 @@
-﻿using BaseApi.Domain.Entidades;
+using BaseApi.Domain.Entidades;
 using BaseApi.Domain.Interfaces.Repositorios;
 using BaseApi.Infrastructure.Dados;
 using Microsoft.EntityFrameworkCore;
@@ -30,14 +30,16 @@ namespace BaseApi.Infrastructure.Repositorios
         public async Task<Reserva?> ObterPorIdAsync(Guid id, CancellationToken ct = default)
         {
             return await contexto.Reserva
+                .Include(x => x.Usuario)
+                .Include(x => x.Quadra)
                 .FirstOrDefaultAsync(x => x.ReservasId == id, ct);
         }
-            
-        
 
         public async Task<IEnumerable<Reserva>> ObterPorQuadraAsync(Guid quadraId, CancellationToken ct = default)
         {
             return await contexto.Reserva
+                .Include(x => x.Usuario)
+                .Include(x => x.Quadra)
                 .Where(x => x.QuadraId == quadraId)
                 .ToListAsync(ct);
         }
@@ -45,6 +47,8 @@ namespace BaseApi.Infrastructure.Repositorios
         public async Task<IEnumerable<Reserva>> ObterPorDataAsync(Guid quadraId, DateTime data, CancellationToken ct = default)
         {
             return await contexto.Reserva
+                .Include(x => x.Usuario)
+                .Include(x => x.Quadra)
                 .Where(x => x.QuadraId == quadraId &&
                             x.DataAgendada.Date == data.Date)
                 .ToListAsync(ct);
@@ -73,7 +77,10 @@ namespace BaseApi.Infrastructure.Repositorios
             DateTime? dataFim,
             CancellationToken ct = default)
         {
-            var query = contexto.Reserva.AsQueryable();
+            var query = contexto.Reserva
+                .Include(x => x.Usuario)
+                .Include(x => x.Quadra)
+                .AsQueryable();
 
             if (quadraId.HasValue)
                 query = query.Where(x => x.QuadraId == quadraId.Value);

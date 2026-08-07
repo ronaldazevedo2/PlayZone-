@@ -2,7 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { catchError, of } from 'rxjs';
 import { SecretariaService, SecretariaListaDto } from '../../services/secretaria.service';
+import { ReservaService, ReservaDto } from '../../services/reserva.service';
+import { QuadraService } from '../../services/quadra.service';
 
 interface Booking {
   time: string;
@@ -28,26 +31,18 @@ interface Message {
 })
 export class DashboardComponent implements OnInit {
   // Stats
-  reservasHojeCount = 24;
-  quadrasOcupadasCount = 5;
-  quadrasTotalCount = 8;
-  mensagensPendentesCount = 7;
+  reservasHojeCount = 0;
+  quadrasOcupadasCount = 0;
+  quadrasTotalCount = 0;
+  mensagensPendentesCount = 0;
   avaliacaoMedia = 4.8;
 
-  // Bookings list
-  bookings: Booking[] = [
-    { time: '18:00', court: 'Society 1', client: 'João Silva', type: 'Futebol Society', typeClass: 'badge-society' },
-    { time: '19:00', court: 'Society 2', client: 'Lucas Santos', type: 'Futebol Society', typeClass: 'badge-society' },
-    { time: '20:00', court: 'Beach Tennis', client: 'Maria Souza', type: 'Beach Tennis', typeClass: 'badge-tennis' },
-    { time: '21:00', court: 'Futsal 1', client: 'Carlos Oliveira', type: 'Futsal', typeClass: 'badge-futsal' },
-    { time: '22:00', court: 'Vôlei de Areia', client: 'Ana Beatriz', type: 'Vôlei', typeClass: 'badge-volei' }
-  ];
+  // Bookings list real
+  bookings: Booking[] = [];
+  carregandoReservas = false;
 
   // Messages list
-  messages: Message[] = [
-    { sender: 'João Silva', avatar: 'JS', content: 'Posso levar mais um jogador?', time: 'Há 2 min' },
-    { sender: 'Carlos Oliveira', avatar: 'CO', content: 'Como funciona o cancelamento?', time: 'Há 10 min' }
-  ];
+  messages: Message[] = [];
 
   secretarias: SecretariaListaDto[] = [];
   carregando = false;
@@ -55,11 +50,15 @@ export class DashboardComponent implements OnInit {
 
   constructor(
     private secretariaService: SecretariaService,
+    private reservaService: ReservaService,
+    private quadraService: QuadraService,
     private router: Router
   ) { }
 
   ngOnInit(): void {
     this.carregarSecretarias();
+    this.carregarReservasReais();
+    this.carregarQuadrasStats();
   }
 
   carregarSecretarias(): void {
@@ -76,6 +75,63 @@ export class DashboardComponent implements OnInit {
         this.carregando = false;
       }
     });
+  }
+
+  carregarQuadrasStats(): void {
+    this.quadraService.listar(1, 100).pipe(catchError(() => of(null))).subscribe(res => {
+      if (res && res.ok && res.dados && res.dados.itens) {
+        const itens = res.dados.itens;
+        this.quadrasTotalCount = itens.length;
+        this.quadrasOcupadasCount = itens.filter((q: any) => q.status === 'Ativa').length;
+      }
+    });
+  }
+
+  carregarReservasReais(): void {
+    this.carregandoReservas = true;
+
+    this.reservaService.listar(1, 100).pipe(
+      catchError(() => of(null))
+    ).subscribe({
+      next: (res: any) => {
+        this.carregandoReservas = false;
+        if (res && res.ok && res.dados && res.dados.itens) {
+          const itens: any[] = res.dados.itens;
+          const hojeStr = new Date().toISOString().split('T')[0];
+
+          this.reservasHojeCount = itens.filter((r: any) => {
+            const dataRes = r.dataAgendada || r.data || '';
+            return dataRes.split('T')[0] === hojeStr;
+          }).length;
+
+          this.bookings = itens.slice(0, 5).map((item: any) => {
+            const horario = item.horarioAgendado || item.horario || '18:00';
+            const modalidade = item.modalidade || 'Futebol Society';
+            return {
+              time: horario,
+              court: item.nomeQuadra || item.quadraNome || 'Quadra',
+              client: item.nomeUsuario || item.usuarioNome || 'Cliente',
+              type: modalidade,
+              typeClass: this.getTypeClass(modalidade)
+            };
+          });
+        } else {
+          this.bookings = [];
+        }
+      },
+      error: () => {
+        this.carregandoReservas = false;
+        this.bookings = [];
+      }
+    });
+  }
+
+  private getTypeClass(modalidade: string): string {
+    const mod = (modalidade || '').toLowerCase();
+    if (mod.includes('beach') || mod.includes('tennis')) return 'badge-tennis';
+    if (mod.includes('futsal')) return 'badge-futsal';
+    if (mod.includes('vôlei') || mod.includes('volei')) return 'badge-volei';
+    return 'badge-society';
   }
 
   navTo(path: string): void {

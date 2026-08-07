@@ -22,7 +22,21 @@ public class ListarReservaHandler(IReservaRepositorio repositorio)
 
         return new ResultadoPaginado<ReservaListaDto>
         {
-            Itens = itens.Adapt<IEnumerable<ReservaListaDto>>(),
+            Itens = itens.Select(r => new ReservaListaDto(
+                r.ReservasId,
+                r.QuadraId,
+                r.UsuarioId,
+                r.UsuarioId,
+                r.DataAgendada,
+                r.HorarioAgendado,
+                r.Usuario?.NomeCompleto ?? "Usuário do Sistema",
+                r.Usuario?.Email,
+                r.Usuario?.Cpf,
+                r.Usuario?.Telefone,
+                r.Quadra?.Nome ?? "Quadra",
+                r.Quadra?.Modalidade ?? "Futebol",
+                r.Status ?? "Ativa"
+            )),
             Total = total,
             Pagina = query.Pagina,
             TamanhoPagina = query.TamanhoPagina
