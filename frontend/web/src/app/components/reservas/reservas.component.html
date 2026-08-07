@@ -1,552 +1,124 @@
 <div class="reservas-container">
+  <!-- Top Header Area -->
+  <div class="header-actions">
+    <div class="page-title">
+      <h2>Reservas</h2>
+      <p>Gerencie todas as reservas realizadas nas quadras.</p>
+    </div>
+    <div class="actions-group">
+      <button class="btn-primary" [routerLink]="['/reservas/nova']">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        Nova Reserva
+      </button>
+    </div>
+  </div>
 
-  <!-- ═══════════════════════════════════════════════════════════
-       VISÃO: FORMULÁRIO NOVA RESERVA
-       ═══════════════════════════════════════════════════════════ -->
-  <ng-container *ngIf="showNovaReservaForm">
-    <!-- Header Breadcrumb -->
-    <div class="form-header-bar">
-      <div class="breadcrumb-container">
-        <h2>Nova Reserva</h2>
-        <div class="breadcrumb-links">
-          <span class="home-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2">
-              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-              <polyline points="9 22 9 12 15 12 15 22"></polyline>
-            </svg>
-          </span>
-          <span class="bc-link" (click)="cancelarNovaReserva()">Reservas</span>
-          <span class="bc-separator">&gt;</span>
-          <span class="bc-current">Nova Reserva</span>
-        </div>
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Carregando dados das quadras e reservas...</p>
+  </div>
+
+  <!-- Cards de Estatísticas -->
+  <section class="stats-grid" *ngIf="!isLoading">
+    <div class="stat-card">
+      <div class="stat-icon blue-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
       </div>
-      <div class="form-action-buttons">
-        <button class="btn-secondary-form" (click)="cancelarNovaReserva()">Cancelar</button>
-        <button class="btn-primary-form" (click)="salvarNovaReserva()" [disabled]="salvando">
-          <svg *ngIf="!salvando" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" class="btn-icon-sm">
-            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-            <polyline points="17 21 17 13 7 13 7 21"></polyline>
-            <polyline points="7 3 7 8 15 8"></polyline>
-          </svg>
-          <span class="spinner-sm" *ngIf="salvando"></span>
-          {{ salvando ? 'Salvando...' : 'Salvar Reserva' }}
-        </button>
+      <div class="stat-details">
+        <p class="stat-label">Reservas Hoje</p>
+        <h3>{{ getReservasHojeCount() }}</h3>
+        <p class="stat-sub text-green">+12% em relação a ontem</p>
       </div>
     </div>
-
-    <!-- Alert de Sucesso -->
-    <div class="alert-success" *ngIf="successMessage">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-        <polyline points="22 4 12 14.01 9 11.01"></polyline>
-      </svg>
-      {{ successMessage }}
-    </div>
-
-    <!-- Alert de Erros -->
-    <div class="alert-error-form" *ngIf="errosForm.length > 0">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="12" r="10"></circle>
-        <line x1="12" y1="8" x2="12" y2="12"></line>
-        <line x1="12" y1="16" x2="12.01" y2="16"></line>
-      </svg>
-      <div>
-        <p *ngFor="let erro of errosForm">{{ erro }}</p>
+    <div class="stat-card">
+      <div class="stat-icon active-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+          <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"></path>
+        </svg>
+      </div>
+      <div class="stat-details">
+        <p class="stat-label">Reservas Semana</p>
+        <h3>{{ getReservasSemanaCount() }}</h3>
+        <p class="stat-sub text-green">+9% em relação à semana passada</p>
       </div>
     </div>
-
-    <!-- Conteúdo do Formulário -->
-    <div class="form-content-grid">
-
-      <!-- Card 1: Informações da Reserva -->
-      <div class="form-card">
-        <div class="form-card-header">
-          <h3>Informações da Reserva</h3>
-          <p>Preencha os dados da reserva que deseja criar.</p>
-        </div>
-
-        <!-- Linha 1: Quadra + Data -->
-        <div class="form-fields-row">
-          <div class="form-field-group">
-            <label>Quadra <span class="required">*</span></label>
-            <select [(ngModel)]="formQuadraId" (change)="onQuadraChange()" class="form-select">
-              <option value="">Selecione uma quadra...</option>
-              <option *ngFor="let q of quadras" [value]="q.id">
-                {{ q.nome }} — {{ q.modalidade }}
-              </option>
-            </select>
-          </div>
-
-          <div class="form-field-group">
-            <label>Data da Reserva <span class="required">*</span></label>
-            <select [(ngModel)]="formData" (change)="onDateChange()" class="form-select">
-              <option value="">Selecione uma data...</option>
-              <option *ngFor="let d of availableDates" [value]="d">{{ d }}</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Linha 2: Horário -->
-        <div class="form-fields-row">
-          <div class="form-field-group">
-            <label>Horário <span class="required">*</span></label>
-            <select [(ngModel)]="formHorario" class="form-select">
-              <option value="">Selecione um horário...</option>
-              <option *ngFor="let h of horariosDisponiveis" [value]="h">{{ h }}</option>
-            </select>
-          </div>
-          <!-- Coluna vazia para manter grid de 2 -->
-          <div></div>
-        </div>
+    <div class="stat-card">
+      <div class="stat-icon users-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
       </div>
-
-      <!-- Card 2: Usuário -->
-      <div class="form-card">
-        <div class="form-card-header">
-          <h3>Usuário da Reserva</h3>
-          <p>Selecione o usuário responsável pela reserva.</p>
-        </div>
-
-        <!-- Campo Usuário Selecionado ou botão buscar -->
-        <div *ngIf="!formUsuarioId" class="usuario-vazio">
-          <div class="usuario-vazio-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-          </div>
-          <div class="usuario-vazio-texto">
-            <p class="usuario-vazio-titulo">Nenhum usuário selecionado</p>
-            <p class="usuario-vazio-sub">Use o botão abaixo para pesquisar e selecionar o usuário.</p>
-          </div>
-          <button class="btn-buscar-usuario" (click)="abrirBuscarUsuario()">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-            Buscar Usuário
-          </button>
-        </div>
-
-        <!-- Usuário Selecionado -->
-        <div *ngIf="formUsuarioId" class="usuario-selecionado">
-          <div class="usuario-avatar">{{ formUsuarioNome.charAt(0) | uppercase }}</div>
-          <div class="usuario-info-selecionado">
-            <span class="usuario-nome-sel">{{ formUsuarioNome }}</span>
-            <span class="usuario-email-sel">{{ formUsuarioEmail }}</span>
-          </div>
-          <div class="usuario-acoes">
-            <button class="btn-trocar-usuario" (click)="abrirBuscarUsuario()">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
-              Trocar
-            </button>
-            <button class="btn-remover-usuario" (click)="limparUsuarioSelecionado()">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Barra Inferior de Ações -->
-      <div class="form-bottom-bar">
-        <div class="form-bottom-info">
-          <div class="info-circle">i</div>
-          <div>
-            <strong>Importante</strong>
-            <p>Todos os campos marcados com <span class="required">*</span> são obrigatórios.</p>
-          </div>
-        </div>
-        <div class="form-bottom-actions">
-          <button class="btn-secondary-form" (click)="cancelarNovaReserva()">Cancelar</button>
-          <button class="btn-primary-form" (click)="salvarNovaReserva()" [disabled]="salvando">
-            <span class="spinner-sm" *ngIf="salvando"></span>
-            {{ salvando ? 'Salvando...' : 'Salvar Reserva' }}
-          </button>
-        </div>
+      <div class="stat-details">
+        <p class="stat-label">Reservas Mês</p>
+        <h3>{{ getReservasMesCount() }}</h3>
+        <p class="stat-sub text-green">+15% em relação ao mês passado</p>
       </div>
     </div>
-  </ng-container>
+  </section>
 
-  <!-- ═══════════════════════════════════════════════════════════
-       VISÃO NORMAL (Listagem)
-       ═══════════════════════════════════════════════════════════ -->
-  <ng-container *ngIf="!showNovaReservaForm">
-
-    <!-- Top Header Area -->
-    <div class="header-actions">
-      <div class="page-title">
-        <h2>Reservas</h2>
-        <p>Gerencie todas as reservas realizadas nas quadras.</p>
-      </div>
-      <div class="actions-group">
-        <button class="btn-primary" (click)="abrirNovaReserva()">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2">
-            <line x1="12" y1="5" x2="12" y2="19"></line>
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-          </svg>
-          Nova Reserva
-        </button>
-      </div>
-    </div>
-
-    <!-- Loading State -->
-    <div class="loading-state" *ngIf="isLoading">
-      <div class="spinner"></div>
-      <p>Carregando dados das reservas...</p>
-    </div>
-
-    <!-- Cards de Estatísticas -->
-    <section class="stats-grid" *ngIf="!isLoading">
-      <div class="stat-card">
-        <div class="stat-icon blue-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="16" y1="2" x2="16" y2="6"></line>
-            <line x1="8" y1="2" x2="8" y2="6"></line>
-            <line x1="3" y1="10" x2="21" y2="10"></line>
-          </svg>
-        </div>
-        <div class="stat-details">
-          <p class="stat-label">Reservas Hoje</p>
-          <h3>{{ getReservasHojeCount() }}</h3>
-          <p class="stat-sub text-green">+12% em relação a ontem</p>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon active-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="16" y1="2" x2="16" y2="6"></line>
-            <line x1="8" y1="2" x2="8" y2="6"></line>
-            <line x1="3" y1="10" x2="21" y2="10"></line>
-            <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"></path>
-          </svg>
-        </div>
-        <div class="stat-details">
-          <p class="stat-label">Reservas Semana</p>
-          <h3>{{ getReservasSemanaCount() }}</h3>
-          <p class="stat-sub text-green">+9% em relação à semana passada</p>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon users-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-            <circle cx="9" cy="7" r="4"></circle>
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-          </svg>
-        </div>
-        <div class="stat-details">
-          <p class="stat-label">Reservas Mês</p>
-          <h3>{{ getReservasMesCount() }}</h3>
-          <p class="stat-sub text-green">+15% em relação ao mês passado</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- ─── VISÃO 1: Grid de Quadras ─── -->
-    <div *ngIf="!quadraSelecionada && !isLoading" class="quadras-view-block">
-      <!-- Filtros -->
-      <div class="table-filters margin-bottom-20">
-        <div class="search-box">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-          <input type="text" placeholder="Buscar quadra..." [(ngModel)]="termoBuscaQuadra" (input)="aplicarFiltros()">
-        </div>
-        <div class="filter-dropdowns">
-          <select class="status-filter" [(ngModel)]="filtroModalidade" (change)="aplicarFiltros()">
-            <option *ngFor="let mod of opcoesModalidades" [value]="mod">{{ mod === 'Todas' ? 'Todas as Modalidades' :
-              mod }}</option>
-          </select>
-        </div>
-      </div>
-
-      <h3 class="section-title">Quadras</h3>
-
-      <div class="quadras-grid" *ngIf="quadrasFiltradas.length > 0">
-        <div class="quadra-card" *ngFor="let quadra of quadrasFiltradas">
-          <div class="quadra-card-img-wrapper">
-            <img [src]="quadra.imagemUrl || 'https://images.unsplash.com/photo-1545807191-178a3752c51e?q=80&w=600'"
-              [alt]="quadra.nome" class="quadra-card-img">
-          </div>
-          <div class="quadra-card-body">
-            <div class="quadra-card-info">
-              <h4 class="quadra-card-title">{{ quadra.nome }}</h4>
-              <p class="quadra-card-subtitle">{{ quadra.modalidade }}</p>
-            </div>
-            <button class="btn-ver-reservas" (click)="verReservasDaQuadra(quadra)">Ver Reservas</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="empty-search-state" *ngIf="quadrasFiltradas.length === 0">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
-          width="48" height="48" style="opacity: 0.4; margin-bottom: 12px;">
+  <!-- Grid de Quadras -->
+  <div *ngIf="!isLoading" class="quadras-view-block">
+    <!-- Filtros -->
+    <div class="table-filters margin-bottom-20">
+      <div class="search-box">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="11" cy="11" r="8"></circle>
           <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
         </svg>
-        <p style="color: #94a3b8; font-size: 0.95rem; margin: 0;">Nenhuma quadra encontrada para <strong>"{{
-            termoBuscaQuadra || filtroModalidade }}"</strong></p>
+        <input type="text" placeholder="Buscar quadra..." [(ngModel)]="termoBuscaQuadra" (input)="aplicarFiltros()">
+      </div>
+      <div class="filter-dropdowns">
+        <select class="status-filter" [(ngModel)]="filtroModalidade" (change)="aplicarFiltros()">
+          <option *ngFor="let mod of opcoesModalidades" [value]="mod">
+            {{ mod === 'Todas' ? 'Todas as Modalidades' : mod }}
+          </option>
+        </select>
       </div>
     </div>
 
-    <!-- ─── VISÃO 2: Tabela de Reservas da Quadra Selecionada ─── -->
-    <div *ngIf="quadraSelecionada && !isLoading" class="reserva-table-block">
-      <div class="reserva-header-bar">
-        <div class="selected-quadra-info">
-          <button class="btn-voltar" (click)="voltarParaQuadras()">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2">
-              <line x1="19" y1="12" x2="5" y2="12"></line>
-              <polyline points="12 19 5 12 12 5"></polyline>
-            </svg>
-            Voltar para Quadras
-          </button>
-          <div class="quadra-title-group">
-            <h3>Reservas de {{ quadraSelecionada.nome }}</h3>
-            <span class="badge-modalidade" [ngClass]="getBadgeModalidadeClass(quadraSelecionada.modalidade)">{{
-              quadraSelecionada.modalidade }}</span>
+    <h3 class="section-title">Quadras</h3>
+
+    <div class="quadras-grid" *ngIf="quadrasFiltradas.length > 0">
+      <div class="quadra-card" *ngFor="let quadra of quadrasFiltradas">
+        <div class="quadra-card-img-wrapper">
+          <img [src]="quadra.imagemUrl || 'https://images.unsplash.com/photo-1545807191-178a3752c51e?q=80&w=600'"
+            [alt]="quadra.nome" class="quadra-card-img">
+        </div>
+        <div class="quadra-card-body">
+          <div class="quadra-card-info">
+            <h4 class="quadra-card-title">{{ quadra.nome }}</h4>
+            <p class="quadra-card-subtitle">{{ quadra.modalidade }}</p>
           </div>
-        </div>
-      </div>
-
-      <div class="table-container margin-top-15">
-        <table class="data-table" *ngIf="reservasQuadraSelecionada.length > 0">
-          <thead>
-            <tr>
-              <th>NOME DO USUÁRIO</th>
-              <th>DATA DA RESERVA</th>
-              <th>HORÁRIO</th>
-              <th>MODALIDADE</th>
-              <th>STATUS DA RESERVA</th>
-              <th>AÇÕES</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let reserva of reservasQuadraSelecionada" (click)="openDetailsModal(reserva)"
-              class="clickable-row">
-              <td>
-                <div class="user-cell">
-                  <div class="user-avatar">{{ reserva.nomeUsuario.charAt(0) | uppercase }}</div>
-                  <div class="user-info">
-                    <span class="user-name">{{ reserva.nomeUsuario }}</span>
-                    <span class="user-date" *ngIf="reserva.emailUsuario">{{ reserva.emailUsuario }}</span>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="date-cell">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    stroke-width="2" class="cell-icon">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                  </svg>
-                  <span class="date-text">{{ reserva.data | date:'dd/MM/yyyy' }}</span>
-                </div>
-              </td>
-              <td>
-                <div class="time-cell">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    stroke-width="2" class="cell-icon">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <polyline points="12 6 12 12 16 14"></polyline>
-                  </svg>
-                  <span class="time-text">{{ reserva.horario }}</span>
-                </div>
-              </td>
-              <td>
-                <span class="badge-modalidade" [ngClass]="getBadgeModalidadeClass(reserva.modalidade)">{{
-                  reserva.modalidade }}</span>
-              </td>
-              <td>
-                <span class="status-badge" [ngClass]="getStatusClass(reserva.status)">{{ reserva.status }}</span>
-              </td>
-              <td>
-                <div class="actions-cell">
-                  <button class="btn-icon" title="Visualizar detalhes"
-                    (click)="$event.stopPropagation(); openDetailsModal(reserva)">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                      stroke-width="2">
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                      <circle cx="12" cy="12" r="3"></circle>
-                    </svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div class="empty-search-state" *ngIf="reservasQuadraSelecionada.length === 0">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="1.5" width="48" height="48" style="opacity: 0.4; margin-bottom: 12px;">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="16" y1="2" x2="16" y2="6"></line>
-            <line x1="8" y1="2" x2="8" y2="6"></line>
-            <line x1="3" y1="10" x2="21" y2="10"></line>
-          </svg>
-          <p style="color: #94a3b8; font-size: 0.95rem; margin: 0;">Nenhuma reserva registrada para <strong>{{
-              quadraSelecionada.nome }}</strong>.</p>
+          <button class="btn-ver-reservas" (click)="verReservasDaQuadra(quadra)">Ver Reservas</button>
         </div>
       </div>
     </div>
 
-  </ng-container>
-
-  <!-- ═══════════════════════════════════════════════════════════
-       MODAL: DETALHES DA RESERVA
-       ═══════════════════════════════════════════════════════════ -->
-  <div class="modal-backdrop" *ngIf="showDetailsModal && selectedReserva" (click)="closeDetailsModal()">
-    <div class="modal-card" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <div class="modal-title-group">
-          <h3>Detalhes da Reserva</h3>
-          <span class="modal-subtitle" *ngIf="selectedReserva.id">ID: {{ selectedReserva.id }}</span>
-        </div>
-        <button class="btn-close" (click)="closeDetailsModal()">✕</button>
-      </div>
-      <div class="modal-body">
-        <div class="detail-row"><span class="detail-label">Quadra</span><span class="detail-value font-semibold">{{
-            selectedReserva.nomeQuadra }}</span></div>
-        <div class="detail-row"><span class="detail-label">Modalidade</span><span class="badge-modalidade"
-            [ngClass]="getBadgeModalidadeClass(selectedReserva.modalidade)">{{ selectedReserva.modalidade }}</span>
-        </div>
-        <div class="detail-row"><span class="detail-label">Usuário</span><span class="detail-value">{{
-            selectedReserva.nomeUsuario }}</span></div>
-        <div class="detail-row" *ngIf="selectedReserva.emailUsuario"><span class="detail-label">E-mail</span><span
-            class="detail-value">{{ selectedReserva.emailUsuario }}</span></div>
-        <div class="detail-row" *ngIf="selectedReserva.telefoneUsuario"><span class="detail-label">Telefone</span><span
-            class="detail-value">{{ selectedReserva.telefoneUsuario }}</span></div>
-        <div class="detail-row"><span class="detail-label">Data</span><span class="detail-value">{{ selectedReserva.data
-            | date:'dd/MM/yyyy' }}</span></div>
-        <div class="detail-row"><span class="detail-label">Horário</span><span class="detail-value font-semibold">{{
-            selectedReserva.horario }}</span></div>
-        <div class="detail-row"><span class="detail-label">Status</span><span class="status-badge"
-            [ngClass]="getStatusClass(selectedReserva.status)">{{ selectedReserva.status }}</span></div>
-        <div class="detail-row" *ngIf="selectedReserva.observacoes"><span class="detail-label">Observações</span><span
-            class="detail-value text-muted">{{ selectedReserva.observacoes }}</span></div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-secondary" (click)="closeDetailsModal()">Fechar</button>
-      </div>
+    <div class="empty-search-state" *ngIf="quadrasFiltradas.length === 0">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+        width="48" height="48" style="opacity: 0.4; margin-bottom: 12px;">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <p style="color: #94a3b8; font-size: 0.95rem; margin: 0;">
+        Nenhuma quadra encontrada para <strong>"{{ termoBuscaQuadra || filtroModalidade }}"</strong>
+      </p>
     </div>
   </div>
-
-  <!-- ═══════════════════════════════════════════════════════════
-       MODAL: BUSCAR USUÁRIO
-       ═══════════════════════════════════════════════════════════ -->
-  <div class="modal-backdrop" *ngIf="showBuscarUsuarioModal" (click)="fecharBuscarUsuario()">
-    <div class="modal-card modal-lg" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <div class="modal-title-group">
-          <h3>Buscar Usuário</h3>
-          <span class="modal-subtitle">Pesquise por nome, CPF ou e-mail</span>
-        </div>
-        <button class="btn-close" (click)="fecharBuscarUsuario()">✕</button>
-      </div>
-
-      <!-- Barra de Pesquisa dentro do Modal -->
-      <div class="modal-search-bar">
-        <div class="search-box modal-search-input">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-          <input type="text" placeholder="Buscar por nome, CPF ou e-mail..." [(ngModel)]="termoBuscaUsuario"
-            (keyup.enter)="buscarUsuarios()">
-        </div>
-        <button class="btn-buscar-action" (click)="buscarUsuarios()">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-          Buscar
-        </button>
-      </div>
-
-      <!-- Lista de Resultados -->
-      <div class="modal-body modal-body-scroll">
-        <!-- Carregando -->
-        <div class="loading-state-sm" *ngIf="buscandoUsuarios">
-          <div class="spinner"></div>
-          <p>Buscando usuários...</p>
-        </div>
-
-        <!-- Erro -->
-        <div class="empty-search-state" *ngIf="erroBuscaUsuario && !buscandoUsuarios">
-          <p style="color: #ef4444;">{{ erroBuscaUsuario }}</p>
-        </div>
-
-        <!-- Tabela de Usuários -->
-        <table class="data-table" *ngIf="!buscandoUsuarios && usuariosBusca.length > 0">
-          <thead>
-            <tr>
-              <th>NOME</th>
-              <th>CPF</th>
-              <th>E-MAIL</th>
-              <th>AÇÃO</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let u of usuariosBusca">
-              <td>
-                <div class="user-cell">
-                  <div class="user-avatar user-avatar-sm">{{ u.nomeCompleto.charAt(0) | uppercase }}</div>
-                  <span class="user-name">{{ u.nomeCompleto }}</span>
-                </div>
-              </td>
-              <td><span style="font-size: 0.85rem; color: #475569;">{{ u.cpf || '—' }}</span></td>
-              <td><span style="font-size: 0.85rem; color: #64748b;">{{ u.email }}</span></td>
-              <td>
-                <div class="actions-cell">
-                  <button class="btn-selecionar-usuario" (click)="selecionarUsuario(u)">
-                    Selecionar
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-        <!-- Sem resultados -->
-        <div class="empty-search-state" *ngIf="!buscandoUsuarios && usuariosBusca.length === 0">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="1.5" width="40" height="40" style="opacity: 0.4; margin-bottom: 10px;">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-            <circle cx="9" cy="7" r="4"></circle>
-          </svg>
-          <p style="color: #94a3b8; font-size: 0.9rem;">Nenhum usuário encontrado.</p>
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn-secondary" (click)="fecharBuscarUsuario()">Cancelar</button>
-      </div>
-    </div>
-  </div>
-
 </div>

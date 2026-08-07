@@ -1,4 +1,4 @@
-﻿using BaseApi.Application.Comum.Modelos;
+using BaseApi.Application.Comum.Modelos;
 using MediatR;
 
 namespace BaseApi.Application.Telefones.Queries.ListarTelefones;
@@ -9,7 +9,8 @@ namespace BaseApi.Application.Telefones.Queries.ListarTelefones;
 public record ListarReservaQuery(
     int Pagina = 1,
     int TamanhoPagina = 10,
-    string? Busca = null
+    string? Busca = null,
+    Guid? QuadraId = null
 ) : IRequest<ResultadoPaginado<ReservaListaDto>>;
 
 /// <summary>DTO resumido para listagem</summary>

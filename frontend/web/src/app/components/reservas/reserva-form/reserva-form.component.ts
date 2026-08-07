@@ -82,6 +82,14 @@ export class ReservaFormComponent implements OnInit {
       const d = new Date();
       d.setDate(d.getDate() + 1);
       this.formData = d.toISOString().split('T')[0];
+
+      // Pré-seleciona automaticamente o usuário da sessão atual se estiver criando nova reserva
+      const session = this.authService.getSession();
+      if (session) {
+        this.formUsuarioNome = session.nome || 'Administrador do Sistema';
+        this.formUsuarioEmail = session.email || '';
+        this.formUsuarioId = '88888888-8888-8888-8888-888888888888'; // ID padrão de sistema/admin para reservas
+      }
     }
   }
 
@@ -435,7 +443,7 @@ export class ReservaFormComponent implements OnInit {
         if (sucessos.length > 0) {
           this.successMessage = `${sucessos.length} reserva(s) enviada(s) e cadastrada(s) com sucesso!`;
           setTimeout(() => {
-            this.router.navigate(['/reservas']);
+            this.router.navigate(['/reservas'], { queryParams: { quadraId: this.formQuadraId } });
           }, 1200);
         } else {
           this.errosForm = ['Erro ao salvar as reservas na API.'];
