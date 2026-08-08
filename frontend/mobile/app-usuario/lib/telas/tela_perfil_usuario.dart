@@ -39,24 +39,41 @@ class _TelaPerfilUsuarioEstado extends State<TelaPerfilUsuario> {
     _sessaoAtual = widget.sessao;
     _preencherCampos();
     _carregarPerfilLocalOuApi();
+
+    // Sincroniza em tempo real as alterações do Nome e E-mail com o cabeçalho da tela
+    _controladorNome.addListener(_aoMudarTexto);
+    _controladorEmail.addListener(_aoMudarTexto);
+  }
+
+  void _aoMudarTexto() {
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   void _preencherCampos() {
     _controladorNome.text = _sessaoAtual.nomeCompleto;
     _controladorEmail.text = _sessaoAtual.email;
     _controladorCpf.text = _formatarCpfExibicao(_sessaoAtual.cpf);
-    _controladorTelefone.text = _sessaoAtual.telefone.isNotEmpty
-        ? _sessaoAtual.telefone
-        : '(11) 98765-4321';
+    _controladorTelefone.text = _formatarTelefoneExibicao(_sessaoAtual.telefone);
+  }
+
+  String _formatarTelefoneExibicao(String telRaw) {
+    final limpo = telRaw.replaceAll(RegExp(r'\D'), '');
+    if (limpo.length == 11) {
+      return '(${limpo.substring(0, 2)}) ${limpo.substring(2, 7)}-${limpo.substring(7)}';
+    } else if (limpo.length == 10) {
+      return '(${limpo.substring(0, 2)}) ${limpo.substring(2, 6)}-${limpo.substring(6)}';
+    }
+    return telRaw;
   }
 
   String _formatarCpfExibicao(String cpfRaw) {
-    if (cpfRaw.isEmpty) return '***.452.898-**';
     final limpo = cpfRaw.replaceAll(RegExp(r'\D'), '');
     if (limpo.length == 11) {
       return '***.${limpo.substring(3, 6)}.${limpo.substring(6, 9)}-**';
     }
-    return cpfRaw;
+    return cpfRaw.isNotEmpty ? cpfRaw : '***.452.898-**';
   }
 
   Future<void> _carregarPerfilLocalOuApi() async {
@@ -67,10 +84,24 @@ class _TelaPerfilUsuarioEstado extends State<TelaPerfilUsuario> {
         _preencherCampos();
       });
     }
+
+    try {
+      final sessaoAtualizada = await ServicoAutenticacao.obterPerfilUsuarioDaApi();
+      if (sessaoAtualizada != null && mounted) {
+        setState(() {
+          _sessaoAtual = sessaoAtualizada;
+          _preencherCampos();
+        });
+      }
+    } catch (_) {
+      // Falha silenciosa se estiver offline, mantém dados locais
+    }
   }
 
   @override
   void dispose() {
+    _controladorNome.removeListener(_aoMudarTexto);
+    _controladorEmail.removeListener(_aoMudarTexto);
     _controladorNome.dispose();
     _controladorEmail.dispose();
     _controladorCpf.dispose();
@@ -146,6 +177,7 @@ class _TelaPerfilUsuarioEstado extends State<TelaPerfilUsuario> {
         _sessaoAtual = novaSessao;
         _modoEdicao = false;
         _estaCarregando = false;
+        _preencherCampos();
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -352,13 +384,15 @@ class _TelaPerfilUsuarioEstado extends State<TelaPerfilUsuario> {
 
   @override
   Widget build(BuildContext context) {
-    final nomeParaExibir = _sessaoAtual.nomeCompleto.isNotEmpty
-        ? _sessaoAtual.nomeCompleto.toUpperCase()
-        : 'RICARDO SILVA';
+    final nomeParaExibir = _controladorNome.text.trim().isNotEmpty
+        ? _controladorNome.text.trim().toUpperCase()
+        : (_sessaoAtual.nomeCompleto.isNotEmpty
+            ? _sessaoAtual.nomeCompleto.toUpperCase()
+            : 'USUÁRIO');
 
-    final emailParaExibir = _sessaoAtual.email.isNotEmpty
-        ? _sessaoAtual.email
-        : 'ricardo.silva@example.com';
+    final emailParaExibir = _controladorEmail.text.trim().isNotEmpty
+        ? _controladorEmail.text.trim()
+        : _sessaoAtual.email;
 
     return Scaffold(
       backgroundColor: Colors.white,

@@ -41,7 +41,10 @@ public class LoginHandler(
             ExpiraEm: expiracao,
             NomeCompleto: usuario.NomeCompleto,
             Email: usuario.Email,
-            Perfil: usuario.Perfil?.Nome ?? string.Empty
+            Perfil: usuario.Perfil?.Nome ?? string.Empty,
+            UsuariosId: usuario.UsuariosId,
+            Cpf: usuario.Cpf,
+            Telefone: usuario.Telefone
         );
     }
 }

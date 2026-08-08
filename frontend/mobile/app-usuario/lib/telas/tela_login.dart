@@ -18,10 +18,10 @@ class _TelaLoginUsuarioEstado extends State<TelaLoginUsuario> {
   bool _estaCarregando = false;
 
   final TextEditingController _controladorEmail = TextEditingController(
-    text: 'usuario@playzone.com',
+    text: 'midiansouza@gmail.com',
   );
   final TextEditingController _controladorSenha = TextEditingController(
-    text: '123456',
+    text: 'Midian123#',
   );
 
   final FocusNode _focoEmail = FocusNode();
