@@ -253,6 +253,9 @@ class _TelaCadastroUsuarioEstado extends State<TelaCadastroUsuario> {
     if (valor.trim().length < 3) {
       return 'Mínimo de 3 caracteres';
     }
+    if (valor.trim().length > 150) {
+      return 'O nome deve ter no máximo 150 caracteres';
+    }
     return null;
   }
 
@@ -405,6 +408,8 @@ class _TelaCadastroUsuarioEstado extends State<TelaCadastroUsuario> {
     final nomeCompleto = _controladorNome.text.trim();
     final email = _controladorEmail.text.trim();
     final senha = _controladorSenha.text;
+    final cpfLimpo = _controladorCpf.text.replaceAll(RegExp(r'\D'), '');
+    final telefoneLimpo = _controladorTelefone.text.replaceAll(RegExp(r'\D'), '');
 
     try {
       // 1. Cadastra o usuário no banco
@@ -412,6 +417,8 @@ class _TelaCadastroUsuarioEstado extends State<TelaCadastroUsuario> {
         nomeCompleto: nomeCompleto,
         email: email,
         senha: senha,
+        cpf: cpfLimpo,
+        telefone: telefoneLimpo,
       );
 
       // 2. Realiza o login (autenticação automática)
@@ -709,8 +716,8 @@ class _TelaCadastroUsuarioEstado extends State<TelaCadastroUsuario> {
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 16.0),
                           elevation: 0,
-                          disabledBackgroundColor: corAzulDestaque.withOpacity(
-                            0.6,
+                          disabledBackgroundColor: corAzulDestaque.withValues(
+                            alpha: 0.6,
                           ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12.0),

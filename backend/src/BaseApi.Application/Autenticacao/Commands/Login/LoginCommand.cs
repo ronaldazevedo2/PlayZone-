@@ -16,5 +16,8 @@ public record LoginResposta(
     DateTime ExpiraEm,
     string NomeCompleto,
     string Email,
-    string Perfil
+    string Perfil,
+    Guid? UsuariosId = null,
+    string Cpf = "",
+    string Telefone = ""
 );

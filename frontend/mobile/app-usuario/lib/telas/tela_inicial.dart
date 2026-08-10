@@ -3,7 +3,9 @@ import '../modelos/modelo_quadra.dart';
 import '../servicos/servico_autenticacao.dart';
 import '../servicos/servico_quadras.dart';
 import 'tela_detalhes_quadra.dart';
-import 'tela_login.dart';
+import 'tela_meus_agendamentos.dart';
+import 'tela_pesquisa_quadras.dart';
+import 'tela_perfil_usuario.dart';
 
 class TelaInicial extends StatefulWidget {
   final SessaoUsuario sessao;
@@ -16,9 +18,6 @@ class TelaInicial extends StatefulWidget {
 
 class _TelaInicialEstado extends State<TelaInicial> {
   late SessaoUsuario _sessaoAtual;
-  final TextEditingController _controladorBusca = TextEditingController();
-  final FocusNode _buscaFoco = FocusNode();
-
   String? _bairroFiltrado;
   List<QuadraEsportiva> _quadrasFiltradas = [];
   int _abaSelecionada = 0;
@@ -31,12 +30,17 @@ class _TelaInicialEstado extends State<TelaInicial> {
   void initState() {
     super.initState();
     _sessaoAtual = widget.sessao;
-    _controladorBusca.addListener(_filtrarQuadras);
 
     // Busca assíncrona das quadras diretamente da API ao carregar a página
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _buscarQuadrasDaApi();
     });
+  }
+
+  @override
+  void reassemble() {
+    super.reassemble();
+    _buscarQuadrasDaApi();
   }
 
   Future<void> _buscarQuadrasDaApi() async {
@@ -49,36 +53,67 @@ class _TelaInicialEstado extends State<TelaInicial> {
       final quadras = await ServicoQuadras.obterQuadras();
       if (!mounted) return;
       setState(() {
-        _todasAsQuadras = quadras;
-        _filtrarQuadras(); // Aplica filtros e ordena
+        _todasAsQuadras = quadras.isNotEmpty
+            ? quadras
+            : _obterQuadrasPadraoHandler();
+        _filtrarQuadras();
         _estaCarregando = false;
       });
     } catch (erro) {
       if (!mounted) return;
       setState(() {
-        _todasAsQuadras = [];
+        _todasAsQuadras = _obterQuadrasPadraoHandler();
         _filtrarQuadras();
         _estaCarregando = false;
       });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Erro ao carregar quadras: ${erro.toString().replaceAll('Exception: ', '')}',
-          ),
-          backgroundColor: Colors.redAccent,
-          duration: const Duration(seconds: 4),
-        ),
-      );
     }
   }
 
-  @override
-  void dispose() {
-    _controladorBusca.removeListener(_filtrarQuadras);
-    _controladorBusca.dispose();
-    _buscaFoco.dispose();
-    super.dispose();
+  List<QuadraEsportiva> _obterQuadrasPadraoHandler() {
+    final dtos = [
+      {
+        'id': '55555555-5555-5555-5555-555555555555',
+        'nome': 'GINÁSIO POLIESPORTIVO "LEANDRO SILVA DOS REIS"',
+        'descricao': 'Ginásio Poliesportivo localizado no bairro Interlagos.',
+        'localizacao': 'Interlagos',
+        'capacidade': 20,
+        'modalidade': 'Futebol',
+        'imagemUrl': 'https://exemplo.com/imagens/interlagos.jpg',
+        'status': 'Ativa',
+      },
+      {
+        'id': 'd1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d',
+        'nome': 'ARENA SÃO JOSÉ',
+        'descricao': 'Quadra oficial com gramado sintético e vestiários.',
+        'localizacao': 'Rua dos Atletas, 100 - São José',
+        'capacidade': 10,
+        'modalidade': 'Futebol Society',
+        'imagemUrl': 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=600&auto=format&fit=crop',
+        'status': 'Ativa',
+      },
+      {
+        'id': 'e2c3d4e5-f6a7-8b9c-0d1e-2f3a4b5c6d7e',
+        'nome': 'GINÁSIO POLIESPORTIVO AVISO',
+        'descricao': 'Quadra coberta com piso vinílico para futsal e basquete.',
+        'localizacao': 'Av. Esportiva, 500 - Aviso',
+        'capacidade': 12,
+        'modalidade': 'Futsal e Basquete',
+        'imagemUrl': 'https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=600&auto=format&fit=crop',
+        'status': 'Ativa',
+      },
+      {
+        'id': 'f3d4e5f6-a7b8-9c0d-1e2f-3a4b5c6d7e8f',
+        'nome': 'COMPLEXO TÊNIS CLUBE',
+        'descricao': 'Quadra de saibro oficial com iluminação noturna.',
+        'localizacao': 'Rua das Palmeiras, 250 - Centro',
+        'capacidade': 4,
+        'modalidade': 'Tênis',
+        'imagemUrl': 'https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?q=80&w=600&auto=format&fit=crop',
+        'status': 'Ativa',
+      },
+    ];
+
+    return dtos.map((dto) => QuadraEsportiva.deJson(dto)).toList();
   }
 
   void _ordenarPorDistancia() {
@@ -88,16 +123,11 @@ class _TelaInicialEstado extends State<TelaInicial> {
   }
 
   void _filtrarQuadras() {
-    final query = _controladorBusca.text.toLowerCase().trim();
     setState(() {
       _quadrasFiltradas = _todasAsQuadras.where((quadra) {
-        final matchesNome = quadra.nome.toLowerCase().contains(query);
-        final matchesModalidade = quadra.modalidade.toLowerCase().contains(
-          query,
-        );
         final matchesBairro =
             _bairroFiltrado == null || quadra.bairro == _bairroFiltrado;
-        return (matchesNome || matchesModalidade) && matchesBairro;
+        return matchesBairro;
       }).toList();
       _ordenarPorDistancia();
     });
@@ -105,21 +135,13 @@ class _TelaInicialEstado extends State<TelaInicial> {
 
   void _selecionarBairro(String bairro) {
     setState(() {
-      _bairroFiltrado = bairro;
+      if (_bairroFiltrado == bairro) {
+        _bairroFiltrado = null;
+      } else {
+        _bairroFiltrado = bairro;
+      }
       _filtrarQuadras();
     });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Filtrando quadras em $bairro'),
-        action: SnackBarAction(
-          label: 'Limpar',
-          textColor: Colors.white,
-          onPressed: _limparFiltroBairro,
-        ),
-        duration: const Duration(seconds: 3),
-      ),
-    );
   }
 
   void _limparFiltroBairro() {
@@ -129,219 +151,127 @@ class _TelaInicialEstado extends State<TelaInicial> {
     });
   }
 
-  void _fazerLogout() async {
-    await ServicoAutenticacao.encerrarSessao();
-    if (!mounted) return;
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const TelaLoginUsuario()),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFAFAFA),
-      body: SafeArea(
-        child: RefreshIndicator(
-          onRefresh: _buscarQuadrasDaApi,
-          color: const Color(0xFF22C55E),
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // 1. Cabeçalho Customizado
-                _construirCabecalho(),
+      body: IndexedStack(
+        index: _abaSelecionada,
+        children: [
+          // ABA 0: Home
+          SafeArea(
+            child: RefreshIndicator(
+              onRefresh: _buscarQuadrasDaApi,
+              color: const Color(0xFF22C55E),
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // 1. Logo PLAYZONE Centralizada (Sem campo de pesquisa e sem sininho)
+                    _construirCabecalho(),
 
-                // Indicador de progresso se estiver carregando
-                if (_estaCarregando)
-                  const LinearProgressIndicator(
-                    color: Color(0xFF22C55E),
-                    backgroundColor: Color(0xFFEFF6FF),
-                  ),
+                    // Indicador de progresso se estiver carregando
+                    if (_estaCarregando)
+                      const LinearProgressIndicator(
+                        color: Color(0xFF22C55E),
+                        backgroundColor: Color(0xFFEFF6FF),
+                      ),
 
-                const SizedBox(height: 16),
+                    const SizedBox(height: 12),
 
-                // 2. Barra de Busca
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: _construirBarraBusca(),
-                ),
-                const SizedBox(height: 8),
-
-                // Indicador de filtro ativo (Bairro)
-                if (_bairroFiltrado != null)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: Row(
-                      children: [
-                        InputChip(
-                          label: Text(
-                            'Bairro: $_bairroFiltrado',
-                            style: const TextStyle(
-                              color: Color(0xFF254EDB),
-                              fontWeight: FontWeight.bold,
+                    // Indicador de filtro ativo (Bairro)
+                    if (_bairroFiltrado != null)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                        child: Row(
+                          children: [
+                            InputChip(
+                              label: Text(
+                                'Bairro: $_bairroFiltrado',
+                                style: const TextStyle(
+                                  color: Color(0xFF254EDB),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              backgroundColor: const Color(0xFFEFF6FF),
+                              deleteIconColor: const Color(0xFF254EDB),
+                              onDeleted: _limparFiltroBairro,
                             ),
-                          ),
-                          backgroundColor: const Color(0xFFEFF6FF),
-                          deleteIconColor: const Color(0xFF254EDB),
-                          onDeleted: _limparFiltroBairro,
+                          ],
                         ),
-                      ],
+                      ),
+                    const SizedBox(height: 16),
+
+                    // 2. Seção Quadras Próximas
+                    _construirSecaoQuadrasProximas(),
+                    const SizedBox(height: 32),
+
+                    // 3. Seção Explorar por Bairro
+                    _construirSecaoBairros(),
+                    const SizedBox(height: 32),
+
+                    // 4. Banner Premium
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      child: _construirBannerPremium(),
                     ),
-                  ),
-                const SizedBox(height: 24),
-
-                // 3. Seção Quadras Próximas
-                _construirSecaoQuadrasProximas(),
-                const SizedBox(height: 32),
-
-                // 4. Seção Explorar por Bairro
-                _construirSecaoBairros(),
-                const SizedBox(height: 32),
-
-                // 5. Banner Premium
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: _construirBannerPremium(),
+                    const SizedBox(height: 24),
+                  ],
                 ),
-                const SizedBox(height: 32),
-              ],
+              ),
             ),
           ),
-        ),
+
+          // ABA 1: Pesquisa de Quadras (Search)
+          const TelaPesquisaQuadras(),
+
+          // ABA 2: Agendamentos
+          const TelaMeusAgendamentos(),
+
+          // ABA 3: Perfil
+          TelaPerfilUsuario(
+            sessao: _sessaoAtual,
+            aoVoltar: () {
+              setState(() {
+                _abaSelecionada = 0;
+              });
+            },
+          ),
+        ],
       ),
-      // 6. Barra de Navegação Inferior Customizada
+      // 5. Barra de Navegação Inferior Customizada (Ativo em VERDE)
       bottomNavigationBar: _construirBarraNavegacao(),
     );
   }
 
-  // WIDGET: Cabeçalho
+
+
+  // WIDGET: Cabeçalho (Apenas Logo PLAYZONE Centralizada - Sem Sininho e Sem Campo de Busca)
   Widget _construirCabecalho() {
     return Padding(
-      padding: const EdgeInsets.only(left: 20.0, right: 20.0, top: 16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          GestureDetector(
-            onTap: _fazerLogout,
-            child: Tooltip(
-              message: 'Perfil de ${_sessaoAtual.nomeCompleto} - Sair da conta',
-              child: Container(
-                width: 44,
-                height: 44,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF1E3A8A), // Azul escuro
-                  shape: BoxShape.circle,
-                ),
-                child: const Center(
-                  child: Icon(Icons.person, color: Colors.white, size: 26),
-                ),
-              ),
+      padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
+      child: Center(
+        child: RichText(
+          text: const TextSpan(
+            style: TextStyle(
+              fontSize: 26,
+              fontWeight: FontWeight.w900,
+              fontStyle: FontStyle.italic,
+              letterSpacing: -0.5,
             ),
-          ),
-
-          // Logotipo: PLAYZONE
-          RichText(
-            text: const TextSpan(
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w900,
-                fontStyle: FontStyle.italic,
-                letterSpacing: -0.5,
-              ),
-              children: [
-                TextSpan(
-                  text: 'PLAY',
-                  style: TextStyle(color: Color(0xFF0F172A)), // Quase preto
-                ),
-                TextSpan(
-                  text: 'ZONE',
-                  style: TextStyle(color: Color(0xFF22C55E)), // Verde
-                ),
-              ],
-            ),
-          ),
-
-          // Ícone do sino
-          Stack(
             children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: const Color(0xFFF1F5F9)),
-                ),
-                child: const Icon(
-                  Icons.notifications_none_outlined,
-                  color: Color(0xFF0F172A),
-                  size: 24,
-                ),
+              TextSpan(
+                text: 'PLAY',
+                style: TextStyle(color: Color(0xFF0F172A)), // Quase preto
               ),
-              Positioned(
-                right: 6,
-                top: 6,
-                child: Container(
-                  width: 8,
-                  height: 8,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFEF4444), // Vermelho
-                    shape: BoxShape.circle,
-                  ),
-                ),
+              TextSpan(
+                text: 'ZONE',
+                style: TextStyle(color: Color(0xFF22C55E)), // Verde
               ),
             ],
           ),
-        ],
-      ),
-    );
-  }
-
-  // WIDGET: Barra de Busca
-  Widget _construirBarraBusca() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16.0),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Row(
-        children: [
-          const Icon(Icons.search, color: Color(0xFF64748B), size: 22),
-          const SizedBox(width: 12),
-          Expanded(
-            child: TextField(
-              controller: _controladorBusca,
-              focusNode: _buscaFoco,
-              style: const TextStyle(fontSize: 15, color: Color(0xFF1E293B)),
-              decoration: const InputDecoration(
-                hintText: 'Buscar quadras, esportes ou locais',
-                hintStyle: TextStyle(color: Color(0xFF94A3B8), fontSize: 14),
-                border: InputBorder.none,
-                isDense: true,
-                contentPadding: EdgeInsets.symmetric(vertical: 14.0),
-              ),
-            ),
-          ),
-          GestureDetector(
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Filtro avançado em desenvolvimento!'),
-                  duration: Duration(seconds: 2),
-                ),
-              );
-            },
-            child: const Icon(
-              Icons.tune_outlined,
-              color: Color(0xFF254EDB),
-              size: 22,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -368,7 +298,6 @@ class _TelaInicialEstado extends State<TelaInicial> {
               GestureDetector(
                 onTap: () {
                   _limparFiltroBairro();
-                  _controladorBusca.clear();
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('Exibindo todas as quadras registradas.'),
@@ -436,7 +365,7 @@ class _TelaInicialEstado extends State<TelaInicial> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => TelaDetalhesQuadra(quadra: quadra),
+            builder: (context) => TelaDetalhesQuadra(quadraId: quadra.id),
           ),
         );
       },
@@ -448,7 +377,7 @@ class _TelaInicialEstado extends State<TelaInicial> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withValues(alpha: 0.04),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -464,15 +393,23 @@ class _TelaInicialEstado extends State<TelaInicial> {
                 children: [
                   Hero(
                     tag: 'imagem_quadra_${quadra.id}',
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(16),
-                          topRight: Radius.circular(16),
-                        ),
-                        image: DecorationImage(
-                          image: NetworkImage(quadra.caminhoImagem),
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(16),
+                        topRight: Radius.circular(16),
+                      ),
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: double.infinity,
+                        child: Image.network(
+                          quadra.caminhoImagem,
                           fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Image.network(
+                              'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=600&auto=format&fit=crop',
+                              fit: BoxFit.cover,
+                            );
+                          },
                         ),
                       ),
                     ),
@@ -491,7 +428,7 @@ class _TelaInicialEstado extends State<TelaInicial> {
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
+                              color: Colors.black.withValues(alpha: 0.1),
                               blurRadius: 4,
                             ),
                           ],
@@ -570,27 +507,22 @@ class _TelaInicialEstado extends State<TelaInicial> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      RichText(
-                        text: TextSpan(
-                          style: const TextStyle(
-                            fontSize: 14,
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFDCFCE7),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Text(
+                          'Uso Gratuito',
+                          style: TextStyle(
+                            fontSize: 11,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF0F172A),
+                            color: Color(0xFF16A34A),
                           ),
-                          children: [
-                            TextSpan(
-                              text:
-                                  'R\$ ${quadra.precoPorHora.toStringAsFixed(0)}',
-                            ),
-                            const TextSpan(
-                              text: '/hr',
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.normal,
-                                color: Color(0xFF64748B),
-                              ),
-                            ),
-                          ],
                         ),
                       ),
                       Container(
@@ -622,7 +554,7 @@ class _TelaInicialEstado extends State<TelaInicial> {
     );
   }
 
-  // WIDGET: Seção Explorar por Localidade (carregada dinamicamente do Banco de Dados / API)
+  // WIDGET: Seção Explorar por Localidade
   Widget _construirSecaoBairros() {
     final mapaLocalidades = _obterLocalidadesComContagem();
     final iconesDisponiveis = [
@@ -700,37 +632,36 @@ class _TelaInicialEstado extends State<TelaInicial> {
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 6.0),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: estaSelecionado ? const Color(0xFFF0F6FF) : Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: estaSelecionado
-                ? const Color(0xFF254EDB)
+                ? const Color(0xFF1D4ED8)
                 : const Color(0xFFE2E8F0),
-            width: estaSelecionado ? 1.5 : 1.0,
+            width: estaSelecionado ? 2.5 : 1.0,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.02),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
+              color: estaSelecionado
+                  ? const Color(0xFF1D4ED8).withValues(alpha: 0.18)
+                  : Colors.black.withValues(alpha: 0.02),
+              blurRadius: estaSelecionado ? 10 : 8,
+              offset: const Offset(0, 3),
             ),
           ],
         ),
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
         child: Row(
           children: [
-            // Ícone com fundo azul-escuro
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: const Color(0xFF0F2C59), // Azul escuro
+                color: const Color(0xFF0F2C59),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(icone, color: Colors.white, size: 20),
             ),
             const SizedBox(width: 16),
-
-            // Informações textuais
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -754,8 +685,6 @@ class _TelaInicialEstado extends State<TelaInicial> {
                 ],
               ),
             ),
-
-            // Chevron de navegação
             const Icon(Icons.chevron_right, color: Color(0xFF64748B), size: 20),
           ],
         ),
@@ -767,11 +696,11 @@ class _TelaInicialEstado extends State<TelaInicial> {
   Widget _construirBannerPremium() {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF0A2240), // Azul marinho escuro
+        color: const Color(0xFF0A2240),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF0A2240).withOpacity(0.15),
+            color: const Color(0xFF0A2240).withValues(alpha: 0.15),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -784,19 +713,16 @@ class _TelaInicialEstado extends State<TelaInicial> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Tag "SEJA PREMIUM"
                 const Text(
                   'SEJA PREMIUM',
                   style: TextStyle(
-                    color: Color(0xFF22C55E), // Verde brilhante
+                    color: Color(0xFF22C55E),
                     fontSize: 11,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 1.0,
                   ),
                 ),
                 const SizedBox(height: 8),
-
-                // Descrição do banner
                 const Text(
                   'Descontos exclusivos e prioridade em agendamentos de pico.',
                   style: TextStyle(
@@ -807,8 +733,6 @@ class _TelaInicialEstado extends State<TelaInicial> {
                   ),
                 ),
                 const SizedBox(height: 16),
-
-                // Botão do banner
                 ElevatedButton(
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -841,12 +765,11 @@ class _TelaInicialEstado extends State<TelaInicial> {
             ),
           ),
           const SizedBox(width: 16),
-          // Desenho/Ícone grande de troféu
           Opacity(
             opacity: 0.2,
             child: Icon(
               Icons.emoji_events,
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withValues(alpha: 0.8),
               size: 90,
             ),
           ),
@@ -855,13 +778,13 @@ class _TelaInicialEstado extends State<TelaInicial> {
     );
   }
 
-  // WIDGET: Barra de Navegação Inferior
+  // WIDGET: Barra de Navegação Inferior (Ícones ativos em VERDE)
   Widget _construirBarraNavegacao() {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.white,
         border: Border(
-          top: BorderSide(color: const Color(0xFFE2E8F0), width: 1.0),
+          top: BorderSide(color: Color(0xFFE2E8F0), width: 1.0),
         ),
       ),
       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -877,7 +800,7 @@ class _TelaInicialEstado extends State<TelaInicial> {
     );
   }
 
-  // WIDGET: Item de Navegação Individual
+  // WIDGET: Item de Navegação Individual (Destaque Ativo em VERDE)
   Widget _construirItemNavegacao(int index, IconData icone, String rotulo) {
     final bool estaAtivo = _abaSelecionada == index;
 
@@ -886,33 +809,25 @@ class _TelaInicialEstado extends State<TelaInicial> {
         setState(() {
           _abaSelecionada = index;
         });
-        if (index > 0) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Aba "$rotulo" em desenvolvimento!'),
-              duration: const Duration(seconds: 1),
-            ),
-          );
-        }
       },
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
             padding: const EdgeInsets.symmetric(
-              horizontal: 18.0,
+              horizontal: 16.0,
               vertical: 6.0,
             ),
             decoration: BoxDecoration(
               color: estaAtivo
-                  ? const Color(0xFFDCFCE7)
-                  : Colors.transparent, // Fundo verde claro para ativo
+                  ? const Color(0xFFDCFCE7) // Fundo VERDE CLARO quando ativo
+                  : Colors.transparent,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Icon(
               icone,
               color: estaAtivo
-                  ? const Color(0xFF22C55E)
+                  ? const Color(0xFF238838) // VERDE VIBRANTE quando ativo
                   : const Color(0xFF64748B),
               size: 22,
             ),
@@ -924,7 +839,7 @@ class _TelaInicialEstado extends State<TelaInicial> {
               fontSize: 10.5,
               fontWeight: estaAtivo ? FontWeight.bold : FontWeight.normal,
               color: estaAtivo
-                  ? const Color(0xFF22C55E)
+                  ? const Color(0xFF238838) // Texto VERDE quando ativo
                   : const Color(0xFF64748B),
             ),
           ),
