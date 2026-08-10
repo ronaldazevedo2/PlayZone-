@@ -763,6 +763,10 @@
   color: #1a73e8;
 }
 
+.data-table {
+  min-width: 850px;
+}
+
 .data-table th:nth-child(1) {
   width: 24%;
 }

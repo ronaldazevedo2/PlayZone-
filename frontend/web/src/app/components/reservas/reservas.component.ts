@@ -164,17 +164,26 @@ export class ReservasComponent implements OnInit {
 
   getReservasSemanaCount(): number {
     const hoje = new Date();
-    const limite = new Date(); limite.setDate(hoje.getDate() - 7);
-    return this.todasReservas.filter(r => { if (!r.data) return false; const dt = new Date(r.data); return dt >= limite && dt <= hoje; }).length;
+    const limite = new Date();
+    limite.setDate(hoje.getDate() - 7);
+    return this.todasReservas.filter(r => {
+      if (!r.data) return false;
+      const dt = new Date(r.data);
+      return dt >= limite && dt <= hoje;
+    }).length;
   }
 
   getReservasMesCount(): number {
     const hoje = new Date();
-    return this.todasReservas.filter(r => { if (!r.data) return false; const dt = new Date(r.data); return dt.getMonth() === hoje.getMonth() && dt.getFullYear() === hoje.getFullYear(); }).length;
+    return this.todasReservas.filter(r => {
+      if (!r.data) return false;
+      const dt = new Date(r.data);
+      return dt.getMonth() === hoje.getMonth() && dt.getFullYear() === hoje.getFullYear();
+    }).length;
   }
 
   // ────────────────────────────────────────
-  //   FILTROS
+  //   FILTROS DE QUADRAS
   // ────────────────────────────────────────
   aplicarFiltros(): void {
     let r = [...this.quadras];

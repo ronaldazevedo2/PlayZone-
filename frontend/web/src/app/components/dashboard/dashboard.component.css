@@ -261,6 +261,10 @@
 }
 
 /* Quick Actions */
+.actions-card {
+  margin-top: 30px;
+}
+
 .actions-card h3 {
   font-size: 1.1rem;
   font-weight: 700;
@@ -269,8 +273,12 @@
 
 .actions-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.bookings-section {
+  margin-top: 24px;
 }
 
 .action-btn {
@@ -441,4 +449,29 @@
   height: 100%;
   background-color: #28a745;
   border-radius: 3px;
+}
+
+/* =========================================================
+   RESPONSIVE — DASHBOARD
+   ========================================================= */
+@media (max-width: 992px) {
+  .row-layout {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .svg-chart {
+    width: 100%;
+  }
+
+  .actions-grid {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+}
+
+@media (max-width: 576px) {
+  .font-card,
+  .chart-card {
+    padding: 16px;
+  }
 }

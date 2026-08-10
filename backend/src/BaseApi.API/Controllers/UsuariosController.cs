@@ -42,7 +42,7 @@ public class UsuariosController(IMediator mediator) : ControllerBase
     // GET /api/usuarios
     // =========================================================
     [HttpGet]
-    [Authorize(Roles = $"{NomePerfil.Admin},{NomePerfil.Gerente}")]
+    [Authorize(Roles = $"{NomePerfil.Admin},{NomePerfil.Vigilante}")]
     [ProducesResponseType(typeof(RespostaApi<ResultadoPaginado<UsuarioListaDto>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Listar(
         [FromQuery] int pagina = 1,
@@ -55,10 +55,64 @@ public class UsuariosController(IMediator mediator) : ControllerBase
     }
 
     // =========================================================
+    // GET /api/usuarios/perfil
+    // =========================================================
+    [HttpGet("perfil")]
+    [Authorize]
+    [ProducesResponseType(typeof(RespostaApi<UsuarioDetalheDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(RespostaApi), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ObterMeuPerfil(CancellationToken ct)
+    {
+        var idClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+            ?? User.FindFirst("nameid")?.Value
+            ?? User.FindFirst("sub")?.Value;
+
+        if (string.IsNullOrEmpty(idClaim) || !Guid.TryParse(idClaim, out var usuarioId))
+        {
+            return BadRequest(RespostaApi.Falha("Identificação do usuário não encontrada no token."));
+        }
+
+        var resultado = await mediator.Send(new ObterUsuarioPorIdQuery(usuarioId), ct);
+        return Ok(RespostaApi<UsuarioDetalheDto>.Sucesso(resultado));
+    }
+
+    // =========================================================
+    // PUT /api/usuarios/perfil
+    // =========================================================
+    [HttpPut("perfil")]
+    [Authorize]
+    [ProducesResponseType(typeof(RespostaApi), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(RespostaApi), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> AtualizarMeuPerfil([FromBody] AtualizarUsuarioRequest request, CancellationToken ct)
+    {
+        var idClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+            ?? User.FindFirst("nameid")?.Value
+            ?? User.FindFirst("sub")?.Value;
+
+        if (string.IsNullOrEmpty(idClaim) || !Guid.TryParse(idClaim, out var usuarioId))
+        {
+            return BadRequest(RespostaApi.Falha("Identificação do usuário não encontrada no token."));
+        }
+
+        var command = new AtualizarUsuarioCommand(
+            usuarioId,
+            request.NomeCompleto,
+            request.Email,
+            request.Cpf,
+            request.Telefone,
+            request.PerfilId,
+            request.Ativo);
+
+        await mediator.Send(command, ct);
+
+        return Ok(RespostaApi.Sucesso("Usuário atualizado com sucesso!"));
+    }
+
+    // =========================================================
     // GET /api/usuarios/{id}
     // =========================================================
     [HttpGet("{id:guid}")]
-    [Authorize(Roles = $"{NomePerfil.Admin},{NomePerfil.Gerente}")]
+    [Authorize]
     [ProducesResponseType(typeof(RespostaApi<UsuarioDetalheDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(RespostaApi), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ObterPorId(Guid id, CancellationToken ct)
@@ -84,7 +138,7 @@ public class UsuariosController(IMediator mediator) : ControllerBase
     ///
     /// PerfilId:
     /// 1 = Admin
-    /// 2 = Gerente
+    /// 2 = Vigilante
     /// 3 = Usuário
     /// </remarks>
     [HttpPost]
@@ -105,7 +159,7 @@ public class UsuariosController(IMediator mediator) : ControllerBase
     // PUT /api/usuarios/{id}
     // =========================================================
     [HttpPut("{id:guid}")]
-    [Authorize(Roles = NomePerfil.Admin)]
+    [Authorize]
     [ProducesResponseType(typeof(RespostaApi), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(RespostaApi), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(RespostaApi), StatusCodes.Status404NotFound)]

@@ -7,6 +7,6 @@ namespace BaseApi.Domain.Enums;
 public static class NomePerfil
 {
     public const string Admin = "Admin";
-    public const string Gerente = "Gerente";
+    public const string Vigilante = "Vigilante";
     public const string Usuario = "Usuário";
 }

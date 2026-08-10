@@ -5,7 +5,7 @@ namespace BaseApi.Application.Autenticacao.Commands.Login;
 /// <summary>
 /// Command de login. Recebe e-mail e senha, retorna o token JWT.
 /// </summary>
-public record LoginCommand(string Email, string Senha) : IRequest<LoginResposta>;
+public record LoginCommand(string Email, string Senha, int? Perfil = null) : IRequest<LoginResposta>;
 
 /// <summary>
 /// Resposta do login com o token JWT e sua expiração.
@@ -16,5 +16,8 @@ public record LoginResposta(
     DateTime ExpiraEm,
     string NomeCompleto,
     string Email,
-    string Perfil
+    string Perfil,
+    Guid? UsuariosId = null,
+    string Cpf = "",
+    string Telefone = ""
 );

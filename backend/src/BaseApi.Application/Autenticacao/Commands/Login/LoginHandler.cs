@@ -24,6 +24,8 @@ public class LoginHandler(
     {
         var usuario = await repositorio.ObterPorEmailAsync(command.Email.ToLowerInvariant().Trim(), ct)
             ?? throw new ExcecaoNaoAutorizado("E-mail ou senha inválidos.");
+        if (command.Perfil.HasValue && command.Perfil.Value > 0 && usuario.Perfil != null && usuario.Perfil.Id != command.Perfil.Value)
+            throw new ExcecaoNaoAutorizado("Usuário não tem permissão para acessar este sistema com o perfil informado.");
 
         if (!usuario.Ativo)
             throw new ExcecaoNaoAutorizado("Usuário inativo. Entre em contato com o administrador.");
@@ -39,7 +41,10 @@ public class LoginHandler(
             ExpiraEm: expiracao,
             NomeCompleto: usuario.NomeCompleto,
             Email: usuario.Email,
-            Perfil: usuario.Perfil?.Nome ?? string.Empty
+            Perfil: usuario.Perfil?.Nome ?? string.Empty,
+            UsuariosId: usuario.UsuariosId,
+            Cpf: usuario.Cpf,
+            Telefone: usuario.Telefone
         );
     }
 }

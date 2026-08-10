@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BaseApi.Domain.Entidades
 {
-   public class Reserva
+    public class Reserva
     {
         public Guid ReservasId { get; set; }
 
@@ -17,5 +17,9 @@ namespace BaseApi.Domain.Entidades
 
         public TimeSpan HorarioAgendado { get; set; }
 
+        public string Status { get; set; } = "Ativa";
+
+        public Quadra? Quadra { get; set; }
+        public Usuario? Usuario { get; set; }
     }
 }

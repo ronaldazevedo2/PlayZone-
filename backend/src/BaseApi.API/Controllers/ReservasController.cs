@@ -1,4 +1,4 @@
-﻿using BaseApi.Application.Comum.Modelos;
+using BaseApi.Application.Comum.Modelos;
 using BaseApi.Application.Reserva.Commands.AtualizarReserva;
 using BaseApi.Application.Reserva.Commands.CriarReserva;
 using BaseApi.Application.Telefones.Commands.ExcluirTelefone;
@@ -21,10 +21,11 @@ public class ReservasController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> Listar(
         [FromQuery] int pagina = 1,
         [FromQuery] int tamanhoPagina = 10,
+        [FromQuery] Guid? quadraId = null,
         CancellationToken ct = default)
     {
         var resultado = await mediator.Send(
-            new ListarReservaQuery(pagina, tamanhoPagina), ct);
+            new ListarReservaQuery(pagina, tamanhoPagina, null, quadraId), ct);
 
         return Ok(RespostaApi<ResultadoPaginado<ReservaListaDto>>.Sucesso(resultado));
     }
@@ -38,7 +39,7 @@ public class ReservasController(IMediator mediator) : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = $"{NomePerfil.Admin},{NomePerfil.Gerente}")]
+    [Authorize(Roles = $"{NomePerfil.Admin},{NomePerfil.Vigilante}")]
     public async Task<IActionResult> Criar(
         [FromBody] CriarReservaCommand command,
         CancellationToken ct)
@@ -56,7 +57,7 @@ public class ReservasController(IMediator mediator) : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    [Authorize(Roles = $"{NomePerfil.Admin},{NomePerfil.Gerente}")]
+    [Authorize(Roles = $"{NomePerfil.Admin},{NomePerfil.Vigilante}")]
     public async Task<IActionResult> Atualizar(
         Guid id,
         [FromBody] AtualizarReservaRequest request,

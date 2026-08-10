@@ -2,13 +2,13 @@ namespace BaseApi.Domain.Entidades;
 
 /// <summary>
 /// Entidade que representa um perfil de acesso no sistema.
-/// Perfis são usados para controlar permissões (ex: Admin, Gerente, Usuário).
+/// Perfis são usados para controlar permissões (ex: Admin, Vigilante, Usuário).
 /// </summary>
 public class Perfil
 {
     public int Id { get; set; }
 
-    /// <summary>Nome do perfil (ex: "Admin", "Gerente", "Usuário")</summary>
+    /// <summary>Nome do perfil (ex: "Admin", "Vigilante", "Usuário")</summary>
     public string Nome { get; set; } = string.Empty;
 
     public string Descricao { get; set; } = string.Empty;

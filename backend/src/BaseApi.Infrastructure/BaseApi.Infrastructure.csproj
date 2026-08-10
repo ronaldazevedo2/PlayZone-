@@ -1,6 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <Compile Remove="Repositorios\NovaPasta\**" />
+    <EmbeddedResource Remove="Repositorios\NovaPasta\**" />
+    <None Remove="Repositorios\NovaPasta\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="Repositorios\DadosSecretaria.cs" />
   </ItemGroup>
 

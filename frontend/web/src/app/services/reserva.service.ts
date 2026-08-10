@@ -15,6 +15,7 @@ export interface ReservaDto {
   usuarioId?: string;
   nomeUsuario: string;
   emailUsuario?: string;
+  cpfUsuario?: string;
   telefoneUsuario?: string;
   data: string;
   horario: string;
@@ -57,7 +58,8 @@ export class ReservaService {
     pagina = 1,
     tamanhoPagina = 10,
     busca?: string,
-    modalidade?: string
+    modalidade?: string,
+    quadraId?: string
   ): Observable<RespostaApi<ResultadoPaginado<ReservaDto>>> {
     let params = new HttpParams()
       .set('pagina', pagina.toString())
@@ -68,6 +70,9 @@ export class ReservaService {
     }
     if (modalidade && modalidade !== 'Todas') {
       params = params.set('modalidade', modalidade);
+    }
+    if (quadraId) {
+      params = params.set('quadraId', quadraId);
     }
 
     return this.http
@@ -91,6 +96,16 @@ export class ReservaService {
     return this.http
       .post<RespostaApi<ReservaDto>>(
         this.BASE_URL,
+        command,
+        { headers: this.getHeaders() }
+      )
+      .pipe(catchError(this.handleError));
+  }
+
+  atualizar(reservaId: string, command: any): Observable<RespostaApi<ReservaDto>> {
+    return this.http
+      .put<RespostaApi<ReservaDto>>(
+        `${this.BASE_URL}/${reservaId}`,
         command,
         { headers: this.getHeaders() }
       )

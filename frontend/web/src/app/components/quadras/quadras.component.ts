@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { QuadraService, ReservaQuadraDto, CriarQuadraCommand } from '../../services/quadra.service';
+import { Router, RouterModule } from '@angular/router';
+import { QuadraService, ReservaQuadraDto } from '../../services/quadra.service';
 
 interface QuadraExibicao extends ReservaQuadraDto {
   status: 'Ativa' | 'Manutenção' | 'Inativa';
@@ -13,7 +14,7 @@ interface QuadraExibicao extends ReservaQuadraDto {
 @Component({
   selector: 'app-quadras',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './quadras.component.html',
   styleUrl: './quadras.component.css'
 })
@@ -21,15 +22,11 @@ export class QuadrasComponent implements OnInit {
   quadras: QuadraExibicao[] = [];
   quadrasFiltradas: QuadraExibicao[] = [];
 
-  // Controle de Visualização
-  exibirFormularioCadastro = false;
-  quadraEditandoId: string | null = null;
-
   // Filtros e busca da listagem
   buscaTexto = '';
   termoBusca = '';
-  filtroStatus: 'Todas' | 'Ativas' | 'Manutenção' | 'Inativas' = 'Todas';
-  abaAtiva: 'Todas' | 'Ativas' | 'Manutenção' | 'Inativas' = 'Todas';
+  filtroStatus: 'Todas' | 'Ativas' | 'Agendadas' | 'Manutenção' | 'Inativas' = 'Todas';
+  abaAtiva: 'Todas' | 'Ativas' | 'Agendadas' | 'Manutenção' | 'Inativas' = 'Todas';
   ordenacao: 'nome-asc' | 'nome-desc' | 'capacidade-asc' | 'capacidade-desc' = 'nome-asc';
 
   // Paginação
@@ -41,13 +38,12 @@ export class QuadrasComponent implements OnInit {
   // Estatísticas
   totalQuadrasCount = 0;
   ativasCount = 0;
+  agendadasCount = 0;
   manutencaoCount = 0;
   horariosCount = 0;
 
   carregando = false;
-  salvando = false;
   erro = '';
-  sucessoMsg = '';
   menuAbertoId: string | null = null;
 
   // Toast notification
@@ -114,11 +110,10 @@ export class QuadrasComponent implements OnInit {
     this.carregando = true;
     this.erro = '';
 
-    this.quadraService.listar(this.paginaAtual, this.tamanhoPagina, this.buscaTexto).subscribe({
+    // Busca todas as quadras (até 1000) de uma só vez para permitir busca global entre páginas
+    this.quadraService.listar(1, 1000, '').subscribe({
       next: (res) => {
         const itens = res.dados?.itens ?? [];
-        this.totalItens = res.dados?.total ?? 0;
-        this.totalPaginas = res.dados?.totalPaginas ?? 0;
 
         this.quadras = itens.map(q => {
           const status = (q as any).status || 'Ativa';
@@ -142,7 +137,7 @@ export class QuadrasComponent implements OnInit {
           };
         });
 
-        this.aplicarFiltrosLocais();
+        this.aplicarFiltrosBusca();
         this.atualizarEstatisticas();
         this.carregando = false;
       },
@@ -154,14 +149,39 @@ export class QuadrasComponent implements OnInit {
     });
   }
 
+  isAgendada(q: ReservaQuadraDto): boolean {
+    if (!q || !q.dataLiberacao) return false;
+    const hojeStr = new Date().toISOString().split('T')[0];
+    const dataLibStr = q.dataLiberacao.split('T')[0];
+    return dataLibStr > hojeStr;
+  }
+
   aplicarFiltrosLocais(): void {
+    this.aplicarFiltrosBusca();
+  }
+
+  aplicarFiltrosBusca(): void {
     let resultado = [...this.quadras];
-    if (this.abaAtiva === 'Ativas') {
-      resultado = resultado.filter(q => q.status === 'Ativa');
-    } else if (this.abaAtiva === 'Manutenção') {
+
+    const statusFiltro = this.filtroStatus !== 'Todas' ? this.filtroStatus : this.abaAtiva;
+
+    if (statusFiltro === 'Ativas') {
+      resultado = resultado.filter(q => q.status === 'Ativa' && !this.isAgendada(q));
+    } else if (statusFiltro === 'Agendadas') {
+      resultado = resultado.filter(q => this.isAgendada(q));
+    } else if (statusFiltro === 'Manutenção') {
       resultado = resultado.filter(q => q.status === 'Manutenção');
-    } else if (this.abaAtiva === 'Inativas') {
+    } else if (statusFiltro === 'Inativas') {
       resultado = resultado.filter(q => q.status === 'Inativa');
+    }
+
+    const termo = (this.termoBusca || this.buscaTexto).toLowerCase().trim();
+    if (termo) {
+      resultado = resultado.filter(q =>
+        q.nome?.toLowerCase().includes(termo) ||
+        q.localizacao?.toLowerCase().includes(termo) ||
+        q.modalidade?.toLowerCase().includes(termo)
+      );
     }
 
     if (this.ordenacao === 'nome-asc') {
@@ -174,7 +194,15 @@ export class QuadrasComponent implements OnInit {
       resultado.sort((a, b) => b.capacidade - a.capacidade);
     }
 
-    this.quadrasFiltradas = resultado;
+    this.totalItens = resultado.length;
+    this.totalPaginas = Math.ceil(this.totalItens / this.tamanhoPagina) || 1;
+
+    if (this.paginaAtual > this.totalPaginas) {
+      this.paginaAtual = 1;
+    }
+
+    const inicio = (this.paginaAtual - 1) * this.tamanhoPagina;
+    this.quadrasFiltradas = resultado.slice(inicio, inicio + this.tamanhoPagina);
   }
 
   aplicarFiltrosBusca(): void {
@@ -203,45 +231,39 @@ export class QuadrasComponent implements OnInit {
   }
 
   atualizarEstatisticas(): void {
-    this.totalQuadrasCount = this.totalItens;
-    this.ativasCount = Math.max(0, this.quadras.filter(q => q.status === 'Ativa').length);
+    this.totalQuadrasCount = this.quadras.length;
+    this.ativasCount = Math.max(0, this.quadras.filter(q => q.status === 'Ativa' && !this.isAgendada(q)).length);
+    this.agendadasCount = Math.max(0, this.quadras.filter(q => this.isAgendada(q)).length);
     this.manutencaoCount = Math.max(0, this.quadras.filter(q => q.status === 'Manutenção').length);
 
-    if (this.totalItens > this.quadras.length) {
-      const proporcao = this.totalItens / this.quadras.length;
-      this.ativasCount = Math.round(this.ativasCount * proporcao);
-      this.manutencaoCount = Math.round(this.manutencaoCount * proporcao);
-    }
-
     this.horariosCount = this.quadras.reduce((sum, q) => sum + q.totalHorarios, 0);
-    if (this.totalItens > this.quadras.length) {
-      this.horariosCount = Math.round(this.horariosCount * (this.totalItens / this.quadras.length));
-    } else if (this.horariosCount === 0) {
+    if (this.horariosCount === 0) {
       this.horariosCount = 156;
     }
   }
 
-  selecionarAba(aba: 'Todas' | 'Ativas' | 'Manutenção' | 'Inativas'): void {
+  selecionarAba(aba: 'Todas' | 'Ativas' | 'Agendadas' | 'Manutenção' | 'Inativas'): void {
     this.abaAtiva = aba;
+    this.filtroStatus = aba;
     this.paginaAtual = 1;
-    this.carregarQuadras();
+    this.aplicarFiltrosBusca();
   }
 
   buscar(): void {
     this.paginaAtual = 1;
-    this.carregarQuadras();
+    this.aplicarFiltrosBusca();
   }
 
   mudarOrdenacao(event: Event): void {
     const value = (event.target as HTMLSelectElement).value as any;
     this.ordenacao = value;
-    this.aplicarFiltrosLocais();
+    this.aplicarFiltrosBusca();
   }
 
   mudarPagina(pagina: number): void {
     if (pagina >= 1 && pagina <= this.totalPaginas) {
       this.paginaAtual = pagina;
-      this.carregarQuadras();
+      this.aplicarFiltrosBusca();
     }
   }
 
@@ -253,7 +275,7 @@ export class QuadrasComponent implements OnInit {
     return paginas;
   }
 
-  // Ações de cadastro
+  // --- Navegação via Roteador ---
   adicionarQuadra(): void {
     this.exibirFormularioCadastro = true;
     this.quadraEditandoId = null;
@@ -450,9 +472,8 @@ export class QuadrasComponent implements OnInit {
 
     this.carregando = true;
     this.quadraService.excluir(quadra.id).subscribe({
-      next: (res) => {
+      next: (res: any) => {
         if (res && res.ok === false) {
-          // API returned 200 but with ok: false (business rule error)
           const rawMsg = (res.erros?.join(' ') || res.mensagem || '').toLowerCase();
           const msgFriendly = this.traduzirErroExclusao(rawMsg, res.erros?.join(', ') || res.mensagem);
           this.mostrarToast('Não foi possível excluir', msgFriendly, 'aviso');
@@ -465,7 +486,7 @@ export class QuadrasComponent implements OnInit {
         }
         this.carregando = false;
       },
-      error: (err) => {
+      error: (err: any) => {
         this.carregando = false;
         const rawMsg = (
           err.error?.erros?.join(' ') ||
@@ -483,7 +504,6 @@ export class QuadrasComponent implements OnInit {
   }
 
   private traduzirErroExclusao(rawLower: string, original: string): string {
-    // Reservation-linked patterns (portuguese + english from .NET EF/SQL)
     const reservaPatterns = ['reserva', 'agendamento', 'booking', 'foreign key', 'constraint', 'fk_', 'reference', 'related', 'vinculad', 'depend'];
     if (reservaPatterns.some(p => rawLower.includes(p))) {
       return 'Esta quadra possui reservas vinculadas e não pode ser excluída. Cancele ou conclua todas as reservas associadas antes de removê-la.';
@@ -494,18 +514,6 @@ export class QuadrasComponent implements OnInit {
     if (rawLower.includes('unauthorized') || rawLower.includes('forbidden') || rawLower.includes('permiss')) {
       return 'Você não tem permissão para excluir esta quadra.';
     }
-    // Fallback: show original but cleaned up
     return original || 'Ocorreu um erro ao tentar excluir a quadra. Tente novamente.';
-  }
-
-  onFileSelected(event: any): void {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.novaQuadra.imagemUrl = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
   }
 }
