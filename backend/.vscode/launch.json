@@ -1,0 +1,22 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Iniciar Backend API",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "compilar-backend",
+            "program": "${workspaceFolder}/src/BaseApi.API/bin/Debug/net8.0/BaseApi.API.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/src/BaseApi.API",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openUrl",
+                "pattern": "\\bnow listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            }
+        }
+    ]
+}

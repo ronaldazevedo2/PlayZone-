@@ -102,7 +102,7 @@ export class UsuarioService {
   }
 
   private handleError = (error: any): Observable<never> => {
-    console.error('[UsuarioService] Erro ao buscar usuários no banco de dados:', error);
+    console.error('[UsuarioService] Erro na requisição:', error);
     return throwError(() => error);
   };
 }

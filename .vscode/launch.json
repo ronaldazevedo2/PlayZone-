@@ -1,28 +1,38 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "app-usuario",
-            "cwd": "frontend\\mobile\\app-usuario",
+            "name": "Iniciar Backend API",
+            "type": "coreclr",
             "request": "launch",
-            "type": "dart"
+            "preLaunchTask": "compilar-backend",
+            "program": "${workspaceFolder}/backend/src/BaseApi.API/bin/Debug/net8.0/BaseApi.API.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/backend/src/BaseApi.API",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openUrl",
+                "pattern": "\\bnow listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            }
         },
         {
-            "name": "app-usuario (profile mode)",
-            "cwd": "frontend\\mobile\\app-usuario",
+            "name": "Iniciar Flutter AppVigilante",
+            "cwd": "${workspaceFolder}/frontend/mobile/app-vigilante",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "profile"
-        },
+            "program": "lib/main.dart"
+        }
+    ],
+    "compounds": [
         {
-            "name": "app-usuario (release mode)",
-            "cwd": "frontend\\mobile\\app-usuario",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "release"
+            "name": "Iniciar Backend e AppVigilante",
+            "configurations": [
+                "Iniciar Backend API",
+                "Iniciar Flutter AppVigilante"
+            ]
         }
     ]
 }

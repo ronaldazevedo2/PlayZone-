@@ -18,7 +18,6 @@ public record ReservaListaDto(
     Guid ReservasId,
     Guid QuadraId,
     Guid UsuarioId,
-    Guid UsuariosId,
     DateTime DataAgendada,
     TimeSpan HorarioAgendado,
     string? NomeUsuario = null,

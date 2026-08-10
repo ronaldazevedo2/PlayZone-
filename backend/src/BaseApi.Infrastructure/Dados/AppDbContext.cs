@@ -226,6 +226,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 Bairro = "Palmital",
                 Cidade = "Linhares"
             }
+           
         );
     }
 

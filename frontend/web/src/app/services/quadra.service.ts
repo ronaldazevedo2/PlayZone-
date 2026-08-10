@@ -352,8 +352,19 @@ export class QuadraService {
       );
   }
 
-  private handleError = (error: any): Observable<never> => {
-    console.error('[QuadraService] Erro na requisição:', error);
+    return this.http
+  .delete<any>(
+    `${this.BASE_URL}/${quadraId}`,
+    { headers: this.getDeleteHeaders() }
+  )
+  .pipe(catchError((error) => {
+    console.error('[QuadraService] Erro na exclusão:', error);
     return throwError(() => error);
+  }));
   }
+
+  private handleError = (error: any): Observable<never> => {
+  console.error('[QuadraService] Erro na requisição:', error);
+  return throwError(() => error);
+}
 }
