@@ -1,4 +1,4 @@
-﻿using BaseApi.Application.Comum.Modelos;
+using BaseApi.Application.Comum.Modelos;
 using BaseApi.Domain.Interfaces.Repositorios;
 using Mapster;
 using MediatR;
@@ -14,7 +14,7 @@ public class ListarReservaHandler(IReservaRepositorio repositorio)
         var (itens, total) = await repositorio.ListarAsync(
             query.Pagina,
             query.TamanhoPagina,
-            null, // Assuming 'quadraId' is not provided in the query
+            query.QuadraId,
             null, // Assuming 'dataInicio' is not provided in the query
             null, // Assuming 'dataFim' is not provided in the query
             ct
@@ -22,7 +22,21 @@ public class ListarReservaHandler(IReservaRepositorio repositorio)
 
         return new ResultadoPaginado<ReservaListaDto>
         {
-            Itens = itens.Adapt<IEnumerable<ReservaListaDto>>(),
+            Itens = itens.Select(r => new ReservaListaDto(
+                r.ReservasId,
+                r.QuadraId,
+                r.UsuarioId,
+                r.UsuarioId,
+                r.DataAgendada,
+                r.HorarioAgendado,
+                r.Usuario?.NomeCompleto ?? "Usuário do Sistema",
+                r.Usuario?.Email,
+                r.Usuario?.Cpf,
+                r.Usuario?.Telefone,
+                r.Quadra?.Nome ?? "Quadra",
+                r.Quadra?.Modalidade ?? "Futebol",
+                r.Status ?? "Ativa"
+            )),
             Total = total,
             Pagina = query.Pagina,
             TamanhoPagina = query.TamanhoPagina

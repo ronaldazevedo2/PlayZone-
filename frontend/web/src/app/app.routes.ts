@@ -37,6 +37,7 @@ export const routes: Routes = [
 
       // Reservas
       { path: 'reservas', loadComponent: () => import('./components/reservas/reservas.component').then(m => m.ReservasComponent) },
+      { path: 'reservas/quadra/:id', loadComponent: () => import('./components/reservas/reserva-quadra-detalhes/reserva-quadra-detalhes.component').then(m => m.ReservaQuadraDetalhesComponent) },
       { path: 'reservas/nova', loadComponent: () => import('./components/reservas/reserva-form/reserva-form.component').then(m => m.ReservaFormComponent) },
       { path: 'reservas/editar/:id', loadComponent: () => import('./components/reservas/reserva-form/reserva-form.component').then(m => m.ReservaFormComponent) },
 

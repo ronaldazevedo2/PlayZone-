@@ -1,4 +1,4 @@
-﻿using BaseApi.Domain.Entidades;
+using BaseApi.Domain.Entidades;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -17,7 +17,7 @@ public class ReservaConfiguracao : IEntityTypeConfiguration<Reserva>
         builder.Property(r => r.QuadraId)
             .IsRequired();
 
-        builder.HasOne<Usuario>()
+        builder.HasOne(r => r.Usuario)
             .WithMany()
             .HasForeignKey(r => r.UsuarioId)
             .OnDelete(DeleteBehavior.Restrict);
@@ -31,7 +31,7 @@ public class ReservaConfiguracao : IEntityTypeConfiguration<Reserva>
             .HasColumnType("time");
 
         // Relacionamento: uma Reserva pertence a uma Quadra
-        builder.HasOne<Quadra>()
+        builder.HasOne(r => r.Quadra)
             .WithMany()
             .HasForeignKey(r => r.QuadraId)
             .OnDelete(DeleteBehavior.Restrict);

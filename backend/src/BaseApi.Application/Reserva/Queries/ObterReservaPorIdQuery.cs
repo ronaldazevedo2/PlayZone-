@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 
 namespace BaseApi.Application.Telefones.Queries.ObterTelefonePorId;
 
@@ -8,11 +8,19 @@ namespace BaseApi.Application.Telefones.Queries.ObterTelefonePorId;
 /// </summary>
 public record ObterReservaPorIdQuery(Guid ReservasId) : IRequest<ReservaDetalheDto>;
 
-/// <summary>DTO com todos os dados do telefone para exibição</summary>
+/// <summary>DTO com todos os dados da reserva para exibição</summary>
 public record ReservaDetalheDto(
     Guid ReservasId,
     Guid QuadraId,
+    Guid UsuarioId,
     Guid UsuariosId,
     DateTime DataAgendada,
-    TimeSpan HorarioAgendado
+    TimeSpan HorarioAgendado,
+    string? NomeUsuario = null,
+    string? EmailUsuario = null,
+    string? CpfUsuario = null,
+    string? TelefoneUsuario = null,
+    string? NomeQuadra = null,
+    string? Modalidade = null,
+    string? Status = "Ativa"
 );

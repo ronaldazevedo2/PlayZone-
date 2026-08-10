@@ -89,11 +89,10 @@ export class QuadrasComponent implements OnInit {
     this.carregando = true;
     this.erro = '';
 
-    this.quadraService.listar(this.paginaAtual, this.tamanhoPagina, this.buscaTexto).subscribe({
+    // Busca todas as quadras (até 1000) de uma só vez para permitir busca global entre páginas
+    this.quadraService.listar(1, 1000, '').subscribe({
       next: (res) => {
         const itens = res.dados?.itens ?? [];
-        this.totalItens = res.dados?.total ?? 0;
-        this.totalPaginas = res.dados?.totalPaginas ?? 0;
 
         this.quadras = itens.map(q => {
           const status = (q as any).status || 'Ativa';
@@ -117,7 +116,7 @@ export class QuadrasComponent implements OnInit {
           };
         });
 
-        this.aplicarFiltrosLocais();
+        this.aplicarFiltrosBusca();
         this.atualizarEstatisticas();
         this.carregando = false;
       },
@@ -137,15 +136,31 @@ export class QuadrasComponent implements OnInit {
   }
 
   aplicarFiltrosLocais(): void {
+    this.aplicarFiltrosBusca();
+  }
+
+  aplicarFiltrosBusca(): void {
     let resultado = [...this.quadras];
-    if (this.abaAtiva === 'Ativas') {
+
+    const statusFiltro = this.filtroStatus !== 'Todas' ? this.filtroStatus : this.abaAtiva;
+
+    if (statusFiltro === 'Ativas') {
       resultado = resultado.filter(q => q.status === 'Ativa' && !this.isAgendada(q));
-    } else if (this.abaAtiva === 'Agendadas') {
+    } else if (statusFiltro === 'Agendadas') {
       resultado = resultado.filter(q => this.isAgendada(q));
-    } else if (this.abaAtiva === 'Manutenção') {
+    } else if (statusFiltro === 'Manutenção') {
       resultado = resultado.filter(q => q.status === 'Manutenção');
-    } else if (this.abaAtiva === 'Inativas') {
+    } else if (statusFiltro === 'Inativas') {
       resultado = resultado.filter(q => q.status === 'Inativa');
+    }
+
+    const termo = (this.termoBusca || this.buscaTexto).toLowerCase().trim();
+    if (termo) {
+      resultado = resultado.filter(q =>
+        q.nome?.toLowerCase().includes(termo) ||
+        q.localizacao?.toLowerCase().includes(termo) ||
+        q.modalidade?.toLowerCase().includes(termo)
+      );
     }
 
     if (this.ordenacao === 'nome-asc') {
@@ -158,76 +173,51 @@ export class QuadrasComponent implements OnInit {
       resultado.sort((a, b) => b.capacidade - a.capacidade);
     }
 
-    this.quadrasFiltradas = resultado;
-  }
+    this.totalItens = resultado.length;
+    this.totalPaginas = Math.ceil(this.totalItens / this.tamanhoPagina) || 1;
 
-  aplicarFiltrosBusca(): void {
-    let resultado = [...this.quadras];
-
-    if (this.filtroStatus === 'Ativas') {
-      resultado = resultado.filter(q => q.status === 'Ativa' && !this.isAgendada(q));
-    } else if (this.filtroStatus === 'Agendadas') {
-      resultado = resultado.filter(q => this.isAgendada(q));
-    } else if (this.filtroStatus === 'Manutenção') {
-      resultado = resultado.filter(q => q.status === 'Manutenção');
-    } else if (this.filtroStatus === 'Inativas') {
-      resultado = resultado.filter(q => q.status === 'Inativa');
+    if (this.paginaAtual > this.totalPaginas) {
+      this.paginaAtual = 1;
     }
 
-    if (this.termoBusca.trim()) {
-      const termo = this.termoBusca.toLowerCase();
-      resultado = resultado.filter(q =>
-        q.nome?.toLowerCase().includes(termo) ||
-        q.localizacao?.toLowerCase().includes(termo) ||
-        q.modalidade?.toLowerCase().includes(termo)
-      );
-    }
-
-    this.quadrasFiltradas = resultado;
+    const inicio = (this.paginaAtual - 1) * this.tamanhoPagina;
+    this.quadrasFiltradas = resultado.slice(inicio, inicio + this.tamanhoPagina);
   }
 
   atualizarEstatisticas(): void {
-    this.totalQuadrasCount = this.totalItens;
+    this.totalQuadrasCount = this.quadras.length;
     this.ativasCount = Math.max(0, this.quadras.filter(q => q.status === 'Ativa' && !this.isAgendada(q)).length);
     this.agendadasCount = Math.max(0, this.quadras.filter(q => this.isAgendada(q)).length);
     this.manutencaoCount = Math.max(0, this.quadras.filter(q => q.status === 'Manutenção').length);
 
-    if (this.totalItens > this.quadras.length) {
-      const proporcao = this.totalItens / this.quadras.length;
-      this.ativasCount = Math.round(this.ativasCount * proporcao);
-      this.agendadasCount = Math.round(this.agendadasCount * proporcao);
-      this.manutencaoCount = Math.round(this.manutencaoCount * proporcao);
-    }
-
     this.horariosCount = this.quadras.reduce((sum, q) => sum + q.totalHorarios, 0);
-    if (this.totalItens > this.quadras.length) {
-      this.horariosCount = Math.round(this.horariosCount * (this.totalItens / this.quadras.length));
-    } else if (this.horariosCount === 0) {
+    if (this.horariosCount === 0) {
       this.horariosCount = 156;
     }
   }
 
   selecionarAba(aba: 'Todas' | 'Ativas' | 'Agendadas' | 'Manutenção' | 'Inativas'): void {
     this.abaAtiva = aba;
+    this.filtroStatus = aba;
     this.paginaAtual = 1;
-    this.carregarQuadras();
+    this.aplicarFiltrosBusca();
   }
 
   buscar(): void {
     this.paginaAtual = 1;
-    this.carregarQuadras();
+    this.aplicarFiltrosBusca();
   }
 
   mudarOrdenacao(event: Event): void {
     const value = (event.target as HTMLSelectElement).value as any;
     this.ordenacao = value;
-    this.aplicarFiltrosLocais();
+    this.aplicarFiltrosBusca();
   }
 
   mudarPagina(pagina: number): void {
     if (pagina >= 1 && pagina <= this.totalPaginas) {
       this.paginaAtual = pagina;
-      this.carregarQuadras();
+      this.aplicarFiltrosBusca();
     }
   }
 

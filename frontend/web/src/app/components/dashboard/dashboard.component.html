@@ -124,7 +124,7 @@
       <button class="text-link-btn" (click)="triggerAction('Ver todas as reservas')">Ver todas</button>
     </div>
     <div class="table-container">
-      <table class="bookings-table">
+      <table class="bookings-table" *ngIf="bookings.length > 0">
         <thead>
           <tr>
             <th>Horário</th>
@@ -144,6 +144,12 @@
           </tr>
         </tbody>
       </table>
+      <div *ngIf="bookings.length === 0 && !carregandoReservas" style="padding: 24px; text-align: center; color: #94a3b8; font-size: 0.9rem;">
+        Nenhuma reserva cadastrada no momento.
+      </div>
+      <div *ngIf="carregandoReservas" style="padding: 24px; text-align: center; color: #64748b; font-size: 0.9rem;">
+        Carregando reservas...
+      </div>
     </div>
   </section>
 </div>

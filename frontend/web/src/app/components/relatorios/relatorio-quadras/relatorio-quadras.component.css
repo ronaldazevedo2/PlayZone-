@@ -104,7 +104,7 @@
    ========================================================= */
 .filter-sections-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 20px;
   width: 100%;
   box-sizing: border-box;
@@ -155,7 +155,7 @@
 
 .card-form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
   gap: 12px;
 }
 
@@ -557,6 +557,10 @@
 }
 
 @media (max-width: 576px) {
+  .card-form-grid {
+    grid-template-columns: 1fr;
+  }
+
   .relatorios-header-actions,
   .bottom-action-bar,
   .export-buttons-group {

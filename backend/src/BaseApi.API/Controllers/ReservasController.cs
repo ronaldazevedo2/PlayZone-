@@ -21,10 +21,11 @@ public class ReservasController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> Listar(
         [FromQuery] int pagina = 1,
         [FromQuery] int tamanhoPagina = 10,
+        [FromQuery] Guid? quadraId = null,
         CancellationToken ct = default)
     {
         var resultado = await mediator.Send(
-            new ListarReservaQuery(pagina, tamanhoPagina), ct);
+            new ListarReservaQuery(pagina, tamanhoPagina, null, quadraId), ct);
 
         return Ok(RespostaApi<ResultadoPaginado<ReservaListaDto>>.Sucesso(resultado));
     }
