@@ -1,3 +1,7 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
+import '../servicos/servico_autenticacao.dart';
+
 class QuadraEsportiva {
   final String id;
   final String nome;
@@ -30,13 +34,10 @@ class QuadraEsportiva {
   });
 
   factory QuadraEsportiva.deJson(Map<String, dynamic> json) {
-    final id = (json['id'] ?? json['Id'])?.toString() ?? '';
-    final nome = (json['nome'] ?? json['Nome'])?.toString() ?? 'Quadra Poliesportiva';
-    final modalidade = (json['modalidade'] ?? json['Modalidade'])?.toString() ?? 'Futebol';
-    final localizacao =
-        (json['localizacao'] ?? json['Localizacao'] ?? json['localidade'])
-            ?.toString() ??
-        'Centro';
+    final id = (json['id'] ?? json['Id'] ?? json['quadraId'] ?? json['QuadraId'])?.toString() ?? '';
+    final nome = (json['nome'] ?? json['Nome'] ?? json['titulo'] ?? json['Titulo'])?.toString() ?? 'Quadra Poliesportiva';
+    final modalidade = (json['modalidade'] ?? json['Modalidade'] ?? json['esporte'] ?? json['Esporte'])?.toString() ?? 'Futebol';
+    final localizacao = (json['localizacao'] ?? json['Localizacao'] ?? json['endereco'] ?? json['Endereco'] ?? json['bairro'] ?? json['Bairro'] ?? json['localidade'])?.toString() ?? 'Centro';
 
     final capRaw = json['capacidade'] ?? json['Capacidade'];
     final int capacidade = capRaw is int
@@ -45,12 +46,16 @@ class QuadraEsportiva {
 
     final descricao = (json['descricao'] ?? json['Descricao'])?.toString() ??
         'Quadra poliesportiva oficial para treinos e jogos.';
-    final imagemUrl = (json['imagemUrl'] ?? json['ImagemUrl'])?.toString();
+    final imagemUrl = (json['imagemUrl'] ?? json['ImagemUrl'] ?? json['caminhoImagem'] ?? json['CaminhoImagem'] ?? json['fotoUrl'] ?? json['FotoUrl'])?.toString();
     final status = (json['status'] ?? json['Status'])?.toString() ?? 'Ativa';
+
+    final precoRaw = json['precoPorHora'] ?? json['PrecoPorHora'] ?? json['preco'] ?? json['Preco'] ?? json['valor'] ?? json['Valor'];
+    final double precoPorHora = precoRaw != null
+        ? (double.tryParse(precoRaw.toString()) ?? (capacidade > 0 ? capacidade * 15.0 : 150.0))
+        : (capacidade > 0 ? (capacidade * 15.0) : 150.0);
 
     final bairro = _extrairBairro(localizacao);
     final endereco = localizacao;
-    final precoPorHora = capacidade > 0 ? (capacidade * 15.0) : 150.0;
 
     final hash = id.hashCode.abs();
     final distanciaEmKm = 1.0 + (hash % 40) / 10.0;
@@ -105,11 +110,20 @@ class QuadraEsportiva {
   static String _obterImagemEsporte(String? imagemUrl, String modalidade) {
     if (imagemUrl != null &&
         imagemUrl.trim().isNotEmpty &&
-        (imagemUrl.startsWith('http://') || imagemUrl.startsWith('https://')) &&
         !imagemUrl.contains('exemplo.com') &&
-        !imagemUrl.contains('example.com') &&
-        !imagemUrl.contains('localhost')) {
-      return imagemUrl.trim();
+        !imagemUrl.contains('example.com')) {
+      var url = imagemUrl.trim();
+      if (!kIsWeb && Platform.isAndroid) {
+        url = url.replaceAll('localhost', '10.0.2.2');
+        url = url.replaceAll('127.0.0.1', '10.0.2.2');
+      }
+      if (url.startsWith('http://') || url.startsWith('https://')) {
+        return url;
+      } else if (url.startsWith('/')) {
+        final baseUrl = ServicoAutenticacao.obterUrlBase();
+        final hostSemApi = baseUrl.replaceAll('/api', '');
+        return '$hostSemApi$url';
+      }
     }
     final mod = modalidade.toLowerCase();
     if (mod.contains('tenis') || mod.contains('tênis')) {

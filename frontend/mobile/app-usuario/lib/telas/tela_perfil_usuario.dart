@@ -327,24 +327,29 @@ class _TelaPerfilUsuarioEstado extends State<TelaPerfilUsuario> {
                                       senhaAtual: controladorSenhaAtual.text,
                                       novaSenha: controladorNovaSenha.text,
                                     );
-                                    if (!mounted) return;
-                                    Navigator.pop(ctx);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          'Senha redefinida com sucesso!',
+                                    if (ctx.mounted) {
+                                      Navigator.pop(ctx);
+                                    }
+                                    if (mounted) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            'Senha redefinida com sucesso!',
+                                          ),
+                                          backgroundColor: Color(0xFF238838),
                                         ),
-                                        backgroundColor: Color(0xFF238838),
-                                      ),
-                                    );
+                                      );
+                                    }
                                   } catch (e) {
                                     setStateModal(() => carregandoModal = false);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text('Erro: $e'),
-                                        backgroundColor: Colors.redAccent,
-                                      ),
-                                    );
+                                    if (mounted) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text('Erro: $e'),
+                                          backgroundColor: Colors.redAccent,
+                                        ),
+                                      );
+                                    }
                                   }
                                 }
                               },

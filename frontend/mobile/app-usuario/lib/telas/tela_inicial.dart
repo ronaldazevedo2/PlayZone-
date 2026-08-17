@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../modelos/modelo_quadra.dart';
 import '../servicos/servico_autenticacao.dart';
@@ -25,6 +26,7 @@ class _TelaInicialEstado extends State<TelaInicial> {
   // Lista dinâmica de quadras carregadas da API
   List<QuadraEsportiva> _todasAsQuadras = [];
   bool _estaCarregando = false;
+  Timer? _timerSincronizacao;
 
   @override
   void initState() {
@@ -35,12 +37,34 @@ class _TelaInicialEstado extends State<TelaInicial> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _buscarQuadrasDaApi();
     });
+
+    // Sincronização automática silenciosa a cada 4 segundos
+    _timerSincronizacao = Timer.periodic(const Duration(seconds: 4), (_) {
+      _atualizarQuadrasSilencioso();
+    });
+  }
+
+  @override
+  void dispose() {
+    _timerSincronizacao?.cancel();
+    super.dispose();
   }
 
   @override
   void reassemble() {
     super.reassemble();
     _buscarQuadrasDaApi();
+  }
+
+  Future<void> _atualizarQuadrasSilencioso() async {
+    try {
+      final quadras = await ServicoQuadras.obterQuadras();
+      if (!mounted) return;
+      setState(() {
+        _todasAsQuadras = quadras;
+        _filtrarQuadras();
+      });
+    } catch (_) {}
   }
 
   Future<void> _buscarQuadrasDaApi() async {
@@ -53,9 +77,7 @@ class _TelaInicialEstado extends State<TelaInicial> {
       final quadras = await ServicoQuadras.obterQuadras();
       if (!mounted) return;
       setState(() {
-        _todasAsQuadras = quadras.isNotEmpty
-            ? quadras
-            : _obterQuadrasPadraoHandler();
+        _todasAsQuadras = quadras;
         _filtrarQuadras();
         _estaCarregando = false;
       });
@@ -125,9 +147,13 @@ class _TelaInicialEstado extends State<TelaInicial> {
   void _filtrarQuadras() {
     setState(() {
       _quadrasFiltradas = _todasAsQuadras.where((quadra) {
-        final matchesBairro =
-            _bairroFiltrado == null || quadra.bairro == _bairroFiltrado;
-        return matchesBairro;
+        if (_bairroFiltrado == null || _bairroFiltrado!.isEmpty) return true;
+        final filtro = _bairroFiltrado!.toLowerCase().trim();
+        final bairroQuadra = quadra.bairro.toLowerCase().trim();
+        final enderecoQuadra = quadra.endereco.toLowerCase().trim();
+        return bairroQuadra == filtro ||
+            bairroQuadra.contains(filtro) ||
+            enderecoQuadra.contains(filtro);
       }).toList();
       _ordenarPorDistancia();
     });
@@ -286,9 +312,11 @@ class _TelaInicialEstado extends State<TelaInicial> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'QUADRAS PRÓXIMAS',
-                style: TextStyle(
+              Text(
+                _bairroFiltrado != null
+                    ? 'QUADRAS EM ${_bairroFiltrado!.toUpperCase()}'
+                    : 'QUADRAS PRÓXIMAS',
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w900,
                   color: Color(0xFF0F172A),
@@ -405,9 +433,37 @@ class _TelaInicialEstado extends State<TelaInicial> {
                           quadra.caminhoImagem,
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
-                            return Image.network(
-                              'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=600&auto=format&fit=crop',
-                              fit: BoxFit.cover,
+                            return Container(
+                              decoration: const BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [Color(0xFF0F2C59), Color(0xFF1E3A8A)],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                              ),
+                              child: Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(
+                                      Icons.sports_soccer,
+                                      color: Color(0xFF22C55E),
+                                      size: 38,
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      quadra.modalidade.isNotEmpty
+                                          ? quadra.modalidade
+                                          : 'Quadra Esportiva',
+                                      style: const TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             );
                           },
                         ),
@@ -490,7 +546,7 @@ class _TelaInicialEstado extends State<TelaInicial> {
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          '${quadra.bairro}, SP',
+                          quadra.bairro,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
@@ -513,15 +569,21 @@ class _TelaInicialEstado extends State<TelaInicial> {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFDCFCE7),
+                          color: quadra.precoPorHora > 0
+                              ? const Color(0xFFEFF6FF)
+                              : const Color(0xFFDCFCE7),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: const Text(
-                          'Uso Gratuito',
+                        child: Text(
+                          quadra.precoPorHora > 0
+                              ? 'R\$ ${quadra.precoPorHora.toStringAsFixed(2)}/h'
+                              : 'Uso Gratuito',
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF16A34A),
+                            color: quadra.precoPorHora > 0
+                                ? const Color(0xFF254EDB)
+                                : const Color(0xFF16A34A),
                           ),
                         ),
                       ),

@@ -93,6 +93,8 @@ class RespostaLogin {
   final String nomeCompleto;
   final String email;
   final String perfil;
+  final String cpf;
+  final String telefone;
 
   const RespostaLogin({
     required this.accessToken,
@@ -100,6 +102,8 @@ class RespostaLogin {
     required this.nomeCompleto,
     required this.email,
     required this.perfil,
+    this.cpf = '',
+    this.telefone = '',
   });
 
   factory RespostaLogin.deJson(Map<String, dynamic> json) {
@@ -109,6 +113,8 @@ class RespostaLogin {
       nomeCompleto: json['nomeCompleto'] ?? '',
       email: json['email'] ?? '',
       perfil: json['perfil'] ?? '',
+      cpf: json['cpf'] ?? '',
+      telefone: json['telefone'] ?? '',
     );
   }
 }

@@ -90,16 +90,16 @@ class SessaoUsuario {
 class ServicoAutenticacao {
   static String _obterUrlPadrao() {
     if (!kIsWeb && Platform.isAndroid) {
-      return 'https://10.0.2.2:7200/api';
+      return 'http://10.0.2.2:5200/api';
     }
-    return 'https://localhost:7200/api';
+    return 'http://localhost:5200/api';
   }
 
   static String _obterUrlAlternativa() {
     if (!kIsWeb && Platform.isAndroid) {
-      return 'http://10.0.2.2:5200/api';
+      return 'https://10.0.2.2:7200/api';
     }
-    return 'http://localhost:5200/api';
+    return 'https://localhost:7200/api';
   }
 
   static String? _urlBaseAtual;
@@ -153,24 +153,24 @@ class ServicoAutenticacao {
       case 'POST':
         return await http
             .post(uri, headers: cabecalhos, body: corpoString)
-            .timeout(const Duration(seconds: 5));
+            .timeout(const Duration(seconds: 3));
       case 'PUT':
         return await http
             .put(uri, headers: cabecalhos, body: corpoString)
-            .timeout(const Duration(seconds: 5));
+            .timeout(const Duration(seconds: 3));
       case 'PATCH':
         return await http
             .patch(uri, headers: cabecalhos, body: corpoString)
-            .timeout(const Duration(seconds: 5));
+            .timeout(const Duration(seconds: 3));
       case 'DELETE':
         return await http
             .delete(uri, headers: cabecalhos)
-            .timeout(const Duration(seconds: 5));
+            .timeout(const Duration(seconds: 3));
       case 'GET':
       default:
         return await http
             .get(uri, headers: cabecalhos)
-            .timeout(const Duration(seconds: 5));
+            .timeout(const Duration(seconds: 3));
     }
   }
 
@@ -413,11 +413,7 @@ class ServicoAutenticacao {
     }
 
     try {
-      final resposta = await _fazerRequisicao(
-        'GET',
-        '/Usuarios/perfil',
-        null,
-      );
+      final resposta = await _fazerRequisicao('GET', '/Usuarios/perfil', null);
 
       if (resposta.statusCode == 200) {
         final mapaJson = jsonDecode(resposta.body);
@@ -491,11 +487,7 @@ class ServicoAutenticacao {
         rotaPut = '/Usuarios/$idUsuario';
       }
 
-      final resposta = await _fazerRequisicao(
-        'PUT',
-        rotaPut,
-        dadosRequisicao,
-      );
+      final resposta = await _fazerRequisicao('PUT', rotaPut, dadosRequisicao);
 
       final statusSucesso =
           resposta.statusCode >= 200 && resposta.statusCode < 300;

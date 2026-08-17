@@ -36,21 +36,21 @@ class ServicoReservas {
           List<dynamic>? lista;
 
           if (dadosResposta is Map<String, dynamic>) {
-            if (dadosResposta['dados'] != null) {
-              if (dadosResposta['dados'] is Map &&
-                  dadosResposta['dados']['itens'] != null) {
-                lista = dadosResposta['dados']['itens'] as List<dynamic>?;
-              } else if (dadosResposta['dados'] is List) {
-                lista = dadosResposta['dados'] as List<dynamic>?;
+            final dados = dadosResposta['dados'] ?? dadosResposta['Dados'];
+            if (dados != null) {
+              if (dados is Map) {
+                lista = (dados['itens'] ?? dados['Itens']) as List<dynamic>?;
+              } else if (dados is List) {
+                lista = dados;
               }
-            } else if (dadosResposta['itens'] != null) {
-              lista = dadosResposta['itens'] as List<dynamic>?;
+            } else if (dadosResposta['itens'] != null || dadosResposta['Itens'] != null) {
+              lista = (dadosResposta['itens'] ?? dadosResposta['Itens']) as List<dynamic>?;
             }
           } else if (dadosResposta is List) {
             lista = dadosResposta;
           }
 
-          if (lista != null && lista.isNotEmpty) {
+          if (lista != null) {
             return lista.map((item) => ModeloReserva.deJson(item)).toList();
           }
         }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../modelos/modelo_quadra.dart';
 import '../servicos/servico_quadras.dart';
@@ -145,6 +146,7 @@ class _TelaMeusAgendamentosEstado extends State<TelaMeusAgendamentos> {
   // 0 = Atuais, 1 = Antigos (Antigos selecionada por padrão)
   int _indiceAbaSelecionada = 1;
   bool _estaCarregando = true;
+  Timer? _timerSincronizacao;
 
   // Listas dinâmicas de agendamentos alimentadas da API de Reservas do Backend
   List<ModeloAgendamentoItem> _listaAgendamentosAntigos = [];
@@ -154,6 +156,16 @@ class _TelaMeusAgendamentosEstado extends State<TelaMeusAgendamentos> {
   void initState() {
     super.initState();
     _carregarReservasDoBackend();
+
+    _timerSincronizacao = Timer.periodic(const Duration(seconds: 5), (_) {
+      _carregarReservasDoBackend();
+    });
+  }
+
+  @override
+  void dispose() {
+    _timerSincronizacao?.cancel();
+    super.dispose();
   }
 
   /// Conecta com a API de Reservas e a API de Quadras para obter os agendamentos reais

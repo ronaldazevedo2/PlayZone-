@@ -78,34 +78,41 @@ class ServicoQuadras {
 
   /// Busca a lista completa de quadras via ListaQuadraHandler do C# backend (/api/Quadra)
   static Future<List<QuadraEsportiva>> obterQuadras() async {
-    try {
-      final resposta = await _fazerRequisicao(
-        'GET',
-        '/Quadra?pagina=1&tamanhoPagina=100',
-        null,
-      );
+    final rotas = [
+      '/Quadra?pagina=1&tamanhoPagina=100',
+      '/Quadra',
+      '/api/Quadra',
+    ];
 
-      if (resposta.statusCode == 200) {
-        final dadosResposta = jsonDecode(resposta.body);
-        if (dadosResposta is Map<String, dynamic>) {
-          final bool ok = dadosResposta['ok'] ?? true;
-          if (ok && dadosResposta['dados'] != null) {
-            final dados = dadosResposta['dados'];
-            List<dynamic>? itens;
-            if (dados is Map) {
-              itens = (dados['itens'] ?? dados['Itens']) as List<dynamic>?;
-            } else if (dados is List) {
-              itens = dados;
+    for (final rota in rotas) {
+      try {
+        final resposta = await _fazerRequisicao('GET', rota, null);
+
+        if (resposta.statusCode == 200) {
+          final dadosResposta = jsonDecode(resposta.body);
+          List<dynamic>? lista;
+
+          if (dadosResposta is Map<String, dynamic>) {
+            final dados = dadosResposta['dados'] ?? dadosResposta['Dados'];
+            if (dados != null) {
+              if (dados is Map) {
+                lista = (dados['itens'] ?? dados['Itens']) as List<dynamic>?;
+              } else if (dados is List) {
+                lista = dados;
+              }
+            } else if (dadosResposta['itens'] != null || dadosResposta['Itens'] != null) {
+              lista = (dadosResposta['itens'] ?? dadosResposta['Itens']) as List<dynamic>?;
             }
-            if (itens != null) {
-              return itens.map((item) => QuadraEsportiva.deJson(item)).toList();
-            }
+          } else if (dadosResposta is List) {
+            lista = dadosResposta;
           }
-        } else if (dadosResposta is List) {
-          return dadosResposta.map((item) => QuadraEsportiva.deJson(item)).toList();
+
+          if (lista != null) {
+            return lista.map((item) => QuadraEsportiva.deJson(item)).toList();
+          }
         }
-      }
-    } catch (_) {}
+      } catch (_) {}
+    }
 
     return [
       QuadraEsportiva(

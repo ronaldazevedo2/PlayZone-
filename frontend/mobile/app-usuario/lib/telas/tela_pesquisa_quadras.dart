@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../modelos/modelo_quadra.dart';
 import '../servicos/servico_quadras.dart';
@@ -16,6 +17,7 @@ class _TelaPesquisaQuadrasEstado extends State<TelaPesquisaQuadras> {
   List<QuadraEsportiva> _quadrasFiltradas = [];
   bool _estaCarregando = true;
   String _modalidadeSelecionada = 'Todas';
+  Timer? _timerSincronizacao;
 
   final List<Map<String, dynamic>> _categoriasModalidade = [
     {'nome': 'Todas', 'icone': Icons.sports},
@@ -29,13 +31,29 @@ class _TelaPesquisaQuadrasEstado extends State<TelaPesquisaQuadras> {
     super.initState();
     _controladorPesquisa.addListener(_filtrarQuadras);
     _carregarQuadrasDaApi();
+
+    _timerSincronizacao = Timer.periodic(const Duration(seconds: 4), (_) {
+      _carregarQuadrasSilencioso();
+    });
   }
 
   @override
   void dispose() {
+    _timerSincronizacao?.cancel();
     _controladorPesquisa.removeListener(_filtrarQuadras);
     _controladorPesquisa.dispose();
     super.dispose();
+  }
+
+  Future<void> _carregarQuadrasSilencioso() async {
+    try {
+      final quadras = await ServicoQuadras.obterQuadras();
+      if (!mounted) return;
+      setState(() {
+        _todasAsQuadras = quadras;
+        _filtrarQuadras();
+      });
+    } catch (_) {}
   }
 
   Future<void> _carregarQuadrasDaApi() async {
@@ -310,11 +328,39 @@ class _TelaPesquisaQuadrasEstado extends State<TelaPesquisaQuadras> {
                   height: 180,
                   width: double.infinity,
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => Image.network(
-                    'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=600&auto=format&fit=crop',
+                  errorBuilder: (context, error, stackTrace) => Container(
                     height: 180,
                     width: double.infinity,
-                    fit: BoxFit.cover,
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Color(0xFF0F2C59), Color(0xFF1E3A8A)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                    ),
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.sports_soccer,
+                            color: Color(0xFF22C55E),
+                            size: 44,
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            quadra.modalidade.isNotEmpty
+                                ? quadra.modalidade
+                                : 'Quadra Esportiva',
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ),
