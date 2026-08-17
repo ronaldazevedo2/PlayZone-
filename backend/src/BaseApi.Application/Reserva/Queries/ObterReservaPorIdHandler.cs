@@ -17,7 +17,6 @@ public class ObterReservaPorIdHandler(IReservaRepositorio repositorio)
             reserva.ReservasId,
             reserva.QuadraId,
             reserva.UsuarioId,
-            reserva.UsuarioId,
             reserva.DataAgendada,
             reserva.HorarioAgendado,
             reserva.Usuario?.NomeCompleto ?? "Usuário do Sistema",

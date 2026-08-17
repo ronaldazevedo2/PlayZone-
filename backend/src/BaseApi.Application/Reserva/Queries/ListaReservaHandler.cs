@@ -26,7 +26,6 @@ public class ListarReservaHandler(IReservaRepositorio repositorio)
                 r.ReservasId,
                 r.QuadraId,
                 r.UsuarioId,
-                r.UsuarioId,
                 r.DataAgendada,
                 r.HorarioAgendado,
                 r.Usuario?.NomeCompleto ?? "Usuário do Sistema",
