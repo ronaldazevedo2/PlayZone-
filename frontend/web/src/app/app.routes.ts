@@ -35,6 +35,9 @@ export const routes: Routes = [
       { path: 'quadras/nova', loadComponent: () => import('./components/quadras/quadra-form/quadra-form.component').then(m => m.QuadraFormComponent) },
       { path: 'quadras/editar/:id', loadComponent: () => import('./components/quadras/quadra-form/quadra-form.component').then(m => m.QuadraFormComponent) },
 
+      // Avaliações
+      { path: 'avaliacoes', loadComponent: () => import('./components/avaliacoes/avaliacoes').then(m => m.Avaliacoes) },
+
       // Reservas
       { path: 'reservas', loadComponent: () => import('./components/reservas/reservas.component').then(m => m.ReservasComponent) },
       { path: 'reservas/quadra/:id', loadComponent: () => import('./components/reservas/reserva-quadra-detalhes/reserva-quadra-detalhes.component').then(m => m.ReservaQuadraDetalhesComponent) },

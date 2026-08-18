@@ -1,0 +1,183 @@
+<div class="avaliacoes-container">
+  <!-- Top Header Bar / Titulo -->
+  <div class="header-actions">
+    <div class="page-title">
+      <h2>Avaliações das Quadras</h2>
+      <p>Visualize e acompanhe as avaliações das quadras do sistema.</p>
+    </div>
+
+    <div class="filter-controls">
+      <!-- Search Box -->
+      <div class="search-box">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" placeholder="Buscar quadra..." [(ngModel)]="termoBusca" (input)="aplicarFiltros()">
+      </div>
+
+      <!-- Dropdown Filter Modalidades -->
+      <div class="dropdown-filter">
+        <div class="filter-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+          </svg>
+        </div>
+        <select [(ngModel)]="filtroModalidade" (change)="aplicarFiltros()" class="select-modalidades">
+          <option value="Todas">Todas as modalidades</option>
+          <ng-container *ngFor="let optionMod of opcoesModalidades">
+            <option *ngIf="optionMod !== 'Todas'" [value]="optionMod">{{ optionMod }}</option>
+          </ng-container>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- State Loading -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Carregando avaliações das quadras...</p>
+  </div>
+
+  <!-- Grid de Cards de Avaliações das Quadras -->
+  <div class="quadras-grid" *ngIf="!isLoading && quadrasFiltradas.length > 0">
+    <div class="quadra-avaliacao-card" *ngFor="let quadra of quadrasFiltradas" (click)="abrirDetalhes(quadra)">
+      <div class="card-image-wrapper">
+        <img [src]="quadra.imagemUrl" [alt]="quadra.nome" class="quadra-card-img" />
+      </div>
+
+      <div class="card-content">
+        <!-- Ícone circular da modalidade na sobreposição/linha superior -->
+        <div class="modalidade-badge-icon" [ngClass]="getBadgeClass(quadra.modalidade)">
+          <svg *ngIf="quadra.modalidade.includes('Society') || quadra.modalidade.includes('Futebol')" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 2a10 10 0 0 0-3.5 19.37L12 16l3.5 5.37A10 10 0 0 0 12 2z"></path>
+          </svg>
+          <svg *ngIf="quadra.modalidade.includes('Futsal')" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+            <circle cx="12" cy="12" r="4"></circle>
+          </svg>
+          <svg *ngIf="quadra.modalidade.includes('Beach') || quadra.modalidade.includes('Tennis')" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="9"></circle>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+          <svg *ngIf="quadra.modalidade.includes('Vôlei') || quadra.modalidade.includes('Volei')" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 2a10 10 0 0 0 0 20M2 12h20"></path>
+          </svg>
+          <svg *ngIf="quadra.modalidade.includes('Basquete')" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M4.93 4.93l14.14 14.14M4.93 19.07l14.14-14.14"></path>
+          </svg>
+        </div>
+
+        <h3 class="quadra-title">{{ quadra.nome }}</h3>
+        <p class="quadra-subtitle">{{ quadra.modalidade }}</p>
+
+        <div class="card-footer-row">
+          <div class="rating-info">
+            <svg class="star-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+            <span class="rating-score">{{ quadra.mediaNota.toFixed(1).replace('.', ',') }}</span>
+            <span class="rating-count">({{ quadra.totalAvaliacoes }} avaliações)</span>
+          </div>
+
+          <div class="arrow-action">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- State Vazio -->
+  <div class="empty-state" *ngIf="!isLoading && quadrasFiltradas.length === 0">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+    </svg>
+    <p>Nenhuma quadra encontrada para os filtros selecionados.</p>
+  </div>
+
+  <!-- Pagination Bottom Bar -->
+  <div class="pagination-bar" *ngIf="!isLoading && quadrasFiltradas.length > 0">
+    <span class="pagination-info">
+      Mostrando 1 a {{ quadrasFiltradas.length }} de {{ quadrasFiltradas.length }} quadras
+    </span>
+
+    <div class="pagination-controls">
+      <button class="page-btn nav-btn" disabled>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      <button class="page-btn active">1</button>
+      <button class="page-btn nav-btn" disabled>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+    </div>
+
+    <div class="items-per-page">
+      <span>Itens por página:</span>
+      <select class="select-items-page">
+        <option value="12">12</option>
+        <option value="24">24</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Modal Detalhes das Avaliações da Quadra Selecionada -->
+  <div class="modal-overlay" *ngIf="exibirModalDetalhes" (click)="fecharModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <h3>Avaliações — {{ quadraSelecionada?.nome }}</h3>
+          <p>{{ quadraSelecionada?.modalidade }} • Média {{ quadraSelecionada?.mediaNota?.toFixed(1)?.replace('.', ',') }} de 5 estrelas</p>
+        </div>
+        <button class="btn-close-modal" (click)="fecharModal()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="comments-list">
+          <div class="comment-item" *ngFor="let item of quadraSelecionada?.avaliacoes">
+            <div class="comment-header">
+              <div class="comment-user">
+                <div class="user-avatar-circle">
+                  {{ item.usuarioNome.charAt(0) }}
+                </div>
+                <div class="user-meta">
+                  <span class="user-name">{{ item.usuarioNome }}</span>
+                  <span class="user-email">{{ item.usuarioEmail }}</span>
+                </div>
+              </div>
+
+              <div class="comment-stars">
+                <span class="star-rating">
+                  <svg *ngFor="let s of [1,2,3,4,5]" class="star-mini" [class.filled]="s <= item.nota" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                  </svg>
+                </span>
+                <span class="comment-date">{{ item.data }}</span>
+              </div>
+            </div>
+
+            <p class="comment-body">{{ item.comentario }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="fecharModal()">Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>
