@@ -377,6 +377,63 @@ class _TelaPerfilUsuarioEstado extends State<TelaPerfilUsuario> {
     );
   }
 
+  String _obterIniciaisNome(String nomeCompleto) {
+    final partes = nomeCompleto.trim().split(RegExp(r'\s+'));
+    final partesValidas = partes.where((p) => p.isNotEmpty).toList();
+    if (partesValidas.isEmpty) return 'US';
+    if (partesValidas.length == 1) {
+      final primeiroNome = partesValidas[0];
+      if (primeiroNome.length >= 2) {
+        return primeiroNome.substring(0, 2).toUpperCase();
+      }
+      return primeiroNome.substring(0, 1).toUpperCase();
+    }
+    final primeiraLetra = partesValidas[0][0].toUpperCase();
+    final segundaLetra = partesValidas[1][0].toUpperCase();
+    return '$primeiraLetra$segundaLetra';
+  }
+
+  Widget _construirAvatarPerfil(String nomeCompleto, String fotoUrl) {
+    final iniciais = _obterIniciaisNome(nomeCompleto);
+    final temFotoUrl = fotoUrl.trim().isNotEmpty &&
+        (fotoUrl.startsWith('http://') || fotoUrl.startsWith('https://'));
+
+    return Container(
+      width: 100,
+      height: 100,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: const Color(0xFFE2E8F0), width: 2.5),
+        gradient: temFotoUrl
+            ? null
+            : const LinearGradient(
+                colors: [Color(0xFF163791), Color(0xFF254EDB)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+        image: temFotoUrl
+            ? DecorationImage(
+                image: NetworkImage(fotoUrl),
+                fit: BoxFit.cover,
+              )
+            : null,
+      ),
+      child: temFotoUrl
+          ? null
+          : Center(
+              child: Text(
+                iniciais,
+                style: const TextStyle(
+                  fontSize: 34,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.white,
+                  letterSpacing: 1.0,
+                ),
+              ),
+            ),
+    );
+  }
+
   void _fazerLogout() async {
     await ServicoAutenticacao.encerrarSessao();
     if (!mounted) return;
@@ -420,19 +477,11 @@ class _TelaPerfilUsuarioEstado extends State<TelaPerfilUsuario> {
             Center(
               child: Stack(
                 children: [
-                  Container(
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: const Color(0xFFE2E8F0), width: 2),
-                      image: const DecorationImage(
-                        image: NetworkImage(
-                          'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
-                        ),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
+                  _construirAvatarPerfil(
+                    _controladorNome.text.trim().isNotEmpty
+                        ? _controladorNome.text.trim()
+                        : _sessaoAtual.nomeCompleto,
+                    _sessaoAtual.fotoPerfilUrl,
                   ),
                   Positioned(
                     bottom: 0,

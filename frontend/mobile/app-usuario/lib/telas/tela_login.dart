@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import '../componentes/cabecalho_autenticacao.dart';
 import '../componentes/campo_texto.dart';
 import '../servicos/servico_autenticacao.dart';
-import 'tela_cadastro_usuario.dart';
-import 'tela_esqueceu_senha.dart';
-import 'tela_inicial.dart';
 
 class TelaLoginUsuario extends StatefulWidget {
   const TelaLoginUsuario({super.key});
@@ -86,9 +83,10 @@ class _TelaLoginUsuarioEstado extends State<TelaLoginUsuario> {
         ),
       );
 
-      Navigator.pushReplacement(
+      Navigator.pushReplacementNamed(
         context,
-        MaterialPageRoute(builder: (context) => TelaInicial(sessao: sessao)),
+        '/inicio',
+        arguments: sessao,
       );
     } catch (erro) {
       if (!mounted) return;
@@ -112,17 +110,11 @@ class _TelaLoginUsuarioEstado extends State<TelaLoginUsuario> {
   }
 
   void _irParaEsqueciSenha() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const TelaEsqueceuSenha()),
-    );
+    Navigator.pushNamed(context, '/esqueceu-senha');
   }
 
   void _irParaCadastro() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const TelaCadastroUsuario()),
-    );
+    Navigator.pushNamed(context, '/cadastro');
   }
 
   @override

@@ -708,7 +708,7 @@ class _TelaDetalhesQuadraEstado extends State<TelaDetalhesQuadra> {
     );
   }
 
-  // WIDGET: Barra Inferior Fixa com Valor e Botão Agendar Agora
+  // WIDGET: Barra Inferior Fixa com Botão Agendar Agora
   Widget _construirBarraInferiorFixa(QuadraEsportiva quadra) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
@@ -724,64 +724,36 @@ class _TelaDetalhesQuadraEstado extends State<TelaDetalhesQuadra> {
       ),
       child: SafeArea(
         top: false,
-        child: Row(
-          children: [
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'AGENDAMENTO',
+        child: SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: _horarioSelecionado != null ? _confirmarAgendamento : null,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF22C55E),
+              disabledBackgroundColor: const Color(0xFFCBD5E1),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 0,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Text(
+                  'AGENDAR AGORA',
                   style: TextStyle(
-                    fontSize: 9,
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF94A3B8),
                     letterSpacing: 0.5,
                   ),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  _horarioSelecionado != null ? 'Gratuito' : '-',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF16A34A),
-                  ),
-                ),
+                SizedBox(width: 6),
+                Icon(Icons.bolt, size: 18),
               ],
             ),
-            const SizedBox(width: 20),
-            Expanded(
-              child: ElevatedButton(
-                onPressed: _horarioSelecionado != null ? _confirmarAgendamento : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF22C55E),
-                  disabledBackgroundColor: const Color(0xFFCBD5E1),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 0,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Text(
-                      'AGENDAR AGORA',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                    SizedBox(width: 6),
-                    Icon(Icons.bolt, size: 18),
-                  ],
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

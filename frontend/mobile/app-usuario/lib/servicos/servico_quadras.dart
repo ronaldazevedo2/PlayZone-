@@ -116,64 +116,64 @@ class ServicoQuadras {
 
     return [
       QuadraEsportiva(
-        id: 'quadra-sao-jose-1',
-        nome: 'ARENA SÃO JOSÉ',
-        modalidade: 'Futebol Society',
-        bairro: 'São José',
-        endereco: 'Rua Principal, 100',
-        capacidade: 10,
-        descricao:
-            'Quadra esportiva completa no bairro São José com iluminação LED e vestiários.',
-        precoPorHora: 0.0,
-        estaDisponivel: true,
-        distanciaEmKm: 1.5,
-        caminhoImagem:
-            'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=600&auto=format&fit=crop',
-      ),
-      QuadraEsportiva(
-        id: 'quadra-interlagos-1',
-        nome: 'ARENA INTERLAGOS',
-        modalidade: 'Sintético Pro',
-        bairro: 'Interlagos',
-        endereco: 'Av. Interlagos, 500',
-        capacidade: 12,
-        descricao:
-            'Quadra de alta performance no bairro Interlagos com gramado sintético premium.',
-        precoPorHora: 0.0,
-        estaDisponivel: true,
-        distanciaEmKm: 2.1,
-        caminhoImagem:
-            'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=600&auto=format&fit=crop',
-      ),
-      QuadraEsportiva(
-        id: 'quadra-araca-1',
-        nome: 'POLIESPORTIVA ARAÇÁ',
+        id: 'quadra-basquete-1',
+        nome: 'ARENA BASQUETE ARAÇÁ',
         modalidade: 'Basquete',
         bairro: 'Araçá',
         endereco: 'Rua das Palmeiras, 250',
         capacidade: 10,
         descricao:
-            'Quadra poliesportiva coberta no bairro Araçá com vestiários e estrutura completa.',
+            'Quadra de basquete coberta com piso de alta performance e estrutura completa.',
         precoPorHora: 0.0,
         estaDisponivel: true,
-        distanciaEmKm: 3.2,
+        distanciaEmKm: 1.2,
         caminhoImagem:
             'https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=600&auto=format&fit=crop',
       ),
       QuadraEsportiva(
-        id: 'quadra-aviso-1',
-        nome: 'ARENA TÊNIS AVISO',
-        modalidade: 'Tênis de Saibro',
-        bairro: 'Aviso',
-        endereco: 'Rua do Esporte, 420',
-        capacidade: 4,
+        id: 'quadra-futebol-1',
+        nome: 'ARENA FUTEBOL SÃO JOSÉ',
+        modalidade: 'Futebol',
+        bairro: 'São José',
+        endereco: 'Rua Principal, 100',
+        capacidade: 14,
         descricao:
-            'Quadra oficial de tênis em saibro no bairro Aviso com iluminação noturna.',
+            'Campo de futebol oficial com gramado sintético e iluminação noturna.',
         precoPorHora: 0.0,
         estaDisponivel: true,
-        distanciaEmKm: 4.0,
+        distanciaEmKm: 1.8,
         caminhoImagem:
-            'https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?q=80&w=600&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=600&auto=format&fit=crop',
+      ),
+      QuadraEsportiva(
+        id: 'quadra-futsal-1',
+        nome: 'GINÁSIO FUTSAL INTERLAGOS',
+        modalidade: 'Futsal',
+        bairro: 'Interlagos',
+        endereco: 'Av. Interlagos, 500',
+        capacidade: 12,
+        descricao:
+            'Ginásio coberto preparado para partidas oficiais de Futsal.',
+        precoPorHora: 0.0,
+        estaDisponivel: true,
+        distanciaEmKm: 2.5,
+        caminhoImagem:
+            'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=600&auto=format&fit=crop',
+      ),
+      QuadraEsportiva(
+        id: 'quadra-volei-1',
+        nome: 'ARENA VÔLEI CENTRO',
+        modalidade: 'Vôlei',
+        bairro: 'Centro',
+        endereco: 'Rua do Esporte, 420',
+        capacidade: 12,
+        descricao:
+            'Quadra oficial para prática de Vôlei de quadra e areia.',
+        precoPorHora: 0.0,
+        estaDisponivel: true,
+        distanciaEmKm: 3.1,
+        caminhoImagem:
+            'https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?q=80&w=600&auto=format&fit=crop',
       ),
     ];
   }

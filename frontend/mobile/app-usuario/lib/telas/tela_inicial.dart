@@ -3,15 +3,19 @@ import 'package:flutter/material.dart';
 import '../modelos/modelo_quadra.dart';
 import '../servicos/servico_autenticacao.dart';
 import '../servicos/servico_quadras.dart';
-import 'tela_detalhes_quadra.dart';
 import 'tela_meus_agendamentos.dart';
 import 'tela_pesquisa_quadras.dart';
 import 'tela_perfil_usuario.dart';
 
 class TelaInicial extends StatefulWidget {
   final SessaoUsuario sessao;
+  final int abaInicial;
 
-  const TelaInicial({super.key, required this.sessao});
+  const TelaInicial({
+    super.key,
+    required this.sessao,
+    this.abaInicial = 0,
+  });
 
   @override
   State<TelaInicial> createState() => _TelaInicialEstado();
@@ -20,18 +24,42 @@ class TelaInicial extends StatefulWidget {
 class _TelaInicialEstado extends State<TelaInicial> {
   late SessaoUsuario _sessaoAtual;
   String? _bairroFiltrado;
+  String _modalidadeSelecionada = 'Todas';
   List<QuadraEsportiva> _quadrasFiltradas = [];
-  int _abaSelecionada = 0;
+  late int _abaSelecionada;
 
   // Lista dinâmica de quadras carregadas da API
   List<QuadraEsportiva> _todasAsQuadras = [];
   bool _estaCarregando = false;
   Timer? _timerSincronizacao;
 
+  List<String> get _modalidadesDisponiveis {
+    final Set<String> modalidadesUnicas = {};
+
+    for (final quadra in _todasAsQuadras) {
+      final mod = quadra.modalidade.trim();
+      if (mod.isNotEmpty && mod.toLowerCase() != 'null') {
+        modalidadesUnicas.add(mod);
+      }
+      for (final subMod in quadra.listaModalidades) {
+        final sub = subMod.trim();
+        if (sub.isNotEmpty && sub.toLowerCase() != 'null') {
+          modalidadesUnicas.add(sub);
+        }
+      }
+    }
+
+    final List<String> modalidadesOrdenadas = modalidadesUnicas.toList()
+      ..sort((a, b) => a.compareTo(b));
+
+    return ['Todas', ...modalidadesOrdenadas];
+  }
+
   @override
   void initState() {
     super.initState();
     _sessaoAtual = widget.sessao;
+    _abaSelecionada = widget.abaInicial;
 
     // Busca assíncrona das quadras diretamente da API ao carregar a página
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -94,43 +122,43 @@ class _TelaInicialEstado extends State<TelaInicial> {
   List<QuadraEsportiva> _obterQuadrasPadraoHandler() {
     final dtos = [
       {
-        'id': '55555555-5555-5555-5555-555555555555',
-        'nome': 'GINÁSIO POLIESPORTIVO "LEANDRO SILVA DOS REIS"',
-        'descricao': 'Ginásio Poliesportivo localizado no bairro Interlagos.',
-        'localizacao': 'Interlagos',
-        'capacidade': 20,
-        'modalidade': 'Futebol',
-        'imagemUrl': 'https://exemplo.com/imagens/interlagos.jpg',
-        'status': 'Ativa',
-      },
-      {
-        'id': 'd1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d',
-        'nome': 'ARENA SÃO JOSÉ',
-        'descricao': 'Quadra oficial com gramado sintético e vestiários.',
-        'localizacao': 'Rua dos Atletas, 100 - São José',
+        'id': '11111111-1111-1111-1111-111111111111',
+        'nome': 'ARENA BASQUETE ARAÇÁ',
+        'descricao': 'Quadra de basquete coberta no bairro Araçá.',
+        'localizacao': 'Rua das Palmeiras, 250 - Araçá',
         'capacidade': 10,
-        'modalidade': 'Futebol Society',
-        'imagemUrl': 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=600&auto=format&fit=crop',
-        'status': 'Ativa',
-      },
-      {
-        'id': 'e2c3d4e5-f6a7-8b9c-0d1e-2f3a4b5c6d7e',
-        'nome': 'GINÁSIO POLIESPORTIVO AVISO',
-        'descricao': 'Quadra coberta com piso vinílico para futsal e basquete.',
-        'localizacao': 'Av. Esportiva, 500 - Aviso',
-        'capacidade': 12,
-        'modalidade': 'Futsal e Basquete',
+        'modalidade': 'Basquete',
         'imagemUrl': 'https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=600&auto=format&fit=crop',
         'status': 'Ativa',
       },
       {
-        'id': 'f3d4e5f6-a7b8-9c0d-1e2f-3a4b5c6d7e8f',
-        'nome': 'COMPLEXO TÊNIS CLUBE',
-        'descricao': 'Quadra de saibro oficial com iluminação noturna.',
-        'localizacao': 'Rua das Palmeiras, 250 - Centro',
-        'capacidade': 4,
-        'modalidade': 'Tênis',
-        'imagemUrl': 'https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?q=80&w=600&auto=format&fit=crop',
+        'id': '22222222-2222-2222-2222-222222222222',
+        'nome': 'ARENA FUTEBOL SÃO JOSÉ',
+        'descricao': 'Campo oficial de futebol com gramado sintético.',
+        'localizacao': 'Rua dos Atletas, 100 - São José',
+        'capacidade': 14,
+        'modalidade': 'Futebol',
+        'imagemUrl': 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=600&auto=format&fit=crop',
+        'status': 'Ativa',
+      },
+      {
+        'id': '33333333-3333-3333-3333-333333333333',
+        'nome': 'GINÁSIO DE FUTSAL INTERLAGOS',
+        'descricao': 'Quadra de futsal com piso vinílico especial.',
+        'localizacao': 'Av. Esportiva, 500 - Interlagos',
+        'capacidade': 12,
+        'modalidade': 'Futsal',
+        'imagemUrl': 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=600&auto=format&fit=crop',
+        'status': 'Ativa',
+      },
+      {
+        'id': '44444444-4444-4444-4444-444444444444',
+        'nome': 'ARENA VÔLEI CENTRO',
+        'descricao': 'Quadra oficial com suporte a Vôlei.',
+        'localizacao': 'Rua das Flores, 20 - Centro',
+        'capacidade': 12,
+        'modalidade': 'Vôlei',
+        'imagemUrl': 'https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?q=80&w=600&auto=format&fit=crop',
         'status': 'Ativa',
       },
     ];
@@ -147,15 +175,40 @@ class _TelaInicialEstado extends State<TelaInicial> {
   void _filtrarQuadras() {
     setState(() {
       _quadrasFiltradas = _todasAsQuadras.where((quadra) {
-        if (_bairroFiltrado == null || _bairroFiltrado!.isEmpty) return true;
-        final filtro = _bairroFiltrado!.toLowerCase().trim();
-        final bairroQuadra = quadra.bairro.toLowerCase().trim();
-        final enderecoQuadra = quadra.endereco.toLowerCase().trim();
-        return bairroQuadra == filtro ||
-            bairroQuadra.contains(filtro) ||
-            enderecoQuadra.contains(filtro);
+        bool bateuBairro = true;
+        if (_bairroFiltrado != null && _bairroFiltrado!.isNotEmpty) {
+          final filtro = _bairroFiltrado!.toLowerCase().trim();
+          final bairroQuadra = quadra.bairro.toLowerCase().trim();
+          final enderecoQuadra = quadra.endereco.toLowerCase().trim();
+          bateuBairro = bairroQuadra == filtro ||
+              bairroQuadra.contains(filtro) ||
+              enderecoQuadra.contains(filtro);
+        }
+
+        bool bateuModalidade = true;
+        if (_modalidadeSelecionada != 'Todas') {
+          final filtroMod = _modalidadeSelecionada.toLowerCase().trim();
+          final modQuadra = quadra.modalidade.toLowerCase().trim();
+          final listaMods =
+              quadra.listaModalidades.map((m) => m.toLowerCase().trim()).toList();
+          bateuModalidade = modQuadra.contains(filtroMod) ||
+              listaMods.any((m) => m.contains(filtroMod) || filtroMod.contains(m));
+        }
+
+        return bateuBairro && bateuModalidade;
       }).toList();
       _ordenarPorDistancia();
+    });
+  }
+
+  void _selecionarModalidade(String modalidade) {
+    setState(() {
+      if (_modalidadeSelecionada == modalidade && modalidade != 'Todas') {
+        _modalidadeSelecionada = 'Todas';
+      } else {
+        _modalidadeSelecionada = modalidade;
+      }
+      _filtrarQuadras();
     });
   }
 
@@ -196,6 +249,12 @@ class _TelaInicialEstado extends State<TelaInicial> {
                   children: [
                     // 1. Logo PLAYZONE Centralizada (Sem campo de pesquisa e sem sininho)
                     _construirCabecalho(),
+
+                    // Chips horizontais de seleção de modalidade extraídos dinamicamente
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      child: _construirCarrosselDeModalidades(),
+                    ),
 
                     // Indicador de progresso se estiver carregando
                     if (_estaCarregando)
@@ -302,6 +361,62 @@ class _TelaInicialEstado extends State<TelaInicial> {
     );
   }
 
+  // WIDGET: Carrossel de Chips de Categorias Esportivas (Dinamico do BD)
+  Widget _construirCarrosselDeModalidades() {
+    final modalidades = _modalidadesDisponiveis;
+
+    return SizedBox(
+      height: 44,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: modalidades.length,
+        itemBuilder: (context, index) {
+          final String nomeModalidade = modalidades[index];
+          final bool selecionado = _modalidadeSelecionada == nomeModalidade;
+
+          return GestureDetector(
+            onTap: () => _selecionarModalidade(nomeModalidade),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              margin: const EdgeInsets.only(right: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              decoration: BoxDecoration(
+                color: selecionado ? const Color(0xFF1E293B) : Colors.white,
+                borderRadius: BorderRadius.circular(22),
+                border: Border.all(
+                  color: selecionado
+                      ? const Color(0xFF1E293B)
+                      : const Color(0xFFE2E8F0),
+                ),
+                boxShadow: selecionado
+                    ? [
+                        BoxShadow(
+                          color:
+                              const Color(0xFF1E293B).withValues(alpha: 0.15),
+                          blurRadius: 8,
+                          offset: const Offset(0, 3),
+                        ),
+                      ]
+                    : null,
+              ),
+              child: Center(
+                child: Text(
+                  nomeModalidade,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color:
+                        selecionado ? Colors.white : const Color(0xFF475569),
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   // WIDGET: Seção Quadras Próximas
   Widget _construirSecaoQuadrasProximas() {
     return Column(
@@ -325,12 +440,9 @@ class _TelaInicialEstado extends State<TelaInicial> {
               ),
               GestureDetector(
                 onTap: () {
-                  _limparFiltroBairro();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Exibindo todas as quadras registradas.'),
-                    ),
-                  );
+                  setState(() {
+                    _abaSelecionada = 1;
+                  });
                 },
                 child: const Row(
                   children: [
@@ -390,11 +502,10 @@ class _TelaInicialEstado extends State<TelaInicial> {
   Widget _construirCardQuadra(QuadraEsportiva quadra) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
+        Navigator.pushNamed(
           context,
-          MaterialPageRoute(
-            builder: (context) => TelaDetalhesQuadra(quadraId: quadra.id),
-          ),
+          '/quadras/detalhes',
+          arguments: quadra.id,
         );
       },
       child: Container(
@@ -559,38 +670,14 @@ class _TelaInicialEstado extends State<TelaInicial> {
                   ),
                   const SizedBox(height: 12),
 
-                  // Rodapé do card: Preço + Botão Agendar
+                  // Rodapé do card: Botão Agendar
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: quadra.precoPorHora > 0
-                              ? const Color(0xFFEFF6FF)
-                              : const Color(0xFFDCFCE7),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          quadra.precoPorHora > 0
-                              ? 'R\$ ${quadra.precoPorHora.toStringAsFixed(2)}/h'
-                              : 'Uso Gratuito',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            color: quadra.precoPorHora > 0
-                                ? const Color(0xFF254EDB)
-                                : const Color(0xFF16A34A),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
+                          horizontal: 16,
+                          vertical: 8,
                         ),
                         decoration: BoxDecoration(
                           color: const Color(0xFF22C55E),
@@ -853,10 +940,10 @@ class _TelaInicialEstado extends State<TelaInicial> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _construirItemNavegacao(0, Icons.home, 'Home'),
-          _construirItemNavegacao(1, Icons.search, 'Search'),
-          _construirItemNavegacao(2, Icons.calendar_today_outlined, 'Bookings'),
-          _construirItemNavegacao(3, Icons.person_outline, 'Profile'),
+          _construirItemNavegacao(0, Icons.home, 'Início'),
+          _construirItemNavegacao(1, Icons.search, 'Buscar'),
+          _construirItemNavegacao(2, Icons.calendar_today_outlined, 'Agendamentos'),
+          _construirItemNavegacao(3, Icons.person_outline, 'Perfil'),
         ],
       ),
     );
@@ -868,9 +955,13 @@ class _TelaInicialEstado extends State<TelaInicial> {
 
     return GestureDetector(
       onTap: () {
-        setState(() {
-          _abaSelecionada = index;
-        });
+        if (index == 3) {
+          Navigator.pushNamed(context, '/perfil');
+        } else {
+          setState(() {
+            _abaSelecionada = index;
+          });
+        }
       },
       child: Column(
         mainAxisSize: MainAxisSize.min,

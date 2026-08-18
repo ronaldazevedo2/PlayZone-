@@ -81,6 +81,12 @@ class QuadraEsportiva {
     );
   }
 
+  List<String> get listaModalidades {
+    if (modalidade.trim().isEmpty) return [];
+    final partes = modalidade.split(RegExp(r'[,/]|(?:\s+e\s+)|\s+E\s+', caseSensitive: false));
+    return partes.map((item) => item.trim()).where((item) => item.isNotEmpty).toList();
+  }
+
   Map<String, dynamic> paraJson() {
     return {
       'id': id,
@@ -118,6 +124,12 @@ class QuadraEsportiva {
         url = url.replaceAll('127.0.0.1', '10.0.2.2');
       }
       if (url.startsWith('http://') || url.startsWith('https://')) {
+        if (kIsWeb &&
+            !url.contains('localhost') &&
+            !url.contains('127.0.0.1') &&
+            !url.contains('weserv.nl')) {
+          return 'https://images.weserv.nl/?url=${Uri.encodeComponent(url)}';
+        }
         return url;
       } else if (url.startsWith('/')) {
         final baseUrl = ServicoAutenticacao.obterUrlBase();

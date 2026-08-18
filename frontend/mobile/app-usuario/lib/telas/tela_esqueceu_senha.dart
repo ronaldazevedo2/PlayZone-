@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../componentes/campo_texto.dart';
 import '../servicos/servico_autenticacao.dart';
-import 'tela_redefinir_senha.dart';
 
 class TelaEsqueceuSenha extends StatefulWidget {
   const TelaEsqueceuSenha({super.key});
@@ -119,12 +118,7 @@ class _TelaEsqueceuSenhaEstado extends State<TelaEsqueceuSenha> {
   }
 
   void _irParaRedefinicaoSenha() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const TelaRedefinirSenha(tokenDemonstracao: 'token_demo_playzone_123'),
-      ),
-    );
+    Navigator.pushNamed(context, '/redefinir-senha');
   }
 
   @override

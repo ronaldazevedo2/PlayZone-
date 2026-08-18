@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../modelos/modelo_quadra.dart';
 import '../servicos/servico_quadras.dart';
-import 'tela_detalhes_quadra.dart';
 
 class TelaPesquisaQuadras extends StatefulWidget {
   const TelaPesquisaQuadras({super.key});
@@ -19,12 +18,27 @@ class _TelaPesquisaQuadrasEstado extends State<TelaPesquisaQuadras> {
   String _modalidadeSelecionada = 'Todas';
   Timer? _timerSincronizacao;
 
-  final List<Map<String, dynamic>> _categoriasModalidade = [
-    {'nome': 'Todas', 'icone': Icons.sports},
-    {'nome': 'Futebol', 'icone': Icons.sports_soccer},
-    {'nome': 'Tênis', 'icone': Icons.sports_tennis},
-    {'nome': 'Basquete', 'icone': Icons.sports_basketball},
-  ];
+  List<String> get _modalidadesDisponiveis {
+    final Set<String> modalidadesUnicas = {};
+
+    for (final quadra in _todasAsQuadras) {
+      final mod = quadra.modalidade.trim();
+      if (mod.isNotEmpty && mod.toLowerCase() != 'null') {
+        modalidadesUnicas.add(mod);
+      }
+      for (final subMod in quadra.listaModalidades) {
+        final sub = subMod.trim();
+        if (sub.isNotEmpty && sub.toLowerCase() != 'null') {
+          modalidadesUnicas.add(sub);
+        }
+      }
+    }
+
+    final List<String> modalidadesOrdenadas = modalidadesUnicas.toList()
+      ..sort((a, b) => a.compareTo(b));
+
+    return ['Todas', ...modalidadesOrdenadas];
+  }
 
   @override
   void initState() {
@@ -97,9 +111,13 @@ class _TelaPesquisaQuadrasEstado extends State<TelaPesquisaQuadras> {
 
         bool bateuCategoria = true;
         if (_modalidadeSelecionada != 'Todas') {
-          bateuCategoria = quadra.modalidade
-              .toLowerCase()
-              .contains(_modalidadeSelecionada.toLowerCase());
+          final filtro = _modalidadeSelecionada.toLowerCase().trim();
+          final modQuadra = quadra.modalidade.toLowerCase().trim();
+          final listaMods =
+              quadra.listaModalidades.map((m) => m.toLowerCase().trim()).toList();
+
+          bateuCategoria = modQuadra.contains(filtro) ||
+              listaMods.any((m) => m.contains(filtro) || filtro.contains(m));
         }
 
         return bateuTermo && bateuCategoria;
@@ -119,11 +137,10 @@ class _TelaPesquisaQuadrasEstado extends State<TelaPesquisaQuadras> {
   }
 
   void _abrirDetalhesQuadra(String quadraId) {
-    Navigator.push(
+    Navigator.pushNamed(
       context,
-      MaterialPageRoute(
-        builder: (context) => TelaDetalhesQuadra(quadraId: quadraId),
-      ),
+      '/quadras/detalhes',
+      arguments: quadraId,
     );
   }
 
@@ -241,15 +258,15 @@ class _TelaPesquisaQuadrasEstado extends State<TelaPesquisaQuadras> {
 
   // WIDGET: Carrossel de Chips de Categorias Esportivas
   Widget _construirCarrosselDeModalidades() {
+    final modalidades = _modalidadesDisponiveis;
+
     return SizedBox(
       height: 44,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        itemCount: _categoriasModalidade.length,
+        itemCount: modalidades.length,
         itemBuilder: (context, index) {
-          final item = _categoriasModalidade[index];
-          final String nomeModalidade = item['nome'];
-          final IconData icone = item['icone'];
+          final String nomeModalidade = modalidades[index];
           final bool selecionado = _modalidadeSelecionada == nomeModalidade;
 
           return GestureDetector(
@@ -257,7 +274,7 @@ class _TelaPesquisaQuadrasEstado extends State<TelaPesquisaQuadras> {
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 180),
               margin: const EdgeInsets.only(right: 10),
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               decoration: BoxDecoration(
                 color: selecionado ? const Color(0xFF1E293B) : Colors.white,
                 borderRadius: BorderRadius.circular(22),
@@ -274,23 +291,15 @@ class _TelaPesquisaQuadrasEstado extends State<TelaPesquisaQuadras> {
                       ]
                     : null,
               ),
-              child: Row(
-                children: [
-                  Icon(
-                    icone,
-                    size: 18,
-                    color: selecionado ? Colors.white : const Color(0xFF64748B),
+              child: Center(
+                child: Text(
+                  nomeModalidade,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: selecionado ? Colors.white : const Color(0xFF475569),
                   ),
-                  const SizedBox(width: 8),
-                  Text(
-                    nomeModalidade,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: selecionado ? Colors.white : const Color(0xFF475569),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           );

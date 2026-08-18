@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../componentes/campo_texto.dart';
 import '../servicos/servico_autenticacao.dart';
-import 'tela_inicial.dart';
 
 /// Formatter personalizado para aplicar a máscara do CPF (000.000.000-00)
 class MascaraCpfFormatter extends TextInputFormatter {
@@ -438,9 +437,10 @@ class _TelaCadastroUsuarioEstado extends State<TelaCadastroUsuario> {
       );
 
       // 3. Navega para a Tela Inicial substituindo a de Cadastro
-      Navigator.pushReplacement(
+      Navigator.pushReplacementNamed(
         context,
-        MaterialPageRoute(builder: (context) => TelaInicial(sessao: sessao)),
+        '/inicio',
+        arguments: sessao,
       );
     } catch (erro) {
       if (!mounted) return;

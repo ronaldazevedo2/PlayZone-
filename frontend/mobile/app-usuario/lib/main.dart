@@ -2,29 +2,21 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'servicos/servico_autenticacao.dart';
+import 'telas/tela_cadastro_usuario.dart';
+import 'telas/tela_detalhes_quadra.dart';
+import 'telas/tela_esqueceu_senha.dart';
 import 'telas/tela_inicial.dart';
 import 'telas/tela_login.dart';
+import 'telas/tela_perfil_usuario.dart';
+import 'telas/tela_redefinir_senha.dart';
 
 void main() {
   HttpOverrides.global = OverridesHttpPlayZone();
   runApp(const MeuAplicativo());
 }
 
-class MeuAplicativo extends StatefulWidget {
+class MeuAplicativo extends StatelessWidget {
   const MeuAplicativo({super.key});
-
-  @override
-  State<MeuAplicativo> createState() => _MeuAplicativoEstado();
-}
-
-class _MeuAplicativoEstado extends State<MeuAplicativo> {
-  late Future<SessaoUsuario?> _futureSessao;
-
-  @override
-  void initState() {
-    super.initState();
-    _futureSessao = ServicoAutenticacao.obterSessao();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,23 +42,72 @@ class _MeuAplicativoEstado extends State<MeuAplicativo> {
         ),
         scaffoldBackgroundColor: Colors.white,
       ),
-      home: FutureBuilder<SessaoUsuario?>(
-        future: _futureSessao,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Scaffold(
-              backgroundColor: Colors.white,
-              body: Center(
-                child: CircularProgressIndicator(color: Color(0xFF238838)),
-              ),
-            );
-          }
-          if (snapshot.hasData && snapshot.data != null) {
-            return TelaInicial(sessao: snapshot.data!);
-          }
-          return const TelaLoginUsuario();
-        },
-      ),
+      onGenerateRoute: _gerarRotaConfigurada,
+    );
+  }
+
+  static Route<dynamic>? _gerarRotaConfigurada(RouteSettings configuracao) {
+    final uri = Uri.parse(configuracao.name ?? '/');
+    final caminho = uri.path;
+
+    return MaterialPageRoute(
+      settings: configuracao,
+      builder: (context) {
+        return FutureBuilder<SessaoUsuario?>(
+          future: ServicoAutenticacao.obterSessao(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Scaffold(
+                backgroundColor: Colors.white,
+                body: Center(
+                  child: CircularProgressIndicator(color: Color(0xFF238838)),
+                ),
+              );
+            }
+
+            final sessao = snapshot.data;
+
+            // Rotas públicas sem necessidade de autenticação
+            if (caminho == '/cadastro') return const TelaCadastroUsuario();
+            if (caminho == '/esqueceu-senha') return const TelaEsqueceuSenha();
+            if (caminho == '/redefinir-senha') return const TelaRedefinirSenha();
+            if (caminho == '/login') {
+              return sessao != null
+                  ? TelaInicial(sessao: sessao, abaInicial: 0)
+                  : const TelaLoginUsuario();
+            }
+
+            // Se a sessão for nula e a rota for privada -> Redireciona para /login
+            if (sessao == null) {
+              return const TelaLoginUsuario();
+            }
+
+            // Rotas autenticadas da aplicação
+            switch (caminho) {
+              case '/inicio':
+              case '/home':
+              case '/':
+                return TelaInicial(sessao: sessao, abaInicial: 0);
+              case '/buscar/quadras':
+              case '/pesquisa':
+                return TelaInicial(sessao: sessao, abaInicial: 1);
+              case '/agendamentos':
+              case '/meus-agendamentos':
+                return TelaInicial(sessao: sessao, abaInicial: 2);
+              case '/perfil':
+                return TelaPerfilUsuario(sessao: sessao);
+              case '/quadras/detalhes':
+              case '/detalhes-quadra':
+                final quadraId = uri.queryParameters['id'] ??
+                    (configuracao.arguments as String?) ??
+                    '33333333-3333-3333-3333-333333333333';
+                return TelaDetalhesQuadra(quadraId: quadraId);
+              default:
+                return TelaInicial(sessao: sessao, abaInicial: 0);
+            }
+          },
+        );
+      },
     );
   }
 }
